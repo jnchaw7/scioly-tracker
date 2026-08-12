@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SciOly Tracking Portal</title>
+
     <style>
       body {
         font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
@@ -12,131 +13,1222 @@
         background-color: #f4f6f9;
         color: #202124;
       }
-      .main-wrapper { max-width: 1000px; margin: 0 auto; }
-     
+
+      .main-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
       .navbar {
-        background-color: #ffffff; padding: 20px 30px; border-radius: 12px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 30px;
-        display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+        background-color: #ffffff;
+        padding: 20px 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
       }
-      h1 { margin: 0; color: #1a73e8; font-size: 24px; font-weight: 600; }
-      .session-tag { background-color: #e8f0fe; color: #1a73e8; padding: 9px 16px; border-radius: 30px; font-weight: 500; font-size: 13px; }
-     
+
+      h1 {
+        margin: 0;
+        color: #1a73e8;
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .session-tag {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+        padding: 9px 16px;
+        border-radius: 30px;
+        font-weight: 500;
+        font-size: 13px;
+      }
+
       .login-box {
-        max-width: 420px; margin: 60px auto; background: white; padding: 35px;
-        border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;
+        max-width: 420px;
+        margin: 60px auto;
+        background: white;
+        padding: 35px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        text-align: center;
       }
-      .login-box h3 { margin-top: 0; font-size: 20px; color: #202124; }
+
+      .login-box h3 {
+        margin-top: 0;
+        font-size: 20px;
+        color: #202124;
+      }
+
       .login-box input {
-        width: 100%; padding: 14px; margin: 18px 0; border: 1px solid #dadce0;
-        border-radius: 8px; font-size: 16px; box-sizing: border-box; text-align: center;
+        width: 100%;
+        padding: 14px;
+        margin: 18px 0;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        font-size: 16px;
+        box-sizing: border-box;
+        text-align: center;
       }
+
       .login-box button {
-        background-color: #1a73e8; color: white; border: none; padding: 14px 24px;
-        font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; width: 100%;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        padding: 14px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
       }
-      .login-box button:disabled { background-color: #8ab4f8; cursor: not-allowed; }
-     
-      .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-      
+
+      .login-box button:disabled {
+        background-color: #8ab4f8;
+        cursor: not-allowed;
+      }
+
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+
       .item-card {
-        border: 1px solid #e0e0e0; border-radius: 12px; padding: 24px;
-        background-color: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        display: flex; flex-direction: column; justify-content: space-between; min-height: 190px;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 24px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 190px;
       }
-      .item-name { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #202124; }
-      .metrics-block { font-size: 14px; color: #5f6368; margin-bottom: 12px; line-height: 1.6; }
-      .metrics-block b { color: #202124; }
-      .url-btn { display: inline-block; margin-top: 6px; color: #1a73e8; text-decoration: none; font-weight: 500; font-size: 14px; }
-      .url-btn:hover { text-decoration: underline; }
-      
-      .empty-state { text-align: center; color: #5f6368; padding: 60px; background: white; border-radius: 12px; grid-column: 1 / -1; }
-      #error-msg { color: #d93025; font-size: 14px; margin-top: 10px; font-weight: 500; display: none; }
+
+      .item-name {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #202124;
+      }
+
+      .metrics-block {
+        font-size: 14px;
+        color: #5f6368;
+        margin-bottom: 12px;
+        line-height: 1.6;
+      }
+
+      .metrics-block b {
+        color: #202124;
+      }
+
+      .url-btn {
+        display: inline-block;
+        margin-top: 6px;
+        color: #1a73e8;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .url-btn:hover {
+        text-decoration: underline;
+      }
+
+      .empty-state {
+        text-align: center;
+        color: #5f6368;
+        padding: 60px;
+        background: white;
+        border-radius: 12px;
+        grid-column: 1 / -1;
+      }
+
+      #error-msg {
+        color: #d93025;
+        font-size: 14px;
+        margin-top: 10px;
+        font-weight: 500;
+        display: none;
+      }
+
+      /* -----------------------------------------
+         ADVISOR MODE
+         ----------------------------------------- */
+
+      .advisor-card {
+        grid-column: 1 / -1;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+      }
+
+      .advisor-header {
+        margin-bottom: 28px;
+      }
+
+      .advisor-header h2 {
+        margin: 0 0 8px 0;
+        color: #202124;
+      }
+
+      .advisor-header p {
+        margin: 0;
+        color: #5f6368;
+      }
+
+      .form-group {
+        margin-bottom: 22px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #202124;
+      }
+
+      .form-group input[type="number"],
+      .form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        padding: 12px;
+        font-family: inherit;
+        font-size: 15px;
+      }
+
+      .form-group input[type="number"]:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
+      }
+
+      .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .file-drop-area {
+        border: 2px dashed #dadce0;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        background-color: #fafafa;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .file-drop-area:hover {
+        border-color: #1a73e8;
+        background-color: #f8fbff;
+      }
+
+      .file-drop-area input {
+        display: none;
+      }
+
+      .file-drop-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #202124;
+        margin-bottom: 6px;
+      }
+
+      .file-drop-subtitle {
+        font-size: 13px;
+        color: #5f6368;
+      }
+
+      .file-list {
+        margin-top: 15px;
+        text-align: left;
+      }
+
+      .file-item {
+        background: #f1f3f4;
+        padding: 9px 12px;
+        border-radius: 6px;
+        margin-bottom: 6px;
+        font-size: 13px;
+        color: #3c4043;
+      }
+
+      .upload-btn {
+        width: 100%;
+        border: none;
+        border-radius: 8px;
+        padding: 14px 20px;
+        background-color: #1a73e8;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .upload-btn:hover {
+        background-color: #1769d1;
+      }
+
+      .upload-btn:disabled {
+        background-color: #8ab4f8;
+        cursor: not-allowed;
+      }
+
+      .upload-status {
+        margin-top: 18px;
+        padding: 13px;
+        border-radius: 8px;
+        font-size: 14px;
+        display: none;
+      }
+
+      .upload-status.success {
+        display: block;
+        background-color: #e6f4ea;
+        color: #137333;
+      }
+
+      .upload-status.error {
+        display: block;
+        background-color: #fce8e6;
+        color: #c5221f;
+      }
+
+      .upload-status.loading {
+        display: block;
+        background-color: #e8f0fe;
+        color: #174ea6;
+      }
+
+      .advisor-info {
+        margin-top: 25px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #5f6368;
+        line-height: 1.5;
+      }
+
+      .logout-btn {
+        margin-top: 15px;
+        background: transparent;
+        border: none;
+        color: #5f6368;
+        cursor: pointer;
+        font-size: 13px;
+      }
+
+      .logout-btn:hover {
+        color: #1a73e8;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 20px 12px;
+        }
+
+        .advisor-card {
+          padding: 22px;
+        }
+
+        .navbar {
+          padding: 18px;
+        }
+      }
     </style>
   </head>
+
   <body>
+
     <div class="main-wrapper">
+
+      <!-- NAVBAR -->
       <div class="navbar">
         <h1>SciOly Tracking Portal</h1>
-        <div class="session-tag" id="user-session">Session: Awaiting Login</div>
-      </div>
-     
-      <div id="login-section" class="login-box">
-        <h3>Enter Student ID</h3>
-        <p style="color: #5f6368; font-size: 14px;">Type your ID number to view your tracking log.</p>
-        <input type="text" id="manual-input" placeholder="e.g., 100034572" required />
-        <button id="login-btn" onclick="submitLogin()">Load My Orders</button>
-        <div id="error-msg"></div>
+        <div class="session-tag" id="user-session">
+          Session: Awaiting Login
+        </div>
       </div>
 
-      <div id="portal-content" class="cards-grid" style="display: none;"></div>
+
+      <!-- LOGIN -->
+      <div id="login-section" class="login-box">
+
+        <h3>Enter Student ID</h3>
+
+        <p style="color: #5f6368; font-size: 14px;">
+          Type your ID number to view your tracking log.
+        </p>
+
+        <input
+          type="text"
+          id="manual-input"
+          placeholder="e.g., 100034572"
+          required
+        />
+
+        <button
+          id="login-btn"
+          onclick="submitLogin()"
+        >
+          Load My Orders
+        </button>
+
+        <div id="error-msg"></div>
+
+      </div>
+
+
+      <!-- PORTAL CONTENT -->
+      <div
+        id="portal-content"
+        class="cards-grid"
+        style="display: none;"
+      ></div>
+
     </div>
 
+
     <script>
-      const API_URL = "https://script.google.com/macros/s/AKfycbzag2WkgUl-_WO4-xlbGJZ3n2sfVk6AFtvzGBCowHF4PxlS0U5Yq6h3IxMV_Xie-4g/exec";
+
+      /*
+       * YOUR GOOGLE APPS SCRIPT WEB APP
+       */
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbzag2WkgUl-_WO4-xlbGJZ3n2sfVk6AFtvzGBCowHF4PxlS0U5Yq6h3IxMV_Xie-4g/exec";
+
+
+      /*
+       * -----------------------------------------
+       * LOGIN
+       * -----------------------------------------
+       */
 
       async function submitLogin() {
-        const inputVal = document.getElementById('manual-input').value.trim();
-        const btn = document.getElementById('login-btn');
-        const errorDiv = document.getElementById('error-msg');
-        
-        if (!inputVal) return;
+
+        const inputVal =
+          document
+            .getElementById('manual-input')
+            .value
+            .trim();
+
+        const btn =
+          document.getElementById('login-btn');
+
+        const errorDiv =
+          document.getElementById('error-msg');
+
+
+        if (!inputVal) {
+          return;
+        }
+
 
         btn.disabled = true;
         btn.innerText = "Querying Database...";
+
         errorDiv.style.display = "none";
-       
+
+
         try {
-          const response = await fetch(`${API_URL}?action=login&input=${encodeURIComponent(inputVal)}`);
-          const data = await response.json();
+
+          const response =
+            await fetch(
+              `${API_URL}?action=login&input=${encodeURIComponent(inputVal)}`
+            );
+
+
+          const data =
+            await response.json();
+
+
+          /*
+           * -----------------------------------------
+           * ADVISOR MODE
+           * -----------------------------------------
+           */
 
           if (data.type === "advisor") {
-            document.getElementById('user-session').innerText = "Advisor Mode Active";
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('portal-content').style.display = 'grid';
-            document.getElementById('portal-content').innerHTML = `
-              <div class="item-card" style="grid-column: 1 / -1;">
-                <h3 style="margin-top:0;">Advisor Package Receiving</h3>
-                <p>Welcome to Advisor Mode.</p>
-              </div>`;
-          } else if (data.type === "student") {
-            renderDashboard(data.data);
+
+            showAdvisorMode();
+
           }
+
+
+          /*
+           * -----------------------------------------
+           * STUDENT MODE
+           * -----------------------------------------
+           */
+
+          else if (data.type === "student") {
+
+            renderDashboard(data.data);
+
+          }
+
+
+          /*
+           * -----------------------------------------
+           * UNKNOWN RESPONSE
+           * -----------------------------------------
+           */
+
+          else {
+
+            errorDiv.innerText =
+              data.message ||
+              "Unable to log in.";
+
+            errorDiv.style.display = "block";
+
+          }
+
+
         } catch (error) {
-          errorDiv.innerText = "Error connecting to the database. Make sure your Apps Script URL is correct.";
+
+          console.error(error);
+
+          errorDiv.innerText =
+            "Error connecting to the database. Make sure your Apps Script URL is correct.";
+
           errorDiv.style.display = "block";
+
+
         } finally {
+
           btn.disabled = false;
           btn.innerText = "Load My Orders";
+
         }
       }
 
-      function renderDashboard(data) {
-        document.getElementById('user-session').innerText = "Portal User: " + data.email;
-        document.getElementById('login-section').style.display = 'none';
-        
-        const container = document.getElementById('portal-content');
+
+      /*
+       * -----------------------------------------
+       * ADVISOR MODE UI
+       * -----------------------------------------
+       */
+
+      function showAdvisorMode() {
+
+        document
+          .getElementById('user-session')
+          .innerText = "Advisor Mode Active";
+
+
+        document
+          .getElementById('login-section')
+          .style.display = 'none';
+
+
+        const container =
+          document.getElementById('portal-content');
+
+
         container.style.display = 'grid';
-       
-        if (!data.items || data.items.length === 0) {
-          container.innerHTML = '<div class="empty-state"><h3>No Entries Found</h3><p>There are no active orders linked to this ID.</p></div>';
+
+
+        container.innerHTML = `
+
+          <div class="advisor-card">
+
+            <div class="advisor-header">
+
+              <h2>Advisor Package Receiving</h2>
+
+              <p>
+                Record packages that have arrived for Science Olympiad.
+                Upload photos and add any notes about the delivery.
+              </p>
+
+            </div>
+
+
+            <!-- PACKAGE COUNT -->
+
+            <div class="form-group">
+
+              <label for="package-count">
+                Number of Packages Arrived
+              </label>
+
+              <input
+                type="number"
+                id="package-count"
+                min="1"
+                value="1"
+              />
+
+            </div>
+
+
+            <!-- PHOTO UPLOAD -->
+
+            <div class="form-group">
+
+              <label>
+                Package Photos
+              </label>
+
+              <label
+                class="file-drop-area"
+                for="package-files"
+              >
+
+                <div class="file-drop-title">
+                  Click to select package photos
+                </div>
+
+                <div class="file-drop-subtitle">
+                  You can select multiple photos
+                </div>
+
+                <input
+                  type="file"
+                  id="package-files"
+                  accept="image/*"
+                  multiple
+                  onchange="updateFileList()"
+                />
+
+              </label>
+
+
+              <div
+                id="file-list"
+                class="file-list"
+              ></div>
+
+            </div>
+
+
+            <!-- NOTES -->
+
+            <div class="form-group">
+
+              <label for="package-notes">
+                Notes
+              </label>
+
+              <textarea
+                id="package-notes"
+                placeholder="Example: Amazon package for Astronomy arrived. Box slightly damaged."
+              ></textarea>
+
+            </div>
+
+
+            <!-- UPLOAD BUTTON -->
+
+            <button
+              id="upload-btn"
+              class="upload-btn"
+              onclick="uploadPackages()"
+            >
+              Upload Package Arrival
+            </button>
+
+
+            <!-- STATUS -->
+
+            <div
+              id="upload-status"
+              class="upload-status"
+            ></div>
+
+
+            <div class="advisor-info">
+
+              <strong>What happens when you upload?</strong><br>
+
+              The photos will be uploaded to the Google Drive
+              package-receiving folder. A folder for today's date
+              will automatically be created if one does not already
+              exist. An arrival log containing the package count
+              and notes will also be saved.
+
+            </div>
+
+
+            <button
+              class="logout-btn"
+              onclick="returnToLogin()"
+            >
+              ← Return to Login
+            </button>
+
+          </div>
+
+        `;
+      }
+
+
+      /*
+       * -----------------------------------------
+       * SHOW SELECTED FILES
+       * -----------------------------------------
+       */
+
+      function updateFileList() {
+
+        const input =
+          document.getElementById('package-files');
+
+        const fileList =
+          document.getElementById('file-list');
+
+
+        if (!input || !fileList) {
           return;
         }
-       
-        container.innerHTML = data.items.map(item => `
-          <div class="item-card">
-            <div>
-              <div class="item-name">${item.itemName}</div>
-              <div class="metrics-block">
-                Quantity: <b>${item.qty}</b><br>
-                Total Cost: <b>${item.price}</b><br>
-                Status: <b>${item.status}</b>
-              </div>
-              ${item.link && item.link.startsWith('http') ? `<a class="url-btn" href="${item.link}" target="_blank">Open Vendor Link ↗</a>` : ''}
-            </div>
-          </div>
-        `).join('');
+
+
+        fileList.innerHTML = "";
+
+
+        if (input.files.length === 0) {
+
+          return;
+
+        }
+
+
+        for (
+          let i = 0;
+          i < input.files.length;
+          i++
+        ) {
+
+          const file =
+            input.files[i];
+
+
+          const fileItem =
+            document.createElement('div');
+
+
+          fileItem.className =
+            "file-item";
+
+
+          fileItem.innerText =
+            "📷 " +
+            file.name;
+
+
+          fileList.appendChild(
+            fileItem
+          );
+
+        }
       }
+
+
+      /*
+       * -----------------------------------------
+       * CONVERT FILE TO BASE64
+       * -----------------------------------------
+       */
+
+      function fileToBase64(file) {
+
+        return new Promise(
+          function(resolve, reject) {
+
+            const reader =
+              new FileReader();
+
+
+            reader.onload = function() {
+
+              /*
+               * FileReader returns:
+               *
+               * data:image/jpeg;base64,ABC123...
+               *
+               * We only want the ABC123... portion.
+               */
+
+              const result =
+                reader.result;
+
+
+              const base64 =
+                result
+                  .split(',')[1];
+
+
+              resolve(base64);
+
+            };
+
+
+            reader.onerror = function() {
+
+              reject(
+                new Error(
+                  "Could not read file: " +
+                  file.name
+                )
+              );
+
+            };
+
+
+            reader.readAsDataURL(file);
+
+          }
+        );
+
+      }
+
+
+      /*
+       * -----------------------------------------
+       * UPLOAD PACKAGE PHOTOS
+       * -----------------------------------------
+       */
+
+      async function uploadPackages() {
+
+        const packageCountInput =
+          document.getElementById(
+            'package-count'
+          );
+
+
+        const filesInput =
+          document.getElementById(
+            'package-files'
+          );
+
+
+        const notesInput =
+          document.getElementById(
+            'package-notes'
+          );
+
+
+        const uploadButton =
+          document.getElementById(
+            'upload-btn'
+          );
+
+
+        const statusDiv =
+          document.getElementById(
+            'upload-status'
+          );
+
+
+        const packageCount =
+          packageCountInput.value;
+
+
+        const notes =
+          notesInput.value.trim();
+
+
+        const files =
+          filesInput.files;
+
+
+        /*
+         * Validate package count
+         */
+
+        if (
+          !packageCount ||
+          Number(packageCount) < 1
+        ) {
+
+          showUploadStatus(
+            "Please enter the number of packages that arrived.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        /*
+         * Require at least one photo
+         */
+
+        if (files.length === 0) {
+
+          showUploadStatus(
+            "Please select at least one package photo.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        uploadButton.disabled = true;
+
+        uploadButton.innerText =
+          "Preparing Photos...";
+
+
+        showUploadStatus(
+          "Reading package photos...",
+          "loading"
+        );
+
+
+        try {
+
+          const encodedFiles = [];
+
+
+          /*
+           * Convert every selected image
+           * into Base64.
+           */
+
+          for (
+            let i = 0;
+            i < files.length;
+            i++
+          ) {
+
+            const file =
+              files[i];
+
+
+            const base64 =
+              await fileToBase64(file);
+
+
+            encodedFiles.push({
+
+              name:
+                file.name,
+
+              mimeType:
+                file.type,
+
+              data:
+                base64
+
+            });
+
+          }
+
+
+          showUploadStatus(
+            "Uploading photos to Google Drive...",
+            "loading"
+          );
+
+
+          uploadButton.innerText =
+            "Uploading...";
+
+
+          /*
+           * Create the object expected
+           * by your Apps Script doPost().
+           */
+
+          const payload = {
+
+            files:
+              encodedFiles,
+
+            notes:
+              notes,
+
+            packageCount:
+              Number(packageCount)
+
+          };
+
+
+          /*
+           * Send POST request
+           */
+
+          const response =
+            await fetch(
+              API_URL,
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "text/plain;charset=utf-8"
+                },
+
+                body:
+                  JSON.stringify(payload)
+              }
+            );
+
+
+          const result =
+            await response.json();
+
+
+          /*
+           * Check Apps Script response
+           */
+
+          if (
+            result.status === "success"
+          ) {
+
+            showUploadStatus(
+              result.message ||
+              "Package photos uploaded successfully!",
+              "success"
+            );
+
+
+            /*
+             * Clear form after successful upload.
+             */
+
+            packageCountInput.value = 1;
+
+            filesInput.value = "";
+
+            notesInput.value = "";
+
+            document.getElementById(
+              'file-list'
+            ).innerHTML = "";
+
+
+          } else {
+
+            throw new Error(
+              result.message ||
+              "The upload failed."
+            );
+
+          }
+
+
+        } catch (error) {
+
+          console.error(
+            "Upload error:",
+            error
+          );
+
+
+          showUploadStatus(
+            "Upload failed: " +
+            error.message,
+            "error"
+          );
+
+
+        } finally {
+
+          uploadButton.disabled = false;
+
+          uploadButton.innerText =
+            "Upload Package Arrival";
+
+        }
+
+      }
+
+
+      /*
+       * -----------------------------------------
+       * UPLOAD STATUS
+       * -----------------------------------------
+       */
+
+      function showUploadStatus(
+        message,
+        type
+      ) {
+
+        const statusDiv =
+          document.getElementById(
+            'upload-status'
+          );
+
+
+        statusDiv.innerText =
+          message;
+
+
+        statusDiv.className =
+          "upload-status " +
+          type;
+
+      }
+
+
+      /*
+       * -----------------------------------------
+       * RETURN TO LOGIN
+       * -----------------------------------------
+       */
+
+      function returnToLogin() {
+
+        document
+          .getElementById('portal-content')
+          .style.display = 'none';
+
+
+        document
+          .getElementById('portal-content')
+          .innerHTML = "";
+
+
+        document
+          .getElementById('login-section')
+          .style.display = 'block';
+
+
+        document
+          .getElementById('user-session')
+          .innerText =
+            "Session: Awaiting Login";
+
+
+        document
+          .getElementById('manual-input')
+          .value = "";
+
+
+        document
+          .getElementById('error-msg')
+          .style.display = "none";
+
+      }
+
+
+      /*
+       * -----------------------------------------
+       * STUDENT DASHBOARD
+       * -----------------------------------------
+       *
+       * This is essentially your original
+       * student-mode code.
+       */
+
+      function renderDashboard(data) {
+
+        document
+          .getElementById('user-session')
+          .innerText =
+            "Portal User: " +
+            data.email;
+
+
+        document
+          .getElementById('login-section')
+          .style.display = 'none';
+
+
+        const container =
+          document.getElementById(
+            'portal-content'
+          );
+
+
+        container.style.display =
+          'grid';
+
+
+        if (
+          !data.items ||
+          data.items.length === 0
+        ) {
+
+          container.innerHTML =
+            '<div class="empty-state">' +
+              '<h3>No Entries Found</h3>' +
+              '<p>There are no active orders linked to this ID.</p>' +
+            '</div>';
+
+          return;
+
+        }
+
+
+        container.innerHTML =
+          data.items
+            .map(
+              function(item) {
+
+                return `
+
+                  <div class="item-card">
+
+                    <div>
+
+                      <div class="item-name">
+                        ${item.itemName}
+                      </div>
+
+                      <div class="metrics-block">
+
+                        Quantity:
+                        <b>${item.qty}</b>
+                        <br>
+
+                        Total Cost:
+                        <b>${item.price}</b>
+                        <br>
+
+                        Status:
+                        <b>${item.status}</b>
+
+                      </div>
+
+                      ${
+                        item.link &&
+                        item.link.startsWith('http')
+                        ?
+                        `<a
+                          class="url-btn"
+                          href="${item.link}"
+                          target="_blank"
+                        >
+                          Open Vendor Link ↗
+                        </a>`
+                        :
+                        ''
+                      }
+
+                    </div>
+
+                  </div>
+
+                `;
+
+              }
+            )
+            .join('');
+
+      }
+
     </script>
+
   </body>
 </html>
