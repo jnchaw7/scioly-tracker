@@ -1,0 +1,147 @@
+const API_URL = "https://script.google.com/macros/s/AKfycbxIoiGGpygzQcYrtSyjvyI9tVKaC2Tmp5hOZOxTucMyZkr56j58b-hjDjcHTxKxom0/exec";
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SciOly Tracking Portal</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+        padding: 40px 20px;
+        margin: 0;
+        background-color: #f4f6f9;
+        color: #202124;
+      }
+      .main-wrapper { max-width: 1000px; margin: 0 auto; }
+     
+      .navbar {
+        background-color: #ffffff; padding: 20px 30px; border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 30px;
+        display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+      }
+      h1 { margin: 0; color: #1a73e8; font-size: 24px; font-weight: 600; }
+      .session-tag { background-color: #e8f0fe; color: #1a73e8; padding: 9px 16px; border-radius: 30px; font-weight: 500; font-size: 13px; }
+     
+      .login-box {
+        max-width: 420px; margin: 60px auto; background: white; padding: 35px;
+        border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;
+      }
+      .login-box h3 { margin-top: 0; font-size: 20px; color: #202124; }
+      .login-box input {
+        width: 100%; padding: 14px; margin: 18px 0; border: 1px solid #dadce0;
+        border-radius: 8px; font-size: 16px; box-sizing: border-box; text-align: center;
+      }
+      .login-box button {
+        background-color: #1a73e8; color: white; border: none; padding: 14px 24px;
+        font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; width: 100%;
+      }
+      .login-box button:disabled { background-color: #8ab4f8; cursor: not-allowed; }
+     
+      .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+      
+      .item-card {
+        border: 1px solid #e0e0e0; border-radius: 12px; padding: 24px;
+        background-color: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        display: flex; flex-direction: column; justify-content: space-between; min-height: 190px;
+      }
+      .item-name { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #202124; }
+      .metrics-block { font-size: 14px; color: #5f6368; margin-bottom: 12px; line-height: 1.6; }
+      .metrics-block b { color: #202124; }
+      .url-btn { display: inline-block; margin-top: 6px; color: #1a73e8; text-decoration: none; font-weight: 500; font-size: 14px; }
+      .url-btn:hover { text-decoration: underline; }
+      
+      .empty-state { text-align: center; color: #5f6368; padding: 60px; background: white; border-radius: 12px; grid-column: 1 / -1; }
+      #error-msg { color: #d93025; font-size: 14px; margin-top: 10px; font-weight: 500; display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="main-wrapper">
+      <div class="navbar">
+        <h1>SciOly Tracking Portal</h1>
+        <div class="session-tag" id="user-session">Session: Awaiting Login</div>
+      </div>
+     
+      <div id="login-section" class="login-box">
+        <h3>Enter Student ID</h3>
+        <p style="color: #5f6368; font-size: 14px;">Type your ID number to view your tracking log.</p>
+        <input type="text" id="manual-input" placeholder="e.g., 100034572" required />
+        <button id="login-btn" onclick="submitLogin()">Load My Orders</button>
+        <div id="error-msg"></div>
+      </div>
+
+      <div id="portal-content" class="cards-grid" style="display: none;"></div>
+    </div>
+
+    <script>
+      // ⚠️ IMPORTANT: PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+      const API_URL = "YOUR_APPS_SCRIPT_URL_HERE";
+
+      async function submitLogin() {
+        const inputVal = document.getElementById('manual-input').value.trim();
+        const btn = document.getElementById('login-btn');
+        const errorDiv = document.getElementById('error-msg');
+        
+        if (!inputVal) return;
+
+        // UI Loading State
+        btn.disabled = true;
+        btn.innerText = "Querying Database...";
+        errorDiv.style.display = "none";
+       
+        try {
+          // Fetch data from your Google Apps Script
+          const response = await fetch(`${API_URL}?action=login&input=${encodeURIComponent(inputVal)}`);
+          const data = await response.json();
+
+          if (data.type === "advisor") {
+            document.getElementById('user-session').innerText = "Advisor Mode Active";
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('portal-content').style.display = 'grid';
+            document.getElementById('portal-content').innerHTML = `
+              <div class="item-card" style="grid-column: 1 / -1;">
+                <h3 style="margin-top:0;">📦 Advisor Package Receiving</h3>
+                <p>Welcome to Advisor Mode. (Photo uploading requires a slightly more complex form, which you can add back later once the basic site is working!)</p>
+              </div>`;
+          } else if (data.type === "student") {
+            renderDashboard(data.data);
+          }
+        } catch (error) {
+          errorDiv.innerText = "Error connecting to the database. Make sure your Apps Script URL is correct.";
+          errorDiv.style.display = "block";
+        } finally {
+          // Reset Button
+          btn.disabled = false;
+          btn.innerText = "Load My Orders";
+        }
+      }
+
+      function renderDashboard(data) {
+        document.getElementById('user-session').innerText = "Portal User: " + data.email;
+        document.getElementById('login-section').style.display = 'none';
+        
+        const container = document.getElementById('portal-content');
+        container.style.display = 'grid';
+       
+        if (!data.items || data.items.length === 0) {
+          container.innerHTML = '<div class="empty-state"><h3>No Entries Found</h3><p>There are no active orders linked to this ID.</p></div>';
+          return;
+        }
+       
+        container.innerHTML = data.items.map(item => `
+          <div class="item-card">
+            <div>
+              <div class="item-name">${item.itemName}</div>
+              <div class="metrics-block">
+                Quantity: <b>${item.qty}</b><br>
+                Total Cost: <b>${item.price}</b><br>
+                Status: <b>${item.status}</b>
+              </div>
+              ${item.link && item.link.startsWith('http') ? `<a class="url-btn" href="${item.link}" target="_blank">Open Vendor Link ↗</a>` : ''}
+            </div>
+          </div>
+        `).join('');
+      }
+    </script>
+  </body>
+</html>
