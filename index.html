@@ -1136,71 +1136,154 @@
         document
           .getElementById('user-session')
           .innerText =
-            "Portal User: " +
-            data.email;
-
-
+            "Portal User: " + data.email;
+      
         document
           .getElementById('login-section')
           .style.display = 'none';
-
-
+      
         const container =
-          document.getElementById(
-            'portal-content'
-          );
-
-
-        container.style.display =
-          'grid';
-
-
+          document.getElementById('portal-content');
+      
+        container.style.display = 'grid';
+      
+        /*
+         * STUDENT DASHBOARD HEADER
+         */
+      
+        let dashboardHTML = `
+      
+          <div
+            style="
+              grid-column: 1 / -1;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              gap: 12px;
+              flex-wrap: wrap;
+            "
+          >
+      
+            <button
+              onclick="returnToLogin()"
+              style="
+                background: white;
+                border: 1px solid #dadce0;
+                color: #5f6368;
+                padding: 11px 18px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+              "
+            >
+              ← Home / Change Student ID
+            </button>
+      
+      
+            <button
+              onclick="openOrderingForm()"
+              style="
+                background: #1a73e8;
+                border: none;
+                color: white;
+                padding: 11px 18px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+              "
+            >
+              + Place New Order
+            </button>
+      
+          </div>
+      
+        `;
+      
+      
+        /*
+         * NO ORDERS
+         */
+      
         if (
           !data.items ||
           data.items.length === 0
         ) {
-
+      
+          dashboardHTML += `
+      
+            <div class="empty-state">
+      
+              <h3>No Entries Found</h3>
+      
+              <p>
+                There are no active orders linked to this ID.
+              </p>
+      
+              <button
+                onclick="openOrderingForm()"
+                style="
+                  margin-top: 12px;
+                  background: #1a73e8;
+                  border: none;
+                  color: white;
+                  padding: 12px 20px;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  cursor: pointer;
+                "
+              >
+                + Place New Order
+              </button>
+      
+            </div>
+      
+          `;
+      
           container.innerHTML =
-            '<div class="empty-state">' +
-              '<h3>No Entries Found</h3>' +
-              '<p>There are no active orders linked to this ID.</p>' +
-            '</div>';
-
+            dashboardHTML;
+      
           return;
-
         }
-
-
-        container.innerHTML =
+      
+      
+        /*
+         * ORDERS
+         */
+      
+        dashboardHTML +=
           data.items
             .map(
               function(item) {
-
+      
                 return `
-
+      
                   <div class="item-card">
-
+      
                     <div>
-
+      
                       <div class="item-name">
                         ${item.itemName}
                       </div>
-
+      
                       <div class="metrics-block">
-
+      
                         Quantity:
                         <b>${item.qty}</b>
                         <br>
-
+      
                         Total Cost:
                         <b>${item.price}</b>
                         <br>
-
+      
                         Status:
                         <b>${item.status}</b>
-
+      
                       </div>
-
+      
+      
                       ${
                         item.link &&
                         item.link.startsWith('http')
@@ -1215,17 +1298,36 @@
                         :
                         ''
                       }
-
+      
                     </div>
-
+      
                   </div>
-
+      
                 `;
-
+      
               }
             )
             .join('');
-
+      
+      
+        container.innerHTML =
+          dashboardHTML;
+      }
+      
+      
+      /*
+       * =========================================
+       * ORDERING FORM
+       * =========================================
+       */
+      
+      function openOrderingForm() {
+      
+        window.open(
+          "https://forms.gle/e2qgGCRH5vSSTHmF7",
+          "_blank"
+        );
+      
       }
 
     </script>
