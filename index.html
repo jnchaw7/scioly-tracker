@@ -305,206 +305,846 @@
 
     <script>
       const API_URL = "https://script.google.com/macros/s/AKfycbzag2WkgUl-_WO4-xlbGJZ3n2sfVk6AFtvzGBCowHF4PxlS0U5Yq6h3IxMV_Xie-4g/exec";
-
-      // Triggered automatically when user clicks Google Sign-In and authenticates
-      async function handleCredentialResponse(response) {
-        const errorDiv = document.getElementById('error-msg');
+    
+      // Stores the Google credential for the currently signed-in user.
+      // It is needed when the executive opens Team Statistics.
+      let googleCredential = null;
+    
+      // Stores the currently displayed dashboard data so that
+      // we can return from the Team Statistics page.
+      let currentDashboardData = null;
+    
+      let currentIsExecutive = false;
+    
+    
+      // =========================================================
+      // GOOGLE LOGIN
+      // =========================================================
+    
+      function handleCredentialResponse(response) {
+        const errorDiv = document.getElementById("error-msg");
+    
         errorDiv.style.display = "none";
-
-        try {
-          const res = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ token: response.credential })
-          });
-
-          const data = await res.json();
-
-          if (data.type === "advisor") {
-            showAdvisorMode(data.email);
-          } else if (data.type === "student") {
-            renderDashboard(data.data);
-          } else {
+    
+        // Save the Google credential.
+        googleCredential = response.credential;
+    
+        fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            token: response.credential
+          })
+        })
+          .then(function(res) {
+            return res.json();
+          })
+          .then(function(data) {
+    
+            // -----------------------------
+            // EXECUTIVE
+            // -----------------------------
+            if (data.type === "exec") {
+              renderDashboard(data.data, true);
+              return;
+            }
+    
+            // -----------------------------
+            // STUDENT
+            // -----------------------------
+            if (data.type === "student") {
+              renderDashboard(data.data, false);
+              return;
+            }
+    
+            // -----------------------------
+            // ERROR
+            // -----------------------------
             errorDiv.innerText = data.message || "Login failed.";
             errorDiv.style.display = "block";
-          }
-        } catch (error) {
-          console.error(error);
-          errorDiv.innerText = "Error connecting to the backend database.";
-          errorDiv.style.display = "block";
-        }
+          })
+          .catch(function(error) {
+            console.error(error);
+    
+            errorDiv.innerText =
+              "Error connecting to the backend database.";
+    
+            errorDiv.style.display = "block";
+          });
       }
-
-      function showAdvisorMode(email) {
-        document.getElementById('user-session').innerText = "Advisor Mode Active (" + email + ")";
-        document.getElementById('login-section').style.display = 'none';
-
-        const container = document.getElementById('portal-content');
-        container.style.display = 'grid';
-        container.innerHTML = `
-          <div class="advisor-card">
-            <div class="advisor-header">
-              <h2>Advisor Package Receiving</h2>
-              <p>Record packages that have arrived for Science Olympiad.</p>
+    
+    
+      // =========================================================
+      // DASHBOARD
+      // =========================================================
+    
+      function renderDashboard(data, isExecutive) {
+    
+        currentDashboardData = data;
+        currentIsExecutive = isExecutive;
+    
+        document.getElementById("user-session").innerText =
+          isExecutive
+            ? "Executive Portal: " + data.email
+            : "Portal User: " + data.email;
+    
+        document.getElementById("login-section").style.display = "none";
+    
+        const container = document.getElementById("portal-content");
+    
+        container.style.display = "grid";
+    
+    
+        // ---------------------------------------------------------
+        // TOP BUTTON BAR
+        // ---------------------------------------------------------
+    
+        let dashboardHTML = `
+          <div style="
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+          ">
+    
+            <div style="
+              display: flex;
+              gap: 10px;
+              flex-wrap: wrap;
+            ">
+    
+              <button
+                onclick="returnToLogin()"
+                style="
+                  background: white;
+                  border: 1px solid #dadce0;
+                  color: #5f6368;
+                  padding: 11px 18px;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  cursor: pointer;
+                "
+              >
+                ← Sign Out
+              </button>
+    
+    
+              <button
+                onclick="openOrderingForm()"
+                style="
+                  background: #1a73e8;
+                  border: none;
+                  color: white;
+                  padding: 11px 18px;
+                  border-radius: 8px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  cursor: pointer;
+                "
+              >
+                + Place New Order
+              </button>
+    
+    
+              ${
+                isExecutive
+                  ? `
+                    <button
+                      onclick="showTeamStatistics()"
+                      style="
+                        background: #188038;
+                        border: none;
+                        color: white;
+                        padding: 11px 18px;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        font-weight: 600;
+                        cursor: pointer;
+                      "
+                    >
+                      Team Statistics
+                    </button>
+                  `
+                  : ""
+              }
+    
             </div>
-            <div class="form-group">
-              <label for="package-count">Number of Packages Arrived</label>
-              <input type="number" id="package-count" min="1" value="1" />
-            </div>
-            <div class="form-group">
-              <label>Package Photos</label>
-              <label class="file-drop-area" for="package-files">
-                <div class="file-drop-title">Click to select package photos</div>
-                <input type="file" id="package-files" accept="image/*" multiple onchange="updateFileList()" />
-              </label>
-              <div id="file-list" class="file-list"></div>
-            </div>
-            <div class="form-group">
-              <label for="package-notes">Notes</label>
-              <textarea id="package-notes" placeholder="Notes on package arrival..."></textarea>
-            </div>
-            <button id="upload-btn" class="upload-btn" onclick="uploadPackages()">Upload Package Arrival</button>
-            <div id="upload-status" class="upload-status"></div>
-            <button class="logout-btn" onclick="returnToLogin()">← Sign Out</button>
           </div>
         `;
+    
+    
+        // ---------------------------------------------------------
+        // NO ORDERS
+        // ---------------------------------------------------------
+    
+        if (!data.items || data.items.length === 0) {
+    
+          dashboardHTML += `
+            <div class="empty-state">
+    
+              <h3>No Entries Found</h3>
+    
+              <p>
+                There are no active orders linked to this account.
+              </p>
+    
+            </div>
+          `;
+    
+          container.innerHTML = dashboardHTML;
+    
+          return;
+        }
+    
+    
+        // ---------------------------------------------------------
+        // ORDER CARDS
+        // ---------------------------------------------------------
+    
+        dashboardHTML += data.items.map(function(item) {
+    
+          return `
+            <div class="item-card">
+    
+              <div>
+    
+                <div class="item-name">
+                  ${escapeHTML(item.itemName)}
+                </div>
+    
+    
+                <div class="metrics-block">
+    
+                  Quantity:
+                  <b>${escapeHTML(item.qty)}</b>
+                  <br>
+    
+                  Total Cost:
+                  <b>${escapeHTML(item.price)}</b>
+                  <br>
+    
+                  Status:
+                  <b>${escapeHTML(item.status)}</b>
+    
+                </div>
+    
+    
+                ${
+                  item.link &&
+                  item.link.startsWith("http")
+                    ? `
+                      <a
+                        class="url-btn"
+                        href="${escapeAttribute(item.link)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Open Vendor Link ↗
+                      </a>
+                    `
+                    : ""
+                }
+    
+              </div>
+    
+            </div>
+          `;
+    
+        }).join("");
+    
+    
+        container.innerHTML = dashboardHTML;
       }
-
+    
+    
+      // =========================================================
+      // TEAM STATISTICS
+      // =========================================================
+    
+      function showTeamStatistics() {
+    
+        // Safety check.
+        // Only executives should be able to get here.
+        if (!currentIsExecutive) {
+          return;
+        }
+    
+        if (!googleCredential) {
+          alert("Your Google login session is missing. Please sign in again.");
+          return;
+        }
+    
+    
+        const container = document.getElementById("portal-content");
+    
+        container.innerHTML = `
+          <div class="empty-state">
+    
+            <h3>Loading Team Statistics...</h3>
+    
+            <p>
+              Getting the latest team data.
+            </p>
+    
+          </div>
+        `;
+    
+    
+        fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            token: googleCredential,
+            action: "teamStatistics"
+          })
+        })
+          .then(function(res) {
+            return res.json();
+          })
+          .then(function(result) {
+    
+            if (result.type !== "teamStatistics") {
+              throw new Error(
+                result.message || "Unable to load team statistics."
+              );
+            }
+    
+            renderTeamStatistics(result.data);
+          })
+          .catch(function(error) {
+    
+            console.error(error);
+    
+            container.innerHTML = `
+              <div class="empty-state">
+    
+                <h3>Unable to Load Team Statistics</h3>
+    
+                <p>
+                  ${escapeHTML(error.message)}
+                </p>
+    
+                <button
+                  onclick="backToDashboard()"
+                  style="
+                    margin-top: 15px;
+                    background: #1a73e8;
+                    border: none;
+                    color: white;
+                    padding: 11px 18px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 600;
+                  "
+                >
+                  ← Back to Dashboard
+                </button>
+    
+              </div>
+            `;
+          });
+      }
+    
+    
+      // =========================================================
+      // RENDER TEAM STATISTICS PAGE
+      // =========================================================
+    
+      function renderTeamStatistics(stats) {
+    
+        const container =
+          document.getElementById("portal-content");
+    
+    
+        let statusHTML = "";
+    
+        const statuses =
+          Object.keys(stats.statusCounts || {});
+    
+    
+        if (statuses.length === 0) {
+    
+          statusHTML = `
+            <div class="metrics-block">
+              No status data available.
+            </div>
+          `;
+    
+        } else {
+    
+          statusHTML = statuses.map(function(status) {
+    
+            return `
+              <div class="metrics-block">
+    
+                <b>
+                  ${escapeHTML(status)}
+                </b>
+    
+                :
+                ${stats.statusCounts[status]}
+    
+              </div>
+            `;
+    
+          }).join("");
+        }
+    
+    
+        container.innerHTML = `
+    
+          <div style="
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+          ">
+    
+            <button
+              onclick="backToDashboard()"
+              style="
+                background: white;
+                border: 1px solid #dadce0;
+                color: #5f6368;
+                padding: 11px 18px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+              "
+            >
+              ← Back to Dashboard
+            </button>
+    
+          </div>
+    
+    
+          <div class="item-card">
+    
+            <div>
+    
+              <div class="item-name">
+                Total Orders
+              </div>
+    
+              <div class="metrics-block">
+    
+                <b>
+                  ${stats.totalOrders}
+                </b>
+    
+              </div>
+    
+            </div>
+    
+          </div>
+    
+    
+          <div class="item-card">
+    
+            <div>
+    
+              <div class="item-name">
+                Students
+              </div>
+    
+              <div class="metrics-block">
+    
+                <b>
+                  ${stats.totalStudents}
+                </b>
+    
+              </div>
+    
+            </div>
+    
+          </div>
+    
+    
+          <div class="item-card">
+    
+            <div>
+    
+              <div class="item-name">
+                Total Quantity
+              </div>
+    
+              <div class="metrics-block">
+    
+                <b>
+                  ${stats.totalQuantity}
+                </b>
+    
+              </div>
+    
+            </div>
+    
+          </div>
+    
+    
+          <div class="item-card">
+    
+            <div>
+    
+              <div class="item-name">
+                Total Cost
+              </div>
+    
+              <div class="metrics-block">
+    
+                <b>
+                  $${Number(stats.totalCost || 0).toFixed(2)}
+                </b>
+    
+              </div>
+    
+            </div>
+    
+          </div>
+    
+    
+          <div
+            class="item-card"
+            style="
+              grid-column: 1 / -1;
+              min-height: auto;
+            "
+          >
+    
+            <div class="item-name">
+              Orders by Status
+            </div>
+    
+            ${statusHTML}
+    
+          </div>
+    
+        `;
+      }
+    
+    
+      // =========================================================
+      // BACK TO DASHBOARD
+      // =========================================================
+    
+      function backToDashboard() {
+    
+        if (!currentDashboardData) {
+          returnToLogin();
+          return;
+        }
+    
+        renderDashboard(
+          currentDashboardData,
+          currentIsExecutive
+        );
+      }
+    
+    
+      // =========================================================
+      // PACKAGE FILE FUNCTIONS
+      // These remain available if you later create an executive
+      // package-upload page.
+      // =========================================================
+    
       function updateFileList() {
-        const input = document.getElementById('package-files');
-        const fileList = document.getElementById('file-list');
-        if (!input || !fileList) return;
+    
+        const input =
+          document.getElementById("package-files");
+    
+        const fileList =
+          document.getElementById("file-list");
+    
+    
+        if (!input || !fileList) {
+          return;
+        }
+    
+    
         fileList.innerHTML = "";
+    
+    
         for (let i = 0; i < input.files.length; i++) {
-          const fileItem = document.createElement('div');
+    
+          const fileItem =
+            document.createElement("div");
+    
           fileItem.className = "file-item";
-          fileItem.innerText = "📷 " + input.files[i].name;
+    
+          fileItem.innerText =
+            "📷 " + input.files[i].name;
+    
           fileList.appendChild(fileItem);
         }
       }
-
+    
+    
       function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
+    
+        return new Promise(function(resolve, reject) {
+    
           const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(',')[1]);
-          reader.onerror = () => reject(new Error("Could not read file"));
+    
+          reader.onload = function() {
+    
+            resolve(
+              reader.result.split(",")[1]
+            );
+    
+          };
+    
+          reader.onerror = function() {
+    
+            reject(
+              new Error("Could not read file")
+            );
+    
+          };
+    
           reader.readAsDataURL(file);
+    
         });
       }
-
-      async function uploadPackages() {
-        const packageCountInput = document.getElementById('package-count');
-        const filesInput = document.getElementById('package-files');
-        const notesInput = document.getElementById('package-notes');
-        const uploadButton = document.getElementById('upload-btn');
-        
-        const packageCount = packageCountInput.value;
-        const notes = notesInput.value.trim();
-        const files = filesInput.files;
-
-        if (!packageCount || Number(packageCount) < 1) {
-          showUploadStatus("Enter number of packages.", "error");
+    
+    
+      function uploadPackages() {
+    
+        const packageCountInput =
+          document.getElementById("package-count");
+    
+        const filesInput =
+          document.getElementById("package-files");
+    
+        const notesInput =
+          document.getElementById("package-notes");
+    
+        const uploadButton =
+          document.getElementById("upload-btn");
+    
+    
+        if (
+          !packageCountInput ||
+          !filesInput ||
+          !notesInput ||
+          !uploadButton
+        ) {
           return;
         }
+    
+    
+        const packageCount =
+          packageCountInput.value;
+    
+        const notes =
+          notesInput.value.trim();
+    
+        const files =
+          filesInput.files;
+    
+    
+        if (
+          !packageCount ||
+          Number(packageCount) < 1
+        ) {
+    
+          showUploadStatus(
+            "Enter number of packages.",
+            "error"
+          );
+    
+          return;
+        }
+    
+    
         if (files.length === 0) {
-          showUploadStatus("Select at least one photo.", "error");
+    
+          showUploadStatus(
+            "Select at least one photo.",
+            "error"
+          );
+    
           return;
         }
-
+    
+    
         uploadButton.disabled = true;
-        uploadButton.innerText = "Uploading...";
-        showUploadStatus("Processing photos...", "loading");
-
-        try {
-          const encodedFiles = [];
-          for (let i = 0; i < files.length; i++) {
-            const base64 = await fileToBase64(files[i]);
-            encodedFiles.push({ name: files[i].name, mimeType: files[i].type, data: base64 });
-          }
-
-          const payload = { files: encodedFiles, notes: notes, packageCount: Number(packageCount) };
-          const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
-          });
-
-          const result = await response.json();
-          if (result.status === "success") {
-            showUploadStatus("Uploaded successfully!", "success");
-            packageCountInput.value = 1;
-            filesInput.value = "";
-            notesInput.value = "";
-            document.getElementById('file-list').innerHTML = "";
-          } else {
-            throw new Error(result.message || "Upload failed.");
-          }
-        } catch (error) {
-          showUploadStatus("Upload failed: " + error.message, "error");
-        } finally {
-          uploadButton.disabled = false;
-          uploadButton.innerText = "Upload Package Arrival";
+    
+        uploadButton.innerText =
+          "Uploading...";
+    
+        showUploadStatus(
+          "Processing photos...",
+          "loading"
+        );
+    
+    
+        const filePromises = [];
+    
+    
+        for (let i = 0; i < files.length; i++) {
+    
+          filePromises.push(
+            fileToBase64(files[i])
+              .then(function(base64) {
+    
+                return {
+                  name: files[i].name,
+                  mimeType: files[i].type,
+                  data: base64
+                };
+    
+              })
+          );
         }
+    
+    
+        Promise.all(filePromises)
+          .then(function(encodedFiles) {
+    
+            const payload = {
+              files: encodedFiles,
+              notes: notes,
+              packageCount: Number(packageCount)
+            };
+    
+    
+            return fetch(API_URL, {
+              method: "POST",
+              headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+              },
+              body: JSON.stringify(payload)
+            });
+    
+          })
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(result) {
+    
+            if (result.status !== "success") {
+    
+              throw new Error(
+                result.message || "Upload failed."
+              );
+            }
+    
+    
+            showUploadStatus(
+              "Uploaded successfully!",
+              "success"
+            );
+    
+    
+            packageCountInput.value = 1;
+    
+            filesInput.value = "";
+    
+            notesInput.value = "";
+    
+            document.getElementById(
+              "file-list"
+            ).innerHTML = "";
+    
+          })
+          .catch(function(error) {
+    
+            showUploadStatus(
+              "Upload failed: " + error.message,
+              "error"
+            );
+    
+          })
+          .finally(function() {
+    
+            uploadButton.disabled = false;
+    
+            uploadButton.innerText =
+              "Upload Package Arrival";
+    
+          });
       }
-
+    
+    
       function showUploadStatus(message, type) {
-        const statusDiv = document.getElementById('upload-status');
-        statusDiv.innerText = message;
-        statusDiv.className = "upload-status " + type;
-      }
-
-      function returnToLogin() {
-        location.reload(); // Reloads page to reset session state clean
-      }
-
-      function renderDashboard(data) {
-        document.getElementById('user-session').innerText = "Portal User: " + data.email;
-        document.getElementById('login-section').style.display = 'none';
-        
-        const container = document.getElementById('portal-content');
-        container.style.display = 'grid';
-
-        let dashboardHTML = `
-          <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <button onclick="returnToLogin()" style="background: white; border: 1px solid #dadce0; color: #5f6368; padding: 11px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
-              ← Sign Out
-            </button>
-            <button onclick="openOrderingForm()" style="background: #1a73e8; border: none; color: white; padding: 11px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
-              + Place New Order
-            </button>
-          </div>
-        `;
-
-        if (!data.items || data.items.length === 0) {
-          dashboardHTML += `
-            <div class="empty-state">
-              <h3>No Entries Found</h3>
-              <p>There are no active orders linked to this account.</p>
-            </div>
-          `;
-          container.innerHTML = dashboardHTML;
+    
+        const statusDiv =
+          document.getElementById("upload-status");
+    
+    
+        if (!statusDiv) {
           return;
         }
-
-        dashboardHTML += data.items.map(item => `
-          <div class="item-card">
-            <div>
-              <div class="item-name">${item.itemName}</div>
-              <div class="metrics-block">
-                Quantity: <b>${item.qty}</b><br>
-                Total Cost: <b>${item.price}</b><br>
-                Status: <b>${item.status}</b>
-              </div>
-              ${item.link && item.link.startsWith('http') ? `<a class="url-btn" href="${item.link}" target="_blank">Open Vendor Link ↗</a>` : ''}
-            </div>
-          </div>
-        `).join('');
-
-        container.innerHTML = dashboardHTML;
+    
+    
+        statusDiv.innerText = message;
+    
+        statusDiv.className =
+          "upload-status " + type;
       }
-
+    
+    
+      // =========================================================
+      // SIGN OUT
+      // =========================================================
+    
+      function returnToLogin() {
+    
+        googleCredential = null;
+    
+        currentDashboardData = null;
+    
+        currentIsExecutive = false;
+    
+        location.reload();
+      }
+    
+    
+      // =========================================================
+      // ORDERING FORM
+      // =========================================================
+    
       function openOrderingForm() {
-        window.open("https://forms.gle/e2qgGCRH5vSSTHmF7", "_blank");
+    
+        window.open(
+          "https://forms.gle/e2qgGCRH5vSSTHmF7",
+          "_blank"
+        );
+      }
+    
+    
+      // =========================================================
+      // SMALL HTML SAFETY HELPERS
+      // =========================================================
+    
+      function escapeHTML(value) {
+    
+        if (value === null || value === undefined) {
+          return "";
+        }
+    
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+    
+    
+      function escapeAttribute(value) {
+    
+        return escapeHTML(value);
       }
     </script>
   </body>
