@@ -759,6 +759,212 @@
 
 
     /* ======================================================
+       HIGH-VALUE SECTION
+       ====================================================== */
+
+    .high-value-section {
+
+      grid-column:
+        1 / -1;
+
+      background:
+        #fff4f3;
+
+      border:
+        1px solid #f3c2bd;
+
+      border-radius:
+        16px;
+
+      padding:
+        24px;
+
+    }
+
+
+    .high-value-title {
+
+      font-size:
+        20px;
+
+      font-weight:
+        750;
+
+      color:
+        #b3261e;
+
+      margin-bottom:
+        6px;
+
+    }
+
+
+    .high-value-subtitle {
+
+      font-size:
+        13px;
+
+      color:
+        #7a2d27;
+
+      margin-bottom:
+        18px;
+
+    }
+
+
+    .high-value-list {
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      gap:
+        12px;
+
+    }
+
+
+    .high-value-card {
+
+      background:
+        #ffffff;
+
+      border:
+        1px solid #f0b6b0;
+
+      border-left:
+        5px solid #d93025;
+
+      border-radius:
+        10px;
+
+      padding:
+        16px 18px;
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      gap:
+        20px;
+
+      flex-wrap:
+        wrap;
+
+    }
+
+
+    .high-value-main {
+
+      min-width:
+        220px;
+
+      flex:
+        1;
+
+    }
+
+
+    .high-value-name {
+
+      font-size:
+        16px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .high-value-item {
+
+      margin-top:
+        4px;
+
+      font-size:
+        14px;
+
+      color:
+        #3c4043;
+
+    }
+
+
+    .high-value-meta {
+
+      margin-top:
+        6px;
+
+      font-size:
+        12px;
+
+      color:
+        #6b6b6b;
+
+      line-height:
+        1.5;
+
+    }
+
+
+    .high-value-price {
+
+      font-size:
+        24px;
+
+      font-weight:
+        750;
+
+      color:
+        #b3261e;
+
+      white-space:
+        nowrap;
+
+    }
+
+
+    .high-value-badge {
+
+      display:
+        inline-block;
+
+      margin-top:
+        8px;
+
+      padding:
+        5px 9px;
+
+      border-radius:
+        999px;
+
+      background:
+        #fce8e6;
+
+      color:
+        #c5221f;
+
+      font-size:
+        11px;
+
+      font-weight:
+        700;
+
+    }
+
+
+    /* ======================================================
        EVENT CARDS
        ====================================================== */
 
@@ -904,7 +1110,7 @@
 
 
     /* ======================================================
-       EVENT DETAIL
+       EVENT DETAILS
        ====================================================== */
 
     .event-detail-title {
@@ -986,7 +1192,7 @@
     }
 
 
-    .person-event-email {
+    .person-event-name {
 
       font-size:
         15px;
@@ -1363,12 +1569,6 @@
       border-radius:
         999px;
 
-      background:
-        #f1f3f4;
-
-      color:
-        #5f6368;
-
       font-size:
         11px;
 
@@ -1377,6 +1577,10 @@
 
     }
 
+
+    /* ======================================================
+       RESPONSIVE
+       ====================================================== */
 
     @media (
       max-width: 600px
@@ -1524,9 +1728,11 @@
       null;
 
 
-    /* ======================================================
-       GOOGLE LOGIN
-       ====================================================== */
+    /*
+     * ========================================================
+     * GOOGLE LOGIN
+     * ========================================================
+     */
 
     function handleCredentialResponse(
       response
@@ -1645,9 +1851,11 @@
     }
 
 
-    /* ======================================================
-       DASHBOARD
-       ====================================================== */
+    /*
+     * ========================================================
+     * PERSONAL DASHBOARD
+     * ========================================================
+     */
 
     function renderDashboard(
       data,
@@ -1690,9 +1898,13 @@
 
       let html = `
 
-        <div class="dashboard-buttons">
+        <div
+          class="dashboard-buttons"
+        >
 
-          <div class="button-group">
+          <div
+            class="button-group"
+          >
 
             <button
               class="
@@ -1748,7 +1960,9 @@
 
         html += `
 
-          <div class="empty-state">
+          <div
+            class="empty-state"
+          >
 
             <h3>
               No Entries Found
@@ -1910,9 +2124,11 @@
     }
 
 
-    /* ======================================================
-       STATUS STYLE
-       ====================================================== */
+    /*
+     * ========================================================
+     * STATUS STYLE
+     * ========================================================
+     */
 
     function getStatusClass(
       status
@@ -1999,9 +2215,11 @@
     }
 
 
-    /* ======================================================
-       TEAM STATISTICS
-       ====================================================== */
+    /*
+     * ========================================================
+     * TEAM STATISTICS
+     * ========================================================
+     */
 
     function showTeamStatistics() {
 
@@ -2035,7 +2253,9 @@
 
       container.innerHTML = `
 
-        <div class="empty-state">
+        <div
+          class="empty-state"
+        >
 
           <h3>
             Loading Team Statistics...
@@ -2089,7 +2309,6 @@
       .then(
         function(result) {
 
-
           if (
             result.type !==
             "teamStatistics"
@@ -2124,7 +2343,9 @@
 
           container.innerHTML = `
 
-            <div class="empty-state">
+            <div
+              class="empty-state"
+            >
 
               <h3>
                 Unable to Load Team Statistics
@@ -2157,9 +2378,11 @@
     }
 
 
-    /* ======================================================
-       RENDER TEAM STATISTICS
-       ====================================================== */
+    /*
+     * ========================================================
+     * TEAM STATISTICS PAGE
+     * ========================================================
+     */
 
     function renderTeamStatistics(
       stats
@@ -2179,6 +2402,168 @@
         stats.people || [];
 
 
+      var highValueOrders =
+        stats.highValueOrders || [];
+
+
+      /*
+       * ======================================================
+       * HIGH VALUE ORDERS
+       * ======================================================
+       */
+
+      var highValueHTML =
+        "";
+
+
+      if (
+        highValueOrders.length === 0
+      ) {
+
+        highValueHTML = `
+
+          <div
+            class="high-value-card"
+          >
+
+            <div
+              class="
+                high-value-main
+              "
+            >
+
+              <div
+                class="
+                  high-value-name
+                "
+              >
+                No high-value orders
+              </div>
+
+              <div
+                class="
+                  high-value-meta
+                "
+              >
+                No individual order is currently
+                over $50.
+              </div>
+
+            </div>
+
+          </div>
+
+        `;
+
+      } else {
+
+        highValueHTML =
+          highValueOrders
+            .map(
+              function(order) {
+
+                return `
+
+                  <div
+                    class="
+                      high-value-card
+                    "
+                  >
+
+                    <div
+                      class="
+                        high-value-main
+                      "
+                    >
+
+                      <div
+                        class="
+                          high-value-name
+                        "
+                      >
+                        ${escapeHTML(
+                          order.name
+                        )}
+                      </div>
+
+
+                      <div
+                        class="
+                          high-value-item
+                        "
+                      >
+                        ${escapeHTML(
+                          order.itemName
+                        )}
+                      </div>
+
+
+                      <div
+                        class="
+                          high-value-meta
+                        "
+                      >
+
+                        Event:
+                        ${escapeHTML(
+                          order.eventName
+                        )}
+
+                        <br>
+
+                        Quantity:
+                        ${escapeHTML(
+                          order.quantity
+                        )}
+
+                        <br>
+
+                        Status:
+                        ${escapeHTML(
+                          order.status
+                        )}
+
+                      </div>
+
+
+                      <div
+                        class="
+                          high-value-badge
+                        "
+                      >
+                        OVER $50
+                      </div>
+
+                    </div>
+
+
+                    <div
+                      class="
+                        high-value-price
+                      "
+                    >
+                      $${Number(
+                        order.price || 0
+                      ).toFixed(2)}
+                    </div>
+
+                  </div>
+
+                `;
+
+              }
+            )
+            .join("");
+
+      }
+
+
+      /*
+       * ======================================================
+       * EVENT CARDS
+       * ======================================================
+       */
+
       var eventCards =
         "";
 
@@ -2189,15 +2574,11 @@
 
         eventCards = `
 
-          <div class="empty-state">
+          <div
+            class="empty-state"
+          >
 
-            <h3>
-              No Events Found
-            </h3>
-
-            <p>
-              No event data is currently available.
-            </p>
+            No event data is currently available.
 
           </div>
 
@@ -2283,6 +2664,12 @@
       }
 
 
+      /*
+       * ======================================================
+       * PEOPLE CARDS
+       * ======================================================
+       */
+
       var peopleCards =
         "";
 
@@ -2293,15 +2680,11 @@
 
         peopleCards = `
 
-          <div class="empty-state">
+          <div
+            class="empty-state"
+          >
 
-            <h3>
-              No People Found
-            </h3>
-
-            <p>
-              No order records are currently available.
-            </p>
+            No people found.
 
           </div>
 
@@ -2388,12 +2771,18 @@
 
       container.innerHTML = `
 
+        <!-- TOP BUTTON -->
+
         <div
-          class="dashboard-buttons"
+          class="
+            dashboard-buttons
+          "
         >
 
           <div
-            class="button-group"
+            class="
+              button-group
+            "
           >
 
             <button
@@ -2411,7 +2800,7 @@
         </div>
 
 
-        <!-- OVERALL -->
+        <!-- OVERALL STATISTICS -->
 
         <div
           class="stat-card"
@@ -2491,6 +2880,43 @@
         </div>
 
 
+        <!-- HIGH VALUE -->
+
+        <div
+          class="
+            high-value-section
+          "
+        >
+
+          <div
+            class="
+              high-value-title
+            "
+          >
+            ⚠ High-Value Orders
+          </div>
+
+
+          <div
+            class="
+              high-value-subtitle
+            "
+          >
+            Individual orders over $50
+          </div>
+
+
+          <div
+            class="
+              high-value-list
+            "
+          >
+            ${highValueHTML}
+          </div>
+
+        </div>
+
+
         <!-- EVENTS -->
 
         <div
@@ -2551,9 +2977,11 @@
     }
 
 
-    /* ======================================================
-       EVENT DETAILS
-       ====================================================== */
+    /*
+     * ========================================================
+     * EVENT DETAILS
+     * ========================================================
+     */
 
     function showEventDetails(
       eventIndex
@@ -2590,10 +3018,10 @@
 
         peopleHTML = `
 
-          <div class="empty-state">
-
+          <div
+            class="empty-state"
+          >
             No orders found for this event.
-
           </div>
 
         `;
@@ -2685,7 +3113,7 @@
 
                     <div
                       class="
-                        person-event-email
+                        person-event-name
                       "
                     >
                       ${escapeHTML(
@@ -2728,11 +3156,15 @@
       container.innerHTML = `
 
         <div
-          class="dashboard-buttons"
+          class="
+            dashboard-buttons
+          "
         >
 
           <div
-            class="button-group"
+            class="
+              button-group
+            "
           >
 
             <button
@@ -2820,9 +3252,11 @@
     }
 
 
-    /* ======================================================
-       PERSON DETAILS
-       ====================================================== */
+    /*
+     * ========================================================
+     * PERSON DETAILS
+     * ========================================================
+     */
 
     function showPersonDetails(
       personIndex
@@ -2862,10 +3296,10 @@
 
         itemsHTML = `
 
-          <div class="empty-state">
-
+          <div
+            class="empty-state"
+          >
             No orders found for this person.
-
           </div>
 
         `;
@@ -2967,11 +3401,15 @@
       container.innerHTML = `
 
         <div
-          class="dashboard-buttons"
+          class="
+            dashboard-buttons
+          "
         >
 
           <div
-            class="button-group"
+            class="
+              button-group
+            "
           >
 
             <button
@@ -3050,7 +3488,9 @@
 
 
           <div
-            class="people-event-list"
+            class="
+              people-event-list
+            "
           >
             ${itemsHTML}
           </div>
@@ -3062,9 +3502,11 @@
     }
 
 
-    /* ======================================================
-       RETURN TO TEAM STATS
-       ====================================================== */
+    /*
+     * ========================================================
+     * BACK TO TEAM STATISTICS
+     * ========================================================
+     */
 
     function renderTeamStatisticsFromSavedData() {
 
@@ -3086,9 +3528,11 @@
     }
 
 
-    /* ======================================================
-       BACK TO PERSONAL DASHBOARD
-       ====================================================== */
+    /*
+     * ========================================================
+     * BACK TO PERSONAL DASHBOARD
+     * ========================================================
+     */
 
     function backToDashboard() {
 
@@ -3111,9 +3555,11 @@
     }
 
 
-    /* ======================================================
-       SIGN OUT
-       ====================================================== */
+    /*
+     * ========================================================
+     * SIGN OUT
+     * ========================================================
+     */
 
     function returnToLogin() {
 
@@ -3138,9 +3584,11 @@
     }
 
 
-    /* ======================================================
-       ORDER FORM
-       ====================================================== */
+    /*
+     * ========================================================
+     * ORDER FORM
+     * ========================================================
+     */
 
     function openOrderingForm() {
 
@@ -3152,9 +3600,11 @@
     }
 
 
-    /* ======================================================
-       HTML ESCAPING
-       ====================================================== */
+    /*
+     * ========================================================
+     * HTML ESCAPING
+     * ========================================================
+     */
 
     function escapeHTML(
       value
@@ -3166,6 +3616,7 @@
       ) {
 
         return "";
+
       }
 
 
