@@ -1,1151 +1,1948 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SciOly Tracking Portal</title>
-    <!-- Load Google's official Sign-In SDK -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <style>
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    SciOly Tracking Portal
+  </title>
+
+
+  <!-- Google Identity Services -->
+  <script
+    src="https://accounts.google.com/gsi/client"
+    async
+    defer
+  ></script>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    body {
+
+      font-family:
+        'Segoe UI',
+        -apple-system,
+        BlinkMacSystemFont,
+        Arial,
+        sans-serif;
+
+      padding: 40px 20px;
+
+      margin: 0;
+
+      background:
+        #f4f6f9;
+
+      color:
+        #202124;
+
+    }
+
+
+    .main-wrapper {
+
+      max-width:
+        1000px;
+
+      margin:
+        0 auto;
+
+    }
+
+
+    /* ======================================================
+       NAVBAR
+       ====================================================== */
+
+    .navbar {
+
+      background:
+        white;
+
+      padding:
+        20px 30px;
+
+      border-radius:
+        14px;
+
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.06);
+
+      margin-bottom:
+        30px;
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      flex-wrap:
+        wrap;
+
+      gap:
+        15px;
+
+    }
+
+
+    h1 {
+
+      margin:
+        0;
+
+      color:
+        #1a73e8;
+
+      font-size:
+        24px;
+
+      font-weight:
+        650;
+
+    }
+
+
+    .session-tag {
+
+      background:
+        #e8f0fe;
+
+      color:
+        #1a73e8;
+
+      padding:
+        9px 16px;
+
+      border-radius:
+        30px;
+
+      font-weight:
+        600;
+
+      font-size:
+        13px;
+
+    }
+
+
+    /* ======================================================
+       LOGIN
+       ====================================================== */
+
+    .login-box {
+
+      max-width:
+        420px;
+
+      margin:
+        60px auto;
+
+      background:
+        white;
+
+      padding:
+        35px;
+
+      border-radius:
+        16px;
+
+      box-shadow:
+        0 4px 20px rgba(0,0,0,0.08);
+
+      text-align:
+        center;
+
+    }
+
+
+    .login-box h3 {
+
+      margin-top:
+        0;
+
+      font-size:
+        20px;
+
+      color:
+        #202124;
+
+    }
+
+
+    /* ======================================================
+       GRID
+       ====================================================== */
+
+    .cards-grid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        repeat(
+          auto-fill,
+          minmax(300px, 1fr)
+        );
+
+      gap:
+        20px;
+
+    }
+
+
+    /* ======================================================
+       ORDER CARD
+       ====================================================== */
+
+    .item-card {
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        24px;
+
+      background:
+        white;
+
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.035);
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      justify-content:
+        space-between;
+
+      min-height:
+        220px;
+
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+    }
+
+
+    .item-card:hover {
+
+      transform:
+        translateY(-2px);
+
+      box-shadow:
+        0 6px 18px rgba(0,0,0,0.07);
+
+    }
+
+
+    .item-name {
+
+      font-size:
+        18px;
+
+      font-weight:
+        650;
+
+      margin-bottom:
+        10px;
+
+      color:
+        #202124;
+
+    }
+
+
+    .metrics-block {
+
+      font-size:
+        14px;
+
+      color:
+        #5f6368;
+
+      line-height:
+        1.7;
+
+    }
+
+
+    .metrics-block b {
+
+      color:
+        #202124;
+
+    }
+
+
+    /* ======================================================
+       SIGNATURES
+       ====================================================== */
+
+    .signatures-label {
+
+      margin-top:
+        10px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .signatures-value {
+
+      margin-top:
+        2px;
+
+      font-size:
+        14px;
+
+      color:
+        #202124;
+
+      font-weight:
+        600;
+
+    }
+
+
+    /* ======================================================
+       ACTUAL STATUS PILL
+       ====================================================== */
+
+    .order-status-box {
+
+      margin-top:
+        16px;
+
+      padding:
+        10px 14px;
+
+      border-radius:
+        10px;
+
+      font-size:
+        13px;
+
+      font-weight:
+        700;
+
+      text-align:
+        center;
+
+      letter-spacing:
+        0.1px;
+
+      border:
+        1px solid transparent;
+
+    }
+
+
+    .status-pending {
+
+      background:
+        #f1f3f4;
+
+      color:
+        #5f6368;
+
+      border-color:
+        #dadce0;
+
+    }
+
+
+    .status-processing {
+
+      background:
+        #e8f0fe;
+
+      color:
+        #1967d2;
+
+      border-color:
+        #c6dafc;
+
+    }
+
+
+    .status-shipped {
+
+      background:
+        #e6f4ea;
+
+      color:
+        #188038;
+
+      border-color:
+        #b7dfc1;
+
+    }
+
+
+    .status-delivered {
+
+      background:
+        #dff3e4;
+
+      color:
+        #137333;
+
+      border-color:
+        #b7dfc1;
+
+    }
+
+
+    .status-problem {
+
+      background:
+        #fce8e6;
+
+      color:
+        #c5221f;
+
+      border-color:
+        #f6aea9;
+
+    }
+
+
+    .status-default {
+
+      background:
+        #f1f3f4;
+
+      color:
+        #5f6368;
+
+      border-color:
+        #dadce0;
+
+    }
+
+
+    /* ======================================================
+       VELOCITY ESTIMATE
+       ====================================================== */
+
+    .delivery-estimate {
+
+      margin-top:
+        10px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+      font-weight:
+        500;
+
+    }
+
+
+    .delivery-delayed {
+
+      color:
+        #c5221f;
+
+      font-weight:
+        650;
+
+    }
+
+
+    /* ======================================================
+       VENDOR LINK
+       ====================================================== */
+
+    .url-btn {
+
+      display:
+        inline-block;
+
+      margin-top:
+        10px;
+
+      color:
+        #1a73e8;
+
+      text-decoration:
+        none;
+
+      font-weight:
+        500;
+
+      font-size:
+        14px;
+
+    }
+
+
+    .url-btn:hover {
+
+      text-decoration:
+        underline;
+
+    }
+
+
+    /* ======================================================
+       EMPTY
+       ====================================================== */
+
+    .empty-state {
+
+      text-align:
+        center;
+
+      color:
+        #5f6368;
+
+      padding:
+        60px;
+
+      background:
+        white;
+
+      border-radius:
+        14px;
+
+      grid-column:
+        1 / -1;
+
+    }
+
+
+    /* ======================================================
+       ERROR
+       ====================================================== */
+
+    #error-msg {
+
+      color:
+        #d93025;
+
+      font-size:
+        14px;
+
+      margin-top:
+        15px;
+
+      font-weight:
+        500;
+
+      display:
+        none;
+
+    }
+
+
+    /* ======================================================
+       BUTTONS
+       ====================================================== */
+
+    .dashboard-buttons {
+
+      grid-column:
+        1 / -1;
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      gap:
+        10px;
+
+      flex-wrap:
+        wrap;
+
+    }
+
+
+    .button-group {
+
+      display:
+        flex;
+
+      gap:
+        10px;
+
+      flex-wrap:
+        wrap;
+
+    }
+
+
+    .dashboard-button {
+
+      border:
+        none;
+
+      padding:
+        11px 18px;
+
+      border-radius:
+        8px;
+
+      font-size:
+        14px;
+
+      font-weight:
+        600;
+
+      cursor:
+        pointer;
+
+    }
+
+
+    .signout-button {
+
+      background:
+        white;
+
+      border:
+        1px solid #dadce0;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .order-button {
+
+      background:
+        #1a73e8;
+
+      color:
+        white;
+
+    }
+
+
+    .team-button {
+
+      background:
+        #188038;
+
+      color:
+        white;
+
+    }
+
+
+    .back-button {
+
+      background:
+        white;
+
+      border:
+        1px solid #dadce0;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .dashboard-button:hover {
+
+      opacity:
+        0.92;
+
+    }
+
+
+    /* ======================================================
+       STATISTICS
+       ====================================================== */
+
+    .stat-card {
+
+      background:
+        white;
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        24px;
+
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.035);
+
+    }
+
+
+    .stat-number {
+
+      font-size:
+        30px;
+
+      font-weight:
+        700;
+
+      margin-top:
+        5px;
+
+      color:
+        #202124;
+
+    }
+
+
+    .stat-label {
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .statistics-wide {
+
+      grid-column:
+        1 / -1;
+
+    }
+
+
+    .status-row {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      padding:
+        10px 0;
+
+      border-bottom:
+        1px solid #f1f3f4;
+
+      font-size:
+        14px;
+
+    }
+
+
+    .status-row:last-child {
+
+      border-bottom:
+        none;
+
+    }
+
+
+    /* ======================================================
+       RESPONSIVE
+       ====================================================== */
+
+    @media (
+      max-width: 600px
+    ) {
+
       body {
-        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-        padding: 40px 20px;
-        margin: 0;
-        background-color: #f4f6f9;
-        color: #202124;
+
+        padding:
+          20px 12px;
+
       }
 
-      .main-wrapper {
-        max-width: 1000px;
-        margin: 0 auto;
-      }
 
       .navbar {
-        background-color: #ffffff;
-        padding: 20px 30px;
-        border-radius: 12px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        margin-bottom: 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 15px;
+
+        padding:
+          18px;
+
       }
 
-      h1 {
-        margin: 0;
-        color: #1a73e8;
-        font-size: 24px;
-        font-weight: 600;
-      }
-
-      .session-tag {
-        background-color: #e8f0fe;
-        color: #1a73e8;
-        padding: 9px 16px;
-        border-radius: 30px;
-        font-weight: 500;
-        font-size: 13px;
-      }
-
-      .login-box {
-        max-width: 420px;
-        margin: 60px auto;
-        background: white;
-        padding: 35px;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        text-align: center;
-      }
-
-      .login-box h3 {
-        margin-top: 0;
-        font-size: 20px;
-        color: #202124;
-      }
-
-      .cards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
-      }
 
       .item-card {
-        border: 1px solid #e0e0e0;
-        border-radius: 12px;
-        padding: 24px;
-        background-color: #ffffff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        min-height: 190px;
+
+        padding:
+          20px;
+
       }
 
-      .item-name {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: #202124;
-      }
+    }
 
-      .metrics-block {
-        font-size: 14px;
-        color: #5f6368;
-        margin-bottom: 12px;
-        line-height: 1.6;
-      }
+  </style>
 
-      .metrics-block b {
-        color: #202124;
-      }
+</head>
 
-      .url-btn {
-        display: inline-block;
-        margin-top: 6px;
-        color: #1a73e8;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 14px;
-      }
 
-      .url-btn:hover {
-        text-decoration: underline;
-      }
+<body>
 
-      .empty-state {
-        text-align: center;
-        color: #5f6368;
-        padding: 60px;
-        background: white;
-        border-radius: 12px;
-        grid-column: 1 / -1;
-      }
+  <div class="main-wrapper">
 
-      #error-msg {
-        color: #d93025;
-        font-size: 14px;
-        margin-top: 15px;
-        font-weight: 500;
-        display: none;
-      }
 
-      /* ADVISOR MODE */
-      .advisor-card {
-        grid-column: 1 / -1;
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 32px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-      }
+    <!-- ====================================================
+         NAVBAR
+         ==================================================== -->
 
-      .advisor-header {
-        margin-bottom: 28px;
-      }
+    <div class="navbar">
 
-      .advisor-header h2 {
-        margin: 0 0 8px 0;
-        color: #202124;
-      }
+      <h1>
+        SciOly Tracking Portal
+      </h1>
 
-      .advisor-header p {
-        margin: 0;
-        color: #5f6368;
-      }
 
-      .form-group {
-        margin-bottom: 22px;
-      }
-
-      .form-group label {
-        display: block;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: #202124;
-      }
-
-      .form-group input[type="number"],
-      .form-group textarea {
-        width: 100%;
-        box-sizing: border-box;
-        border: 1px solid #dadce0;
-        border-radius: 8px;
-        padding: 12px;
-        font-family: inherit;
-        font-size: 15px;
-      }
-
-      .form-group textarea {
-        min-height: 120px;
-        resize: vertical;
-      }
-
-      .file-drop-area {
-        border: 2px dashed #dadce0;
-        border-radius: 12px;
-        padding: 30px;
-        text-align: center;
-        background-color: #fafafa;
-        cursor: pointer;
-      }
-
-      .file-drop-area input {
-        display: none;
-      }
-
-      .file-drop-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #202124;
-        margin-bottom: 6px;
-      }
-
-      .file-drop-subtitle {
-        font-size: 13px;
-        color: #5f6368;
-      }
-
-      .file-list {
-        margin-top: 15px;
-        text-align: left;
-      }
-
-      .file-item {
-        background: #f1f3f4;
-        padding: 9px 12px;
-        border-radius: 6px;
-        margin-bottom: 6px;
-        font-size: 13px;
-        color: #3c4043;
-      }
-
-      .upload-btn {
-        width: 100%;
-        border: none;
-        border-radius: 8px;
-        padding: 14px 20px;
-        background-color: #1a73e8;
-        color: white;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-      }
-
-      .upload-btn:hover {
-        background-color: #1769d1;
-      }
-
-      .upload-status {
-        margin-top: 18px;
-        padding: 13px;
-        border-radius: 8px;
-        font-size: 14px;
-        display: none;
-      }
-
-      .upload-status.success { display: block; background-color: #e6f4ea; color: #137333; }
-      .upload-status.error { display: block; background-color: #fce8e6; color: #c5221f; }
-      .upload-status.loading { display: block; background-color: #e8f0fe; color: #174ea6; }
-
-      .advisor-info {
-        margin-top: 25px;
-        padding: 15px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        font-size: 13px;
-        color: #5f6368;
-        line-height: 1.5;
-      }
-
-      .logout-btn {
-        margin-top: 15px;
-        background: transparent;
-        border: none;
-        color: #5f6368;
-        cursor: pointer;
-        font-size: 13px;
-      }
-
-      .logout-btn:hover { color: #1a73e8; }
-    </style>
-  </head>
-
-  <body>
-
-    <div class="main-wrapper">
-      <!-- NAVBAR -->
-      <div class="navbar">
-        <h1>SciOly Tracking Portal</h1>
-        <div class="session-tag" id="user-session">Session: Awaiting Login</div>
+      <div
+        class="session-tag"
+        id="user-session"
+      >
+        Session: Awaiting Login
       </div>
 
-      <!-- GOOGLE LOGIN SECTION -->
-      <div id="login-section" class="login-box">
-        <h3>Portal Sign In</h3>
-        <p style="color: #5f6368; font-size: 14px; margin-bottom: 20px;">
-          Authenticate with your Google account to view tracking data.
-        </p>
-
-        <!-- Google Identity Services Button Container -->
-        <div id="g_id_onload"
-             data-client_id="483790698157-mk3l3ugqgvh4uv10q3bng2g9j8j3vp8q.apps.googleusercontent.com"
-             data-callback="handleCredentialResponse"
-             data-auto_prompt="false">
-        </div>
-        <div class="g_id_signin" data-type="standard" data-size="large" data-width="100%"></div>
-
-        <div id="error-msg"></div>
-      </div>
-
-      <!-- PORTAL CONTENT -->
-      <div id="portal-content" class="cards-grid" style="display: none;"></div>
     </div>
 
-    <script>
-      const API_URL = "https://script.google.com/macros/s/AKfycbzag2WkgUl-_WO4-xlbGJZ3n2sfVk6AFtvzGBCowHF4PxlS0U5Yq6h3IxMV_Xie-4g/exec";
-    
-      // Stores the Google credential for the currently signed-in user.
-      // It is needed when the executive opens Team Statistics.
-      let googleCredential = null;
-    
-      // Stores the currently displayed dashboard data so that
-      // we can return from the Team Statistics page.
-      let currentDashboardData = null;
-    
-      let currentIsExecutive = false;
-    
-    
-      // =========================================================
-      // GOOGLE LOGIN
-      // =========================================================
-    
-      function handleCredentialResponse(response) {
-        const errorDiv = document.getElementById("error-msg");
-    
-        errorDiv.style.display = "none";
-    
-        // Save the Google credential.
-        googleCredential = response.credential;
-    
-        fetch(API_URL, {
+
+    <!-- ====================================================
+         LOGIN
+         ==================================================== -->
+
+    <div
+      id="login-section"
+      class="login-box"
+    >
+
+      <h3>
+        Portal Sign In
+      </h3>
+
+
+      <p
+        style="
+          color: #5f6368;
+          font-size: 14px;
+          margin-bottom: 20px;
+        "
+      >
+        Authenticate with your Google account
+        to view tracking data.
+      </p>
+
+
+      <div
+        id="g_id_onload"
+        data-client_id="483790698157-mk3l3ugqgvh4uv10q3bng2g9j8j3vp8q.apps.googleusercontent.com"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="false"
+      >
+      </div>
+
+
+      <div
+        class="g_id_signin"
+        data-type="standard"
+        data-size="large"
+        data-width="100%"
+      >
+      </div>
+
+
+      <div id="error-msg"></div>
+
+    </div>
+
+
+    <!-- ====================================================
+         PORTAL
+         ==================================================== -->
+
+    <div
+      id="portal-content"
+      class="cards-grid"
+      style="display: none;"
+    >
+    </div>
+
+
+  </div>
+
+
+  <script>
+
+    /*
+     * ======================================================
+     * CONFIGURATION
+     * ======================================================
+     */
+
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbzag2WkgUl-_WO4-xlbGJZ3n2sfVk6AFtvzGBCowHF4PxlS0U5Yq6h3IxMV_Xie-4g/exec";
+
+
+    /*
+     * Current Google ID token.
+     *
+     * This is stored in the browser only while the user
+     * is signed in.
+     */
+
+    let googleCredential = null;
+
+
+    /*
+     * Current dashboard data.
+     *
+     * Used to return from Team Statistics.
+     */
+
+    let currentDashboardData = null;
+
+
+    /*
+     * Whether the current account is an executive.
+     */
+
+    let currentIsExecutive = false;
+
+
+    /* ======================================================
+       GOOGLE LOGIN
+       ====================================================== */
+
+    function handleCredentialResponse(response) {
+
+      const errorDiv =
+        document.getElementById(
+          "error-msg"
+        );
+
+
+      errorDiv.style.display =
+        "none";
+
+
+      googleCredential =
+        response.credential;
+
+
+      fetch(
+        API_URL,
+        {
           method: "POST",
+
           headers: {
-            "Content-Type": "text/plain;charset=utf-8"
+            "Content-Type":
+              "text/plain;charset=utf-8"
           },
-          body: JSON.stringify({
-            token: response.credential
-          })
-        })
-          .then(function(res) {
-            return res.json();
-          })
-          .then(function(data) {
-    
-            // -----------------------------
-            // EXECUTIVE
-            // -----------------------------
-            if (data.type === "exec") {
-              renderDashboard(data.data, true);
-              return;
+
+          body:
+            JSON.stringify({
+              token:
+                response.credential
+            })
+        }
+      )
+
+      .then(
+        function(response) {
+
+          return response.json();
+
+        }
+      )
+
+      .then(
+        function(data) {
+
+
+          /*
+           * ================================================
+           * EXECUTIVE
+           * ================================================
+           */
+
+          if (
+            data.type === "exec"
+          ) {
+
+            renderDashboard(
+              data.data,
+              true
+            );
+
+            return;
+
+          }
+
+
+          /*
+           * ================================================
+           * STUDENT
+           * ================================================
+           */
+
+          if (
+            data.type === "student"
+          ) {
+
+            renderDashboard(
+              data.data,
+              false
+            );
+
+            return;
+
+          }
+
+
+          /*
+           * ================================================
+           * ERROR
+           * ================================================
+           */
+
+          errorDiv.innerText =
+            data.message ||
+            "Login failed.";
+
+
+          errorDiv.style.display =
+            "block";
+
+        }
+      )
+
+      .catch(
+        function(error) {
+
+          console.error(error);
+
+
+          errorDiv.innerText =
+            "Error connecting to the backend database.";
+
+
+          errorDiv.style.display =
+            "block";
+
+        }
+      );
+
+    }
+
+
+    /* ======================================================
+       DASHBOARD
+       ====================================================== */
+
+    function renderDashboard(
+      data,
+      isExecutive
+    ) {
+
+      currentDashboardData =
+        data;
+
+
+      currentIsExecutive =
+        isExecutive;
+
+
+      const session =
+        document.getElementById(
+          "user-session"
+        );
+
+
+      session.innerText =
+        isExecutive
+          ? "Executive Portal: " +
+            data.email
+          : "Portal User: " +
+            data.email;
+
+
+      document.getElementById(
+        "login-section"
+      ).style.display =
+        "none";
+
+
+      const container =
+        document.getElementById(
+          "portal-content"
+        );
+
+
+      container.style.display =
+        "grid";
+
+
+      /*
+       * TOP BUTTONS
+       */
+
+      let html = `
+
+        <div class="dashboard-buttons">
+
+          <div class="button-group">
+
+
+            <button
+              class="
+                dashboard-button
+                signout-button
+              "
+              onclick="returnToLogin()"
+            >
+              ← Sign Out
+            </button>
+
+
+            <button
+              class="
+                dashboard-button
+                order-button
+              "
+              onclick="openOrderingForm()"
+            >
+              + Place New Order
+            </button>
+
+
+            ${
+              isExecutive
+                ? `
+
+                  <button
+                    class="
+                      dashboard-button
+                      team-button
+                    "
+                    onclick="showTeamStatistics()"
+                  >
+                    Team Statistics
+                  </button>
+
+                `
+                : ""
             }
-    
-            // -----------------------------
-            // STUDENT
-            // -----------------------------
-            if (data.type === "student") {
-              renderDashboard(data.data, false);
-              return;
-            }
-    
-            // -----------------------------
-            // ERROR
-            // -----------------------------
-            errorDiv.innerText = data.message || "Login failed.";
-            errorDiv.style.display = "block";
-          })
-          .catch(function(error) {
-            console.error(error);
-    
-            errorDiv.innerText =
-              "Error connecting to the backend database.";
-    
-            errorDiv.style.display = "block";
-          });
+
+          </div>
+
+        </div>
+
+      `;
+
+
+      /*
+       * NO ORDERS
+       */
+
+      if (
+        !data.items ||
+        data.items.length === 0
+      ) {
+
+        html += `
+
+          <div class="empty-state">
+
+            <h3>
+              No Entries Found
+            </h3>
+
+            <p>
+              There are no active orders
+              linked to this account.
+            </p>
+
+          </div>
+
+        `;
+
+
+        container.innerHTML =
+          html;
+
+
+        return;
+
       }
-    
-    
-      // =========================================================
-      // DASHBOARD
-      // =========================================================
-    
-      function renderDashboard(data, isExecutive) {
-    
-        currentDashboardData = data;
-        currentIsExecutive = isExecutive;
-    
-        document.getElementById("user-session").innerText =
-          isExecutive
-            ? "Executive Portal: " + data.email
-            : "Portal User: " + data.email;
-    
-        document.getElementById("login-section").style.display = "none";
-    
-        const container = document.getElementById("portal-content");
-    
-        container.style.display = "grid";
-    
-    
-        // ---------------------------------------------------------
-        // TOP BUTTON BAR
-        // ---------------------------------------------------------
-    
-        let dashboardHTML = `
-          <div style="
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-          ">
-    
-            <div style="
-              display: flex;
-              gap: 10px;
-              flex-wrap: wrap;
-            ">
-    
-              <button
-                onclick="returnToLogin()"
-                style="
-                  background: white;
-                  border: 1px solid #dadce0;
-                  color: #5f6368;
-                  padding: 11px 18px;
-                  border-radius: 8px;
-                  font-size: 14px;
-                  font-weight: 600;
-                  cursor: pointer;
-                "
-              >
-                ← Sign Out
-              </button>
-    
-    
-              <button
-                onclick="openOrderingForm()"
-                style="
-                  background: #1a73e8;
-                  border: none;
-                  color: white;
-                  padding: 11px 18px;
-                  border-radius: 8px;
-                  font-size: 14px;
-                  font-weight: 600;
-                  cursor: pointer;
-                "
-              >
-                + Place New Order
-              </button>
-    
-    
-              ${
-                isExecutive
-                  ? `
-                    <button
-                      onclick="showTeamStatistics()"
-                      style="
-                        background: #188038;
-                        border: none;
-                        color: white;
-                        padding: 11px 18px;
-                        border-radius: 8px;
-                        font-size: 14px;
-                        font-weight: 600;
-                        cursor: pointer;
+
+
+      /*
+       * ORDER CARDS
+       */
+
+      html +=
+        data.items
+          .map(
+            function(item) {
+
+              const statusClass =
+                getStatusClass(
+                  item.orderStatus
+                );
+
+
+              const estimateClass =
+                item.isStuck
+                  ? "delivery-estimate delivery-delayed"
+                  : "delivery-estimate";
+
+
+              return `
+
+                <div
+                  class="item-card"
+                >
+
+                  <div>
+
+
+                    <!-- ITEM -->
+
+                    <div
+                      class="item-name"
+                    >
+                      ${escapeHTML(
+                        item.itemName
+                      )}
+                    </div>
+
+
+                    <!-- BASIC INFO -->
+
+                    <div
+                      class="metrics-block"
+                    >
+
+                      Quantity:
+                      <b>
+                        ${escapeHTML(
+                          item.qty
+                        )}
+                      </b>
+
+                      <br>
+
+
+                      Total Cost:
+                      <b>
+                        ${escapeHTML(
+                          item.price
+                        )}
+                      </b>
+
+                    </div>
+
+
+                    <!-- SIGNATURES -->
+
+                    <div
+                      class="
+                        signatures-label
                       "
                     >
-                      Team Statistics
-                    </button>
-                  `
-                  : ""
-              }
-    
-            </div>
-          </div>
-        `;
-    
-    
-        // ---------------------------------------------------------
-        // NO ORDERS
-        // ---------------------------------------------------------
-    
-        if (!data.items || data.items.length === 0) {
-    
-          dashboardHTML += `
-            <div class="empty-state">
-    
-              <h3>No Entries Found</h3>
-    
-              <p>
-                There are no active orders linked to this account.
-              </p>
-    
-            </div>
-          `;
-    
-          container.innerHTML = dashboardHTML;
-    
-          return;
-        }
-    
-    
-        // ---------------------------------------------------------
-        // ORDER CARDS
-        // ---------------------------------------------------------
-    
-        dashboardHTML += data.items.map(function(item) {
-    
-          return `
-            <div class="item-card">
-    
-              <div>
-    
-                <div class="item-name">
-                  ${escapeHTML(item.itemName)}
+                      Signatures:
+                    </div>
+
+
+                    <div
+                      class="
+                        signatures-value
+                      "
+                    >
+                      ${escapeHTML(
+                        item.signatures
+                      )}
+                    </div>
+
+
+                    <!-- ACTUAL STATUS -->
+
+                    <div
+                      class="
+                        order-status-box
+                        ${statusClass}
+                      "
+                    >
+                      ${escapeHTML(
+                        item.orderStatus
+                      )}
+                    </div>
+
+
+                    <!-- ESTIMATED DELIVERY -->
+
+                    <div
+                      class="${estimateClass}"
+                    >
+                      ${escapeHTML(
+                        item.deliveryText
+                      )}
+                    </div>
+
+
+                    <!-- VENDOR -->
+
+                    ${
+                      item.link &&
+                      item.link.startsWith(
+                        "http"
+                      )
+                      ? `
+
+                        <a
+                          class="url-btn"
+                          href="${escapeAttribute(
+                            item.link
+                          )}"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Open Vendor Link ↗
+                        </a>
+
+                      `
+                      : ""
+                    }
+
+                  </div>
+
                 </div>
-    
-    
-                <div class="metrics-block">
-    
-                  Quantity:
-                  <b>${escapeHTML(item.qty)}</b>
-                  <br>
-    
-                  Total Cost:
-                  <b>${escapeHTML(item.price)}</b>
-                  <br>
-    
-                  Status:
-                  <b>${escapeHTML(item.status)}</b>
-    
-                </div>
-    
-    
-                ${
-                  item.link &&
-                  item.link.startsWith("http")
-                    ? `
-                      <a
-                        class="url-btn"
-                        href="${escapeAttribute(item.link)}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Open Vendor Link ↗
-                      </a>
-                    `
-                    : ""
-                }
-    
-              </div>
-    
-            </div>
-          `;
-    
-        }).join("");
-    
-    
-        container.innerHTML = dashboardHTML;
-      }
-    
-    
-      // =========================================================
-      // TEAM STATISTICS
-      // =========================================================
-    
-      function showTeamStatistics() {
-    
-        // Safety check.
-        // Only executives should be able to get here.
-        if (!currentIsExecutive) {
-          return;
-        }
-    
-        if (!googleCredential) {
-          alert("Your Google login session is missing. Please sign in again.");
-          return;
-        }
-    
-    
-        const container = document.getElementById("portal-content");
-    
-        container.innerHTML = `
-          <div class="empty-state">
-    
-            <h3>Loading Team Statistics...</h3>
-    
-            <p>
-              Getting the latest team data.
-            </p>
-    
-          </div>
-        `;
-    
-    
-        fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
-          body: JSON.stringify({
-            token: googleCredential,
-            action: "teamStatistics"
-          })
-        })
-          .then(function(res) {
-            return res.json();
-          })
-          .then(function(result) {
-    
-            if (result.type !== "teamStatistics") {
-              throw new Error(
-                result.message || "Unable to load team statistics."
-              );
+
+              `;
+
             }
-    
-            renderTeamStatistics(result.data);
-          })
-          .catch(function(error) {
-    
-            console.error(error);
-    
-            container.innerHTML = `
-              <div class="empty-state">
-    
-                <h3>Unable to Load Team Statistics</h3>
-    
-                <p>
-                  ${escapeHTML(error.message)}
-                </p>
-    
-                <button
-                  onclick="backToDashboard()"
-                  style="
-                    margin-top: 15px;
-                    background: #1a73e8;
-                    border: none;
-                    color: white;
-                    padding: 11px 18px;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    font-size: 14px;
-                    font-weight: 600;
-                  "
-                >
-                  ← Back to Dashboard
-                </button>
-    
-              </div>
-            `;
-          });
+          )
+          .join("");
+
+
+      container.innerHTML =
+        html;
+
+    }
+
+
+    /* ======================================================
+       STATUS COLOR
+       ====================================================== */
+
+    function getStatusClass(
+      status
+    ) {
+
+      const normalized =
+        String(
+          status || ""
+        )
+        .toLowerCase()
+        .trim();
+
+
+      if (
+        normalized.includes(
+          "delivered"
+        )
+      ) {
+
+        return "status-delivered";
+
       }
-    
-    
-      // =========================================================
-      // RENDER TEAM STATISTICS PAGE
-      // =========================================================
-    
-      function renderTeamStatistics(stats) {
-    
-        const container =
-          document.getElementById("portal-content");
-    
-    
-        let statusHTML = "";
-    
-        const statuses =
-          Object.keys(stats.statusCounts || {});
-    
-    
-        if (statuses.length === 0) {
-    
-          statusHTML = `
-            <div class="metrics-block">
-              No status data available.
-            </div>
-          `;
-    
-        } else {
-    
-          statusHTML = statuses.map(function(status) {
-    
-            return `
-              <div class="metrics-block">
-    
-                <b>
-                  ${escapeHTML(status)}
-                </b>
-    
-                :
-                ${stats.statusCounts[status]}
-    
-              </div>
-            `;
-    
-          }).join("");
+
+
+      if (
+        normalized.includes(
+          "shipped"
+        )
+      ) {
+
+        return "status-shipped";
+
+      }
+
+
+      if (
+        normalized.includes(
+          "delay"
+        ) ||
+        normalized.includes(
+          "problem"
+        ) ||
+        normalized.includes(
+          "error"
+        )
+      ) {
+
+        return "status-problem";
+
+      }
+
+
+      if (
+        normalized.includes(
+          "process"
+        ) ||
+        normalized.includes(
+          "ordered"
+        ) ||
+        normalized.includes(
+          "step"
+        )
+      ) {
+
+        return "status-processing";
+
+      }
+
+
+      if (
+        normalized === "" ||
+        normalized.includes(
+          "pending"
+        )
+      ) {
+
+        return "status-pending";
+
+      }
+
+
+      return "status-default";
+
+    }
+
+
+    /* ======================================================
+       TEAM STATISTICS
+       ====================================================== */
+
+    function showTeamStatistics() {
+
+      /*
+       * This button should only exist for executives,
+       * but check anyway.
+       */
+
+      if (
+        !currentIsExecutive
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        !googleCredential
+      ) {
+
+        alert(
+          "Your Google login session is missing. Please sign in again."
+        );
+
+        return;
+
+      }
+
+
+      const container =
+        document.getElementById(
+          "portal-content"
+        );
+
+
+      container.innerHTML = `
+
+        <div class="empty-state">
+
+          <h3>
+            Loading Team Statistics...
+          </h3>
+
+          <p>
+            Getting the latest team data.
+          </p>
+
+        </div>
+
+      `;
+
+
+      fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "text/plain;charset=utf-8"
+          },
+
+          body:
+            JSON.stringify({
+              token:
+                googleCredential,
+
+              action:
+                "teamStatistics"
+            })
         }
-    
-    
-        container.innerHTML = `
-    
-          <div style="
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-          ">
-    
+      )
+
+      .then(
+        function(response) {
+
+          return response.json();
+
+        }
+      )
+
+      .then(
+        function(result) {
+
+
+          if (
+            result.type !==
+            "teamStatistics"
+          ) {
+
+            throw new Error(
+              result.message ||
+              "Unable to load team statistics."
+            );
+
+          }
+
+
+          renderTeamStatistics(
+            result.data
+          );
+
+        }
+      )
+
+      .catch(
+        function(error) {
+
+          console.error(error);
+
+
+          container.innerHTML = `
+
+            <div class="empty-state">
+
+              <h3>
+                Unable to Load Team Statistics
+              </h3>
+
+              <p>
+                ${escapeHTML(
+                  error.message
+                )}
+              </p>
+
+
+              <button
+                class="
+                  dashboard-button
+                  back-button
+                "
+                onclick="backToDashboard()"
+              >
+                ← Back to Dashboard
+              </button>
+
+            </div>
+
+          `;
+
+        }
+      );
+
+    }
+
+
+    /* ======================================================
+       RENDER TEAM STATISTICS
+       ====================================================== */
+
+    function renderTeamStatistics(
+      stats
+    ) {
+
+      const container =
+        document.getElementById(
+          "portal-content"
+        );
+
+
+      const statusCounts =
+        stats.statusCounts || {};
+
+
+      const statuses =
+        Object.keys(
+          statusCounts
+        );
+
+
+      let statusRows = "";
+
+
+      if (
+        statuses.length === 0
+      ) {
+
+        statusRows = `
+
+          <div
+            class="metrics-block"
+          >
+            No status data available.
+          </div>
+
+        `;
+
+      } else {
+
+        statusRows =
+          statuses
+            .map(
+              function(status) {
+
+                return `
+
+                  <div
+                    class="
+                      status-row
+                    "
+                  >
+
+                    <span>
+                      ${escapeHTML(
+                        status
+                      )}
+                    </span>
+
+                    <b>
+                      ${
+                        statusCounts[
+                          status
+                        ]
+                      }
+                    </b>
+
+                  </div>
+
+                `;
+
+              }
+            )
+            .join("");
+
+      }
+
+
+      container.innerHTML = `
+
+        <!-- BACK BUTTON -->
+
+        <div
+          class="dashboard-buttons"
+        >
+
+          <div
+            class="button-group"
+          >
+
             <button
-              onclick="backToDashboard()"
-              style="
-                background: white;
-                border: 1px solid #dadce0;
-                color: #5f6368;
-                padding: 11px 18px;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: 600;
-                cursor: pointer;
+              class="
+                dashboard-button
+                back-button
               "
+              onclick="backToDashboard()"
             >
               ← Back to Dashboard
             </button>
-    
+
           </div>
-    
-    
-          <div class="item-card">
-    
-            <div>
-    
-              <div class="item-name">
-                Total Orders
-              </div>
-    
-              <div class="metrics-block">
-    
-                <b>
-                  ${stats.totalOrders}
-                </b>
-    
-              </div>
-    
-            </div>
-    
-          </div>
-    
-    
-          <div class="item-card">
-    
-            <div>
-    
-              <div class="item-name">
-                Students
-              </div>
-    
-              <div class="metrics-block">
-    
-                <b>
-                  ${stats.totalStudents}
-                </b>
-    
-              </div>
-    
-            </div>
-    
-          </div>
-    
-    
-          <div class="item-card">
-    
-            <div>
-    
-              <div class="item-name">
-                Total Quantity
-              </div>
-    
-              <div class="metrics-block">
-    
-                <b>
-                  ${stats.totalQuantity}
-                </b>
-    
-              </div>
-    
-            </div>
-    
-          </div>
-    
-    
-          <div class="item-card">
-    
-            <div>
-    
-              <div class="item-name">
-                Total Cost
-              </div>
-    
-              <div class="metrics-block">
-    
-                <b>
-                  $${Number(stats.totalCost || 0).toFixed(2)}
-                </b>
-    
-              </div>
-    
-            </div>
-    
-          </div>
-    
-    
+
+        </div>
+
+
+        <!-- TOTAL ORDERS -->
+
+        <div
+          class="stat-card"
+        >
+
           <div
-            class="item-card"
-            style="
-              grid-column: 1 / -1;
-              min-height: auto;
-            "
+            class="stat-label"
           >
-    
-            <div class="item-name">
-              Orders by Status
-            </div>
-    
-            ${statusHTML}
-    
+            Total Orders
           </div>
-    
-        `;
+
+          <div
+            class="stat-number"
+          >
+            ${stats.totalOrders}
+          </div>
+
+        </div>
+
+
+        <!-- STUDENTS -->
+
+        <div
+          class="stat-card"
+        >
+
+          <div
+            class="stat-label"
+          >
+            Students
+          </div>
+
+          <div
+            class="stat-number"
+          >
+            ${stats.totalStudents}
+          </div>
+
+        </div>
+
+
+        <!-- TOTAL QUANTITY -->
+
+        <div
+          class="stat-card"
+        >
+
+          <div
+            class="stat-label"
+          >
+            Total Quantity
+          </div>
+
+          <div
+            class="stat-number"
+          >
+            ${stats.totalQuantity}
+          </div>
+
+        </div>
+
+
+        <!-- TOTAL COST -->
+
+        <div
+          class="stat-card"
+        >
+
+          <div
+            class="stat-label"
+          >
+            Total Cost
+          </div>
+
+          <div
+            class="stat-number"
+          >
+            $${Number(
+              stats.totalCost || 0
+            ).toFixed(2)}
+          </div>
+
+        </div>
+
+
+        <!-- STATUS BREAKDOWN -->
+
+        <div
+          class="
+            stat-card
+            statistics-wide
+          "
+        >
+
+          <div
+            class="item-name"
+          >
+            Orders by Status
+          </div>
+
+
+          ${statusRows}
+
+        </div>
+
+      `;
+
+    }
+
+
+    /* ======================================================
+       BACK TO DASHBOARD
+       ====================================================== */
+
+    function backToDashboard() {
+
+      if (
+        !currentDashboardData
+      ) {
+
+        returnToLogin();
+
+        return;
+
       }
-    
-    
-      // =========================================================
-      // BACK TO DASHBOARD
-      // =========================================================
-    
-      function backToDashboard() {
-    
-        if (!currentDashboardData) {
-          returnToLogin();
-          return;
-        }
-    
-        renderDashboard(
-          currentDashboardData,
-          currentIsExecutive
+
+
+      renderDashboard(
+        currentDashboardData,
+        currentIsExecutive
+      );
+
+    }
+
+
+    /* ======================================================
+       SIGN OUT
+       ====================================================== */
+
+    function returnToLogin() {
+
+      googleCredential =
+        null;
+
+
+      currentDashboardData =
+        null;
+
+
+      currentIsExecutive =
+        false;
+
+
+      location.reload();
+
+    }
+
+
+    /* ======================================================
+       ORDER FORM
+       ====================================================== */
+
+    function openOrderingForm() {
+
+      window.open(
+        "https://forms.gle/e2qgGCRH5vSSTHmF7",
+        "_blank"
+      );
+
+    }
+
+
+    /* ======================================================
+       HTML ESCAPING
+       ====================================================== */
+
+    function escapeHTML(
+      value
+    ) {
+
+      if (
+        value === null ||
+        value === undefined
+      ) {
+
+        return "";
+
+      }
+
+
+      return String(value)
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+        .replace(
+          /</g,
+          "&lt;"
+        )
+        .replace(
+          />/g,
+          "&gt;"
+        )
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+        .replace(
+          /'/g,
+          "&#039;"
         );
-      }
-    
-    
-      // =========================================================
-      // PACKAGE FILE FUNCTIONS
-      // These remain available if you later create an executive
-      // package-upload page.
-      // =========================================================
-    
-      function updateFileList() {
-    
-        const input =
-          document.getElementById("package-files");
-    
-        const fileList =
-          document.getElementById("file-list");
-    
-    
-        if (!input || !fileList) {
-          return;
-        }
-    
-    
-        fileList.innerHTML = "";
-    
-    
-        for (let i = 0; i < input.files.length; i++) {
-    
-          const fileItem =
-            document.createElement("div");
-    
-          fileItem.className = "file-item";
-    
-          fileItem.innerText =
-            "📷 " + input.files[i].name;
-    
-          fileList.appendChild(fileItem);
-        }
-      }
-    
-    
-      function fileToBase64(file) {
-    
-        return new Promise(function(resolve, reject) {
-    
-          const reader = new FileReader();
-    
-          reader.onload = function() {
-    
-            resolve(
-              reader.result.split(",")[1]
-            );
-    
-          };
-    
-          reader.onerror = function() {
-    
-            reject(
-              new Error("Could not read file")
-            );
-    
-          };
-    
-          reader.readAsDataURL(file);
-    
-        });
-      }
-    
-    
-      function uploadPackages() {
-    
-        const packageCountInput =
-          document.getElementById("package-count");
-    
-        const filesInput =
-          document.getElementById("package-files");
-    
-        const notesInput =
-          document.getElementById("package-notes");
-    
-        const uploadButton =
-          document.getElementById("upload-btn");
-    
-    
-        if (
-          !packageCountInput ||
-          !filesInput ||
-          !notesInput ||
-          !uploadButton
-        ) {
-          return;
-        }
-    
-    
-        const packageCount =
-          packageCountInput.value;
-    
-        const notes =
-          notesInput.value.trim();
-    
-        const files =
-          filesInput.files;
-    
-    
-        if (
-          !packageCount ||
-          Number(packageCount) < 1
-        ) {
-    
-          showUploadStatus(
-            "Enter number of packages.",
-            "error"
-          );
-    
-          return;
-        }
-    
-    
-        if (files.length === 0) {
-    
-          showUploadStatus(
-            "Select at least one photo.",
-            "error"
-          );
-    
-          return;
-        }
-    
-    
-        uploadButton.disabled = true;
-    
-        uploadButton.innerText =
-          "Uploading...";
-    
-        showUploadStatus(
-          "Processing photos...",
-          "loading"
-        );
-    
-    
-        const filePromises = [];
-    
-    
-        for (let i = 0; i < files.length; i++) {
-    
-          filePromises.push(
-            fileToBase64(files[i])
-              .then(function(base64) {
-    
-                return {
-                  name: files[i].name,
-                  mimeType: files[i].type,
-                  data: base64
-                };
-    
-              })
-          );
-        }
-    
-    
-        Promise.all(filePromises)
-          .then(function(encodedFiles) {
-    
-            const payload = {
-              files: encodedFiles,
-              notes: notes,
-              packageCount: Number(packageCount)
-            };
-    
-    
-            return fetch(API_URL, {
-              method: "POST",
-              headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-              },
-              body: JSON.stringify(payload)
-            });
-    
-          })
-          .then(function(response) {
-            return response.json();
-          })
-          .then(function(result) {
-    
-            if (result.status !== "success") {
-    
-              throw new Error(
-                result.message || "Upload failed."
-              );
-            }
-    
-    
-            showUploadStatus(
-              "Uploaded successfully!",
-              "success"
-            );
-    
-    
-            packageCountInput.value = 1;
-    
-            filesInput.value = "";
-    
-            notesInput.value = "";
-    
-            document.getElementById(
-              "file-list"
-            ).innerHTML = "";
-    
-          })
-          .catch(function(error) {
-    
-            showUploadStatus(
-              "Upload failed: " + error.message,
-              "error"
-            );
-    
-          })
-          .finally(function() {
-    
-            uploadButton.disabled = false;
-    
-            uploadButton.innerText =
-              "Upload Package Arrival";
-    
-          });
-      }
-    
-    
-      function showUploadStatus(message, type) {
-    
-        const statusDiv =
-          document.getElementById("upload-status");
-    
-    
-        if (!statusDiv) {
-          return;
-        }
-    
-    
-        statusDiv.innerText = message;
-    
-        statusDiv.className =
-          "upload-status " + type;
-      }
-    
-    
-      // =========================================================
-      // SIGN OUT
-      // =========================================================
-    
-      function returnToLogin() {
-    
-        googleCredential = null;
-    
-        currentDashboardData = null;
-    
-        currentIsExecutive = false;
-    
-        location.reload();
-      }
-    
-    
-      // =========================================================
-      // ORDERING FORM
-      // =========================================================
-    
-      function openOrderingForm() {
-    
-        window.open(
-          "https://forms.gle/e2qgGCRH5vSSTHmF7",
-          "_blank"
-        );
-      }
-    
-    
-      // =========================================================
-      // SMALL HTML SAFETY HELPERS
-      // =========================================================
-    
-      function escapeHTML(value) {
-    
-        if (value === null || value === undefined) {
-          return "";
-        }
-    
-        return String(value)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
-      }
-    
-    
-      function escapeAttribute(value) {
-    
-        return escapeHTML(value);
-      }
-    </script>
-  </body>
+
+    }
+
+
+    function escapeAttribute(
+      value
+    ) {
+
+      return escapeHTML(
+        value
+      );
+
+    }
+
+  </script>
+
+</body>
+
 </html>
