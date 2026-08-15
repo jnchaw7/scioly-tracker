@@ -15,7 +15,6 @@
   </title>
 
 
-  <!-- Google Identity Services -->
   <script
     src="https://accounts.google.com/gsi/client"
     async
@@ -39,9 +38,11 @@
         Arial,
         sans-serif;
 
-      padding: 40px 20px;
+      padding:
+        40px 20px;
 
-      margin: 0;
+      margin:
+        0;
 
       background:
         #f4f6f9;
@@ -55,7 +56,7 @@
     .main-wrapper {
 
       max-width:
-        1000px;
+        1050px;
 
       margin:
         0 auto;
@@ -70,7 +71,7 @@
     .navbar {
 
       background:
-        white;
+        #ffffff;
 
       padding:
         20px 30px;
@@ -186,8 +187,28 @@
     }
 
 
+    #error-msg {
+
+      color:
+        #d93025;
+
+      font-size:
+        14px;
+
+      margin-top:
+        15px;
+
+      font-weight:
+        500;
+
+      display:
+        none;
+
+    }
+
+
     /* ======================================================
-       GRID
+       MAIN GRID
        ====================================================== */
 
     .cards-grid {
@@ -208,7 +229,7 @@
 
 
     /* ======================================================
-       ORDER CARD
+       ORDER CARDS
        ====================================================== */
 
     .item-card {
@@ -223,7 +244,7 @@
         24px;
 
       background:
-        white;
+        #ffffff;
 
       box-shadow:
         0 3px 8px rgba(0,0,0,0.035);
@@ -238,7 +259,7 @@
         space-between;
 
       min-height:
-        220px;
+        235px;
 
       transition:
         transform 0.15s ease,
@@ -333,7 +354,7 @@
 
 
     /* ======================================================
-       ACTUAL STATUS PILL
+       ACTUAL STATUS
        ====================================================== */
 
     .order-status-box {
@@ -355,9 +376,6 @@
 
       text-align:
         center;
-
-      letter-spacing:
-        0.1px;
 
       border:
         1px solid transparent;
@@ -450,7 +468,7 @@
 
 
     /* ======================================================
-       VELOCITY ESTIMATE
+       VELOCITY
        ====================================================== */
 
     .delivery-estimate {
@@ -482,7 +500,7 @@
 
 
     /* ======================================================
-       VENDOR LINK
+       LINKS
        ====================================================== */
 
     .url-btn {
@@ -509,61 +527,8 @@
 
 
     .url-btn:hover {
-
       text-decoration:
         underline;
-
-    }
-
-
-    /* ======================================================
-       EMPTY
-       ====================================================== */
-
-    .empty-state {
-
-      text-align:
-        center;
-
-      color:
-        #5f6368;
-
-      padding:
-        60px;
-
-      background:
-        white;
-
-      border-radius:
-        14px;
-
-      grid-column:
-        1 / -1;
-
-    }
-
-
-    /* ======================================================
-       ERROR
-       ====================================================== */
-
-    #error-msg {
-
-      color:
-        #d93025;
-
-      font-size:
-        14px;
-
-      margin-top:
-        15px;
-
-      font-weight:
-        500;
-
-      display:
-        none;
-
     }
 
 
@@ -631,6 +596,14 @@
     }
 
 
+    .dashboard-button:hover {
+
+      opacity:
+        0.92;
+
+    }
+
+
     .signout-button {
 
       background:
@@ -681,16 +654,35 @@
     }
 
 
-    .dashboard-button:hover {
+    /* ======================================================
+       EMPTY STATE
+       ====================================================== */
 
-      opacity:
-        0.92;
+    .empty-state {
+
+      text-align:
+        center;
+
+      color:
+        #5f6368;
+
+      padding:
+        60px;
+
+      background:
+        white;
+
+      border-radius:
+        14px;
+
+      grid-column:
+        1 / -1;
 
     }
 
 
     /* ======================================================
-       STATISTICS
+       STATISTICS CARDS
        ====================================================== */
 
     .stat-card {
@@ -713,6 +705,17 @@
     }
 
 
+    .stat-label {
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
     .stat-number {
 
       font-size:
@@ -730,7 +733,118 @@
     }
 
 
-    .stat-label {
+    .statistics-wide {
+
+      grid-column:
+        1 / -1;
+
+    }
+
+
+    .statistics-section-title {
+
+      font-size:
+        20px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+      margin-bottom:
+        16px;
+
+    }
+
+
+    /* ======================================================
+       EVENT CARDS
+       ====================================================== */
+
+    .event-stat-grid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        repeat(
+          auto-fill,
+          minmax(250px, 1fr)
+        );
+
+      gap:
+        16px;
+
+    }
+
+
+    .event-stat-card {
+
+      width:
+        100%;
+
+      text-align:
+        left;
+
+      background:
+        white;
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        22px;
+
+      cursor:
+        pointer;
+
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.035);
+
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
+
+    }
+
+
+    .event-stat-card:hover {
+
+      transform:
+        translateY(-2px);
+
+      box-shadow:
+        0 6px 18px rgba(0,0,0,0.08);
+
+      border-color:
+        #c6dafc;
+
+    }
+
+
+    .event-stat-name {
+
+      font-size:
+        18px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+      margin-bottom:
+        18px;
+
+    }
+
+
+    .event-stat-label {
 
       font-size:
         13px;
@@ -741,15 +855,177 @@
     }
 
 
-    .statistics-wide {
+    .event-stat-price {
 
-      grid-column:
-        1 / -1;
+      font-size:
+        30px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+      margin-top:
+        4px;
 
     }
 
 
-    .status-row {
+    .event-stat-orders {
+
+      margin-top:
+        8px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .event-stat-arrow {
+
+      margin-top:
+        18px;
+
+      font-size:
+        13px;
+
+      font-weight:
+        600;
+
+      color:
+        #1a73e8;
+
+    }
+
+
+    /* ======================================================
+       EVENT DETAIL
+       ====================================================== */
+
+    .event-detail-title {
+
+      font-size:
+        24px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .event-detail-total-label {
+
+      margin-top:
+        18px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .event-detail-total {
+
+      margin-top:
+        4px;
+
+      font-size:
+        34px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-event-card {
+
+      background:
+        white;
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        20px;
+
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.035);
+
+    }
+
+
+    .people-event-list {
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      gap:
+        14px;
+
+    }
+
+
+    .person-event-email {
+
+      font-size:
+        15px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-event-total {
+
+      margin-top:
+        4px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .event-items-list {
+
+      margin-top:
+        16px;
+
+      border-top:
+        1px solid #f1f3f4;
+
+    }
+
+
+    .event-item-row {
 
       display:
         flex;
@@ -760,19 +1036,19 @@
       align-items:
         center;
 
+      gap:
+        20px;
+
       padding:
-        10px 0;
+        13px 0;
 
       border-bottom:
         1px solid #f1f3f4;
 
-      font-size:
-        14px;
-
     }
 
 
-    .status-row:last-child {
+    .event-item-row:last-child {
 
       border-bottom:
         none;
@@ -780,9 +1056,327 @@
     }
 
 
+    .event-item-name {
+
+      font-size:
+        14px;
+
+      font-weight:
+        600;
+
+      color:
+        #202124;
+
+    }
+
+
+    .event-item-quantity {
+
+      margin-top:
+        3px;
+
+      font-size:
+        12px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .event-item-price {
+
+      font-size:
+        14px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+      white-space:
+        nowrap;
+
+    }
+
+
     /* ======================================================
-       RESPONSIVE
+       PEOPLE SECTION
        ====================================================== */
+
+    .people-stat-grid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        repeat(
+          auto-fill,
+          minmax(250px, 1fr)
+        );
+
+      gap:
+        16px;
+
+    }
+
+
+    .person-stat-card {
+
+      width:
+        100%;
+
+      text-align:
+        left;
+
+      background:
+        white;
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        22px;
+
+      cursor:
+        pointer;
+
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.035);
+
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
+
+    }
+
+
+    .person-stat-card:hover {
+
+      transform:
+        translateY(-2px);
+
+      box-shadow:
+        0 6px 18px rgba(0,0,0,0.08);
+
+      border-color:
+        #c6dafc;
+
+    }
+
+
+    .person-stat-name {
+
+      font-size:
+        18px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-stat-orders {
+
+      margin-top:
+        10px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .person-stat-total {
+
+      margin-top:
+        4px;
+
+      font-size:
+        26px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    /* ======================================================
+       PERSON DETAIL
+       ====================================================== */
+
+    .person-detail-name {
+
+      font-size:
+        24px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-detail-subtitle {
+
+      margin-top:
+        5px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .person-detail-total {
+
+      margin-top:
+        18px;
+
+      font-size:
+        34px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-item-card {
+
+      background:
+        white;
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        18px;
+
+      box-shadow:
+        0 2px 6px rgba(0,0,0,0.03);
+
+    }
+
+
+    .person-item-header {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      gap:
+        15px;
+
+      align-items:
+        center;
+
+    }
+
+
+    .person-item-name {
+
+      font-size:
+        15px;
+
+      font-weight:
+        650;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-item-price {
+
+      font-size:
+        15px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+      white-space:
+        nowrap;
+
+    }
+
+
+    .person-item-details {
+
+      margin-top:
+        8px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+      line-height:
+        1.6;
+
+    }
+
+
+    .person-item-status {
+
+      display:
+        inline-block;
+
+      margin-top:
+        10px;
+
+      padding:
+        5px 9px;
+
+      border-radius:
+        999px;
+
+      background:
+        #f1f3f4;
+
+      color:
+        #5f6368;
+
+      font-size:
+        11px;
+
+      font-weight:
+        600;
+
+    }
+
 
     @media (
       max-width: 600px
@@ -812,183 +1406,6 @@
       }
 
     }
-      .event-section {
-        width: 100%;
-      }
-      
-      .statistics-section-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: #202124;
-        margin-bottom: 16px;
-      }
-      
-      .event-stat-grid {
-        display: grid;
-        grid-template-columns:
-          repeat(
-            auto-fill,
-            minmax(250px, 1fr)
-          );
-        gap: 16px;
-      }
-      
-      .event-stat-card {
-        width: 100%;
-        text-align: left;
-      
-        background: white;
-      
-        border: 1px solid #e0e0e0;
-      
-        border-radius: 14px;
-      
-        padding: 22px;
-      
-        cursor: pointer;
-      
-        box-shadow:
-          0 3px 8px rgba(0,0,0,0.035);
-      
-        transition:
-          transform 0.15s ease,
-          box-shadow 0.15s ease,
-          border-color 0.15s ease;
-      }
-      
-      .event-stat-card:hover {
-        transform: translateY(-2px);
-      
-        box-shadow:
-          0 6px 18px rgba(0,0,0,0.08);
-      
-        border-color: #c6dafc;
-      }
-      
-      .event-stat-name {
-        font-size: 18px;
-        font-weight: 700;
-        color: #202124;
-        margin-bottom: 18px;
-      }
-      
-      .event-stat-label {
-        font-size: 13px;
-        color: #5f6368;
-      }
-      
-      .event-stat-price {
-        font-size: 30px;
-        font-weight: 700;
-        color: #202124;
-        margin-top: 4px;
-      }
-      
-      .event-stat-orders {
-        margin-top: 8px;
-        font-size: 13px;
-        color: #5f6368;
-      }
-      
-      .event-stat-arrow {
-        margin-top: 18px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #1a73e8;
-      }
-      
-      .event-detail-title {
-        font-size: 24px;
-        font-weight: 700;
-        color: #202124;
-      }
-      
-      .event-detail-total-label {
-        margin-top: 18px;
-        font-size: 13px;
-        color: #5f6368;
-      }
-      
-      .event-detail-total {
-        margin-top: 4px;
-        font-size: 34px;
-        font-weight: 700;
-        color: #202124;
-      }
-      
-      .people-section {
-        width: 100%;
-      }
-      
-      .people-event-list {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-      }
-      
-      .person-event-card {
-        background: white;
-      
-        border: 1px solid #e0e0e0;
-      
-        border-radius: 14px;
-      
-        padding: 20px;
-      
-        box-shadow:
-          0 3px 8px rgba(0,0,0,0.035);
-      }
-      
-      .person-event-email {
-        font-size: 15px;
-        font-weight: 700;
-        color: #202124;
-      }
-      
-      .person-event-total {
-        margin-top: 4px;
-        font-size: 13px;
-        color: #5f6368;
-      }
-      
-      .event-items-list {
-        margin-top: 16px;
-        border-top: 1px solid #f1f3f4;
-      }
-      
-      .event-item-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-      
-        padding: 13px 0;
-      
-        border-bottom: 1px solid #f1f3f4;
-      }
-      
-      .event-item-row:last-child {
-        border-bottom: none;
-      }
-      
-      .event-item-name {
-        font-size: 14px;
-        font-weight: 600;
-        color: #202124;
-      }
-      
-      .event-item-quantity {
-        margin-top: 3px;
-        font-size: 12px;
-        color: #5f6368;
-      }
-      
-      .event-item-price {
-        font-size: 14px;
-        font-weight: 700;
-        color: #202124;
-        white-space: nowrap;
-      }
 
   </style>
 
@@ -1087,47 +1504,33 @@
 
   <script>
 
-    /*
-     * ======================================================
-     * CONFIGURATION
-     * ======================================================
-     */
-
     const API_URL =
       "https://script.google.com/macros/s/AKfycbzag2WkgUl-_WO4-xlbGJZ3n2sfVk6AFtvzGBCowHF4PxlS0U5Yq6h3IxMV_Xie-4g/exec";
 
 
-    /*
-     * Current Google ID token.
-     *
-     * This is stored in the browser only while the user
-     * is signed in.
-     */
-
-    let googleCredential = null;
+    let googleCredential =
+      null;
 
 
-    /*
-     * Current dashboard data.
-     *
-     * Used to return from Team Statistics.
-     */
-
-    let currentDashboardData = null;
+    let currentDashboardData =
+      null;
 
 
-    /*
-     * Whether the current account is an executive.
-     */
+    let currentIsExecutive =
+      false;
 
-    let currentIsExecutive = false;
+
+    let savedTeamStatistics =
+      null;
 
 
     /* ======================================================
        GOOGLE LOGIN
        ====================================================== */
 
-    function handleCredentialResponse(response) {
+    function handleCredentialResponse(
+      response
+    ) {
 
       const errorDiv =
         document.getElementById(
@@ -1146,18 +1549,25 @@
       fetch(
         API_URL,
         {
-          method: "POST",
+
+          method:
+            "POST",
 
           headers: {
+
             "Content-Type":
               "text/plain;charset=utf-8"
+
           },
 
           body:
             JSON.stringify({
+
               token:
                 response.credential
+
             })
+
         }
       )
 
@@ -1173,14 +1583,9 @@
         function(data) {
 
 
-          /*
-           * ================================================
-           * EXECUTIVE
-           * ================================================
-           */
-
           if (
-            data.type === "exec"
+            data.type ===
+            "exec"
           ) {
 
             renderDashboard(
@@ -1193,14 +1598,9 @@
           }
 
 
-          /*
-           * ================================================
-           * STUDENT
-           * ================================================
-           */
-
           if (
-            data.type === "student"
+            data.type ===
+            "student"
           ) {
 
             renderDashboard(
@@ -1212,12 +1612,6 @@
 
           }
 
-
-          /*
-           * ================================================
-           * ERROR
-           * ================================================
-           */
 
           errorDiv.innerText =
             data.message ||
@@ -1233,7 +1627,9 @@
       .catch(
         function(error) {
 
-          console.error(error);
+          console.error(
+            error
+          );
 
 
           errorDiv.innerText =
@@ -1266,13 +1662,9 @@
         isExecutive;
 
 
-      const session =
-        document.getElementById(
-          "user-session"
-        );
-
-
-      session.innerText =
+      document.getElementById(
+        "user-session"
+      ).innerText =
         isExecutive
           ? "Executive Portal: " +
             data.email
@@ -1296,16 +1688,11 @@
         "grid";
 
 
-      /*
-       * TOP BUTTONS
-       */
-
       let html = `
 
         <div class="dashboard-buttons">
 
           <div class="button-group">
-
 
             <button
               class="
@@ -1354,10 +1741,6 @@
       `;
 
 
-      /*
-       * NO ORDERS
-       */
-
       if (
         !data.items ||
         data.items.length === 0
@@ -1390,22 +1773,18 @@
       }
 
 
-      /*
-       * ORDER CARDS
-       */
-
       html +=
         data.items
           .map(
             function(item) {
 
-              const statusClass =
+              var statusClass =
                 getStatusClass(
                   item.orderStatus
                 );
 
 
-              const estimateClass =
+              var estimateClass =
                 item.isStuck
                   ? "delivery-estimate delivery-delayed"
                   : "delivery-estimate";
@@ -1419,9 +1798,6 @@
 
                   <div>
 
-
-                    <!-- ITEM -->
-
                     <div
                       class="item-name"
                     >
@@ -1430,8 +1806,6 @@
                       )}
                     </div>
 
-
-                    <!-- BASIC INFO -->
 
                     <div
                       class="metrics-block"
@@ -1446,7 +1820,6 @@
 
                       <br>
 
-
                       Total Cost:
                       <b>
                         ${escapeHTML(
@@ -1456,8 +1829,6 @@
 
                     </div>
 
-
-                    <!-- SIGNATURES -->
 
                     <div
                       class="
@@ -1479,8 +1850,6 @@
                     </div>
 
 
-                    <!-- ACTUAL STATUS -->
-
                     <div
                       class="
                         order-status-box
@@ -1493,8 +1862,6 @@
                     </div>
 
 
-                    <!-- ESTIMATED DELIVERY -->
-
                     <div
                       class="${estimateClass}"
                     >
@@ -1504,28 +1871,26 @@
                     </div>
 
 
-                    <!-- VENDOR -->
-
                     ${
                       item.link &&
                       item.link.startsWith(
                         "http"
                       )
-                      ? `
+                        ? `
 
-                        <a
-                          class="url-btn"
-                          href="${escapeAttribute(
-                            item.link
-                          )}"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Open Vendor Link ↗
-                        </a>
+                          <a
+                            class="url-btn"
+                            href="${escapeAttribute(
+                              item.link
+                            )}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Open Vendor Link ↗
+                          </a>
 
-                      `
-                      : ""
+                        `
+                        : ""
                     }
 
                   </div>
@@ -1546,14 +1911,14 @@
 
 
     /* ======================================================
-       STATUS COLOR
+       STATUS STYLE
        ====================================================== */
 
     function getStatusClass(
       status
     ) {
 
-      const normalized =
+      var normalized =
         String(
           status || ""
         )
@@ -1640,11 +2005,6 @@
 
     function showTeamStatistics() {
 
-      /*
-       * This button should only exist for executives,
-       * but check anyway.
-       */
-
       if (
         !currentIsExecutive
       ) {
@@ -1693,21 +2053,28 @@
       fetch(
         API_URL,
         {
-          method: "POST",
+
+          method:
+            "POST",
 
           headers: {
+
             "Content-Type":
               "text/plain;charset=utf-8"
+
           },
 
           body:
             JSON.stringify({
+
               token:
                 googleCredential,
 
               action:
                 "teamStatistics"
+
             })
+
         }
       )
 
@@ -1736,9 +2103,10 @@
           }
 
 
-          window.savedTeamStatistics =
+          savedTeamStatistics =
             result.data;
-          
+
+
           renderTeamStatistics(
             result.data
           );
@@ -1749,7 +2117,9 @@
       .catch(
         function(error) {
 
-          console.error(error);
+          console.error(
+            error
+          );
 
 
           container.innerHTML = `
@@ -1791,96 +2161,241 @@
        RENDER TEAM STATISTICS
        ====================================================== */
 
-    function renderTeamStatistics(stats) {
+    function renderTeamStatistics(
+      stats
+    ) {
 
-      var container =
+      const container =
         document.getElementById(
           "portal-content"
         );
-    
-    
+
+
       var events =
         stats.events || [];
-    
-    
-      var eventCards = "";
-    
-    
-      if (events.length === 0) {
-    
+
+
+      var people =
+        stats.people || [];
+
+
+      var eventCards =
+        "";
+
+
+      if (
+        events.length === 0
+      ) {
+
         eventCards = `
+
           <div class="empty-state">
-            <h3>No Events Found</h3>
+
+            <h3>
+              No Events Found
+            </h3>
+
             <p>
               No event data is currently available.
             </p>
+
           </div>
+
         `;
-    
+
       } else {
-    
+
         eventCards =
           events
-            .map(function(event, index) {
-    
-              return `
-                <button
-                  class="event-stat-card"
-                  onclick="showEventDetails(${index})"
-                >
-    
-                  <div class="event-stat-name">
-                    ${escapeHTML(
-                      event.eventName
-                    )}
-                  </div>
-    
-                  <div class="event-stat-label">
-                    Total Spending
-                  </div>
-    
-                  <div class="event-stat-price">
-                    $${Number(
-                      event.totalCost || 0
-                    ).toFixed(2)}
-                  </div>
-    
-                  <div class="event-stat-orders">
-                    ${event.orderCount}
-                    ${
-                      event.orderCount === 1
-                        ? "order"
-                        : "orders"
-                    }
-                  </div>
-    
-                  <div class="event-stat-arrow">
-                    View Details →
-                  </div>
-    
-                </button>
-              `;
-    
-            })
+            .map(
+              function(event, index) {
+
+                return `
+
+                  <button
+                    class="
+                      event-stat-card
+                    "
+                    onclick="showEventDetails(${index})"
+                  >
+
+                    <div
+                      class="
+                        event-stat-name
+                      "
+                    >
+                      ${escapeHTML(
+                        event.eventName
+                      )}
+                    </div>
+
+
+                    <div
+                      class="
+                        event-stat-label
+                      "
+                    >
+                      Total Spending
+                    </div>
+
+
+                    <div
+                      class="
+                        event-stat-price
+                      "
+                    >
+                      $${Number(
+                        event.totalCost || 0
+                      ).toFixed(2)}
+                    </div>
+
+
+                    <div
+                      class="
+                        event-stat-orders
+                      "
+                    >
+                      ${event.orderCount}
+                      ${
+                        event.orderCount === 1
+                          ? "order"
+                          : "orders"
+                      }
+                    </div>
+
+
+                    <div
+                      class="
+                        event-stat-arrow
+                      "
+                    >
+                      View Details →
+                    </div>
+
+                  </button>
+
+                `;
+
+              }
+            )
             .join("");
-    
+
       }
-    
-    
-      /*
-       * Save event data so clicking a card can
-       * open its detailed page.
-       */
-      window.currentStatisticsEvents =
+
+
+      var peopleCards =
+        "";
+
+
+      if (
+        people.length === 0
+      ) {
+
+        peopleCards = `
+
+          <div class="empty-state">
+
+            <h3>
+              No People Found
+            </h3>
+
+            <p>
+              No order records are currently available.
+            </p>
+
+          </div>
+
+        `;
+
+      } else {
+
+        peopleCards =
+          people
+            .map(
+              function(person, index) {
+
+                return `
+
+                  <button
+                    class="
+                      person-stat-card
+                    "
+                    onclick="showPersonDetails(${index})"
+                  >
+
+                    <div
+                      class="
+                        person-stat-name
+                      "
+                    >
+                      ${escapeHTML(
+                        person.name
+                      )}
+                    </div>
+
+
+                    <div
+                      class="
+                        person-stat-orders
+                      "
+                    >
+                      ${person.orderCount}
+                      ${
+                        person.orderCount === 1
+                          ? "order"
+                          : "orders"
+                      }
+                    </div>
+
+
+                    <div
+                      class="
+                        person-stat-total
+                      "
+                    >
+                      $${Number(
+                        person.totalCost || 0
+                      ).toFixed(2)}
+                    </div>
+
+
+                    <div
+                      class="
+                        event-stat-arrow
+                      "
+                    >
+                      View Orders →
+                    </div>
+
+                  </button>
+
+                `;
+
+              }
+            )
+            .join("");
+
+      }
+
+
+      window.statisticsEvents =
         events;
-    
-    
+
+
+      window.statisticsPeople =
+        people;
+
+
       container.innerHTML = `
-    
-        <div class="dashboard-buttons">
-    
-          <div class="button-group">
-    
+
+        <div
+          class="dashboard-buttons"
+        >
+
+          <div
+            class="button-group"
+          >
+
             <button
               class="
                 dashboard-button
@@ -1890,232 +2405,336 @@
             >
               ← Back to Dashboard
             </button>
-    
+
           </div>
-    
+
         </div>
-    
-    
-        <div class="stat-card">
-    
-          <div class="stat-label">
+
+
+        <!-- OVERALL -->
+
+        <div
+          class="stat-card"
+        >
+
+          <div
+            class="stat-label"
+          >
             Total Orders
           </div>
-    
-          <div class="stat-number">
+
+          <div
+            class="stat-number"
+          >
             ${stats.totalOrders}
           </div>
-    
+
         </div>
-    
-    
-        <div class="stat-card">
-    
-          <div class="stat-label">
+
+
+        <div
+          class="stat-card"
+        >
+
+          <div
+            class="stat-label"
+          >
             Students
           </div>
-    
-          <div class="stat-number">
+
+          <div
+            class="stat-number"
+          >
             ${stats.totalStudents}
           </div>
-    
+
         </div>
-    
-    
-        <div class="stat-card">
-    
-          <div class="stat-label">
+
+
+        <div
+          class="stat-card"
+        >
+
+          <div
+            class="stat-label"
+          >
             Total Quantity
           </div>
-    
-          <div class="stat-number">
+
+          <div
+            class="stat-number"
+          >
             ${stats.totalQuantity}
           </div>
-    
+
         </div>
-    
-    
-        <div class="stat-card">
-    
-          <div class="stat-label">
+
+
+        <div
+          class="stat-card"
+        >
+
+          <div
+            class="stat-label"
+          >
             Total Spending
           </div>
-    
-          <div class="stat-number">
+
+          <div
+            class="stat-number"
+          >
             $${Number(
               stats.totalCost || 0
             ).toFixed(2)}
           </div>
-    
+
         </div>
-    
-    
-        <div class="
-          statistics-wide
-          event-section
-        ">
-    
-          <div class="statistics-section-title">
+
+
+        <!-- EVENTS -->
+
+        <div
+          class="
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              statistics-section-title
+            "
+          >
             Spending by Event
           </div>
-    
-          <div class="event-stat-grid">
+
+
+          <div
+            class="
+              event-stat-grid
+            "
+          >
             ${eventCards}
           </div>
-    
+
         </div>
-    
+
+
+        <!-- PEOPLE -->
+
+        <div
+          class="
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              statistics-section-title
+            "
+          >
+            People
+          </div>
+
+
+          <div
+            class="
+              people-stat-grid
+            "
+          >
+            ${peopleCards}
+          </div>
+
+        </div>
+
       `;
-    
+
     }
 
 
     /* ======================================================
-       BACK TO DASHBOARD
+       EVENT DETAILS
        ====================================================== */
-    
-    
-    function showEventDetails(eventIndex) {
 
-      if (
-        !window.currentStatisticsEvents ||
-        !window.currentStatisticsEvents[eventIndex]
-      ) {
+    function showEventDetails(
+      eventIndex
+    ) {
+
+      var events =
+        window.statisticsEvents ||
+        [];
+
+
+      var event =
+        events[eventIndex];
+
+
+      if (!event) {
         return;
       }
-    
-    
-      var event =
-        window.currentStatisticsEvents[
-          eventIndex
-        ];
-    
-    
-      var container =
+
+
+      const container =
         document.getElementById(
           "portal-content"
         );
-    
-    
-      var peopleHTML = "";
-    
-    
+
+
+      var peopleHTML =
+        "";
+
+
       if (
         !event.people ||
         event.people.length === 0
       ) {
-    
+
         peopleHTML = `
+
           <div class="empty-state">
+
             No orders found for this event.
+
           </div>
+
         `;
-    
+
       } else {
-    
+
         peopleHTML =
           event.people
-            .map(function(person) {
-    
-              var itemsHTML = "";
-    
-    
-              if (
-                person.items &&
-                person.items.length > 0
-              ) {
-    
-                itemsHTML =
-                  person.items
-                    .map(function(item) {
-    
-                      return `
-                        <div class="event-item-row">
-    
-                          <div>
-                            <div class="event-item-name">
-                              ${escapeHTML(
-                                item.itemName
-                              )}
+            .map(
+              function(person) {
+
+                var itemsHTML =
+                  "";
+
+
+                if (
+                  person.items &&
+                  person.items.length > 0
+                ) {
+
+                  itemsHTML =
+                    person.items
+                      .map(
+                        function(item) {
+
+                          return `
+
+                            <div
+                              class="
+                                event-item-row
+                              "
+                            >
+
+                              <div>
+
+                                <div
+                                  class="
+                                    event-item-name
+                                  "
+                                >
+                                  ${escapeHTML(
+                                    item.itemName
+                                  )}
+                                </div>
+
+
+                                <div
+                                  class="
+                                    event-item-quantity
+                                  "
+                                >
+                                  Quantity:
+                                  ${escapeHTML(
+                                    item.quantity
+                                  )}
+                                </div>
+
+                              </div>
+
+
+                              <div
+                                class="
+                                  event-item-price
+                                "
+                              >
+                                $${Number(
+                                  item.price || 0
+                                ).toFixed(2)}
+                              </div>
+
                             </div>
-    
-                            <div class="event-item-quantity">
-                              Quantity:
-                              ${escapeHTML(
-                                item.quantity
-                              )}
-                            </div>
-                          </div>
-    
-                          <div class="event-item-price">
-                            $${Number(
-                              item.price || 0
-                            ).toFixed(2)}
-                          </div>
-    
-                        </div>
-                      `;
-    
-                    })
-                    .join("");
-    
-              } else {
-    
-                itemsHTML = `
-                  <div class="metrics-block">
-                    No items found.
-                  </div>
-                `;
-    
-              }
-    
-    
-              return `
-                <div class="person-event-card">
-    
-                  <div class="person-event-header">
-    
-                    <div>
-    
-                      <div class="person-event-email">
-                        ${escapeHTML(
-                          person.email
-                        )}
-                      </div>
-    
-                      <div class="person-event-total">
-                        Total:
-                        $${Number(
-                          person.totalCost || 0
-                        ).toFixed(2)}
-                      </div>
-    
+
+                          `;
+
+                        }
+                      )
+                      .join("");
+
+                }
+
+
+                return `
+
+                  <div
+                    class="
+                      person-event-card
+                    "
+                  >
+
+                    <div
+                      class="
+                        person-event-email
+                      "
+                    >
+                      ${escapeHTML(
+                        person.name
+                      )}
                     </div>
-    
+
+
+                    <div
+                      class="
+                        person-event-total
+                      "
+                    >
+                      $${Number(
+                        person.totalCost || 0
+                      ).toFixed(2)}
+                      total
+                    </div>
+
+
+                    <div
+                      class="
+                        event-items-list
+                      "
+                    >
+                      ${itemsHTML}
+                    </div>
+
                   </div>
-    
-    
-                  <div class="event-items-list">
-    
-                    ${itemsHTML}
-    
-                  </div>
-    
-                </div>
-              `;
-    
-            })
+
+                `;
+
+              }
+            )
             .join("");
-    
+
       }
-    
-    
+
+
       container.innerHTML = `
-    
-        <div class="dashboard-buttons">
-    
-          <div class="button-group">
-    
+
+        <div
+          class="dashboard-buttons"
+        >
+
+          <div
+            class="button-group"
+          >
+
             <button
               class="
                 dashboard-button
@@ -2125,70 +2744,352 @@
             >
               ← Back to Team Statistics
             </button>
-    
+
           </div>
-    
+
         </div>
-    
-    
-        <div class="
-          stat-card
-          statistics-wide
-        ">
-    
-          <div class="event-detail-title">
+
+
+        <div
+          class="
+            stat-card
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              event-detail-title
+            "
+          >
             ${escapeHTML(
               event.eventName
             )}
           </div>
-    
-          <div class="event-detail-total-label">
+
+
+          <div
+            class="
+              event-detail-total-label
+            "
+          >
             Total Spending
           </div>
-    
-          <div class="event-detail-total">
+
+
+          <div
+            class="
+              event-detail-total
+            "
+          >
             $${Number(
               event.totalCost || 0
             ).toFixed(2)}
           </div>
-    
+
         </div>
-    
-    
-        <div class="
-          statistics-wide
-          people-section
-        ">
-    
-          <div class="statistics-section-title">
+
+
+        <div
+          class="
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              statistics-section-title
+            "
+          >
             Orders by Person
           </div>
-    
-          <div class="people-event-list">
+
+
+          <div
+            class="
+              people-event-list
+            "
+          >
             ${peopleHTML}
           </div>
-    
+
         </div>
-    
+
       `;
-    
+
     }
+
+
+    /* ======================================================
+       PERSON DETAILS
+       ====================================================== */
+
+    function showPersonDetails(
+      personIndex
+    ) {
+
+      var people =
+        window.statisticsPeople ||
+        [];
+
+
+      var person =
+        people[personIndex];
+
+
+      if (!person) {
+        return;
+      }
+
+
+      const container =
+        document.getElementById(
+          "portal-content"
+        );
+
+
+      var items =
+        person.items || [];
+
+
+      var itemsHTML =
+        "";
+
+
+      if (
+        items.length === 0
+      ) {
+
+        itemsHTML = `
+
+          <div class="empty-state">
+
+            No orders found for this person.
+
+          </div>
+
+        `;
+
+      } else {
+
+        itemsHTML =
+          items
+            .map(
+              function(item) {
+
+                var statusClass =
+                  getStatusClass(
+                    item.status
+                  );
+
+
+                return `
+
+                  <div
+                    class="
+                      person-item-card
+                    "
+                  >
+
+                    <div
+                      class="
+                        person-item-header
+                      "
+                    >
+
+                      <div
+                        class="
+                          person-item-name
+                        "
+                      >
+                        ${escapeHTML(
+                          item.itemName
+                        )}
+                      </div>
+
+
+                      <div
+                        class="
+                          person-item-price
+                        "
+                      >
+                        $${Number(
+                          item.price || 0
+                        ).toFixed(2)}
+                      </div>
+
+                    </div>
+
+
+                    <div
+                      class="
+                        person-item-details
+                      "
+                    >
+
+                      Quantity:
+                      ${escapeHTML(
+                        item.quantity
+                      )}
+
+                      <br>
+
+                      Event:
+                      ${escapeHTML(
+                        item.eventName
+                      )}
+
+                    </div>
+
+
+                    <div
+                      class="
+                        person-item-status
+                        ${statusClass}
+                      "
+                    >
+                      ${escapeHTML(
+                        item.status
+                      )}
+                    </div>
+
+                  </div>
+
+                `;
+
+              }
+            )
+            .join("");
+
+      }
+
+
+      container.innerHTML = `
+
+        <div
+          class="dashboard-buttons"
+        >
+
+          <div
+            class="button-group"
+          >
+
+            <button
+              class="
+                dashboard-button
+                back-button
+              "
+              onclick="renderTeamStatisticsFromSavedData()"
+            >
+              ← Back to Team Statistics
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            stat-card
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              person-detail-name
+            "
+          >
+            ${escapeHTML(
+              person.name
+            )}
+          </div>
+
+
+          <div
+            class="
+              person-detail-subtitle
+            "
+          >
+            ${person.orderCount}
+            ${
+              person.orderCount === 1
+                ? "order"
+                : "orders"
+            }
+          </div>
+
+
+          <div
+            class="
+              person-detail-total
+            "
+          >
+            $${Number(
+              person.totalCost || 0
+            ).toFixed(2)}
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              statistics-section-title
+            "
+          >
+            Ordered Items
+          </div>
+
+
+          <div
+            class="people-event-list"
+          >
+            ${itemsHTML}
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+
+    /* ======================================================
+       RETURN TO TEAM STATS
+       ====================================================== */
 
     function renderTeamStatisticsFromSavedData() {
 
       if (
-        window.savedTeamStatistics
+        savedTeamStatistics
       ) {
-    
+
         renderTeamStatistics(
-          window.savedTeamStatistics
+          savedTeamStatistics
         );
-    
+
+        return;
+
       }
-    
+
+
+      showTeamStatistics();
+
     }
 
-    
+
+    /* ======================================================
+       BACK TO PERSONAL DASHBOARD
+       ====================================================== */
+
     function backToDashboard() {
 
       if (
@@ -2228,6 +3129,10 @@
         false;
 
 
+      savedTeamStatistics =
+        null;
+
+
       location.reload();
 
     }
@@ -2261,27 +3166,31 @@
       ) {
 
         return "";
-
       }
 
 
       return String(value)
+
         .replace(
           /&/g,
           "&amp;"
         )
+
         .replace(
           /</g,
           "&lt;"
         )
+
         .replace(
           />/g,
           "&gt;"
         )
+
         .replace(
           /"/g,
           "&quot;"
         )
+
         .replace(
           /'/g,
           "&#039;"
