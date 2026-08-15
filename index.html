@@ -617,6 +617,19 @@
 
     }
 
+    .refresh-button {
+
+      background:
+        #f1f3f4;
+    
+      color:
+        #202124;
+    
+      border:
+        1px solid #dadce0;
+    
+    }
+
 
     .order-button {
 
@@ -1672,7 +1685,8 @@
         id="g_id_onload"
         data-client_id="483790698157-mk3l3ugqgvh4uv10q3bng2g9j8j3vp8q.apps.googleusercontent.com"
         data-callback="handleCredentialResponse"
-        data-auto_prompt="false"
+        data-auto_prompt="true"
+        data-auto_select="true"
       >
       </div>
 
@@ -1914,6 +1928,26 @@
               onclick="returnToLogin()"
             >
               ← Sign Out
+            </button>
+
+            <button
+              class="
+                dashboard-button
+                refresh-button
+              "
+              onclick="refreshDashboard()"
+            >
+              ↻ Refresh Data
+            </button>
+
+            <button
+              class="
+                dashboard-button
+                refresh-button
+              "
+              onclick="showTeamStatistics()"
+            >
+              ↻ Refresh Statistics
             </button>
 
 
@@ -3533,7 +3567,167 @@
      * BACK TO PERSONAL DASHBOARD
      * ========================================================
      */
+    function refreshDashboard() {
 
+      if (!googleCredential) {
+    
+        alert(
+          "Your login session is missing. Please sign in again."
+        );
+    
+        return;
+    
+      }
+    
+    
+      const container =
+        document.getElementById(
+          "portal-content"
+        );
+    
+    
+      container.innerHTML = `
+    
+        <div
+          class="empty-state"
+        >
+    
+          <h3>
+            Refreshing...
+          </h3>
+    
+          <p>
+            Getting the latest order data.
+          </p>
+    
+        </div>
+    
+      `;
+    
+    
+      fetch(
+        API_URL,
+        {
+    
+          method:
+            "POST",
+    
+          headers: {
+    
+            "Content-Type":
+              "text/plain;charset=utf-8"
+    
+          },
+    
+          body:
+            JSON.stringify({
+    
+              token:
+                googleCredential
+    
+            })
+    
+        }
+      )
+    
+      .then(
+        function(response) {
+    
+          return response.json();
+    
+        }
+      )
+    
+      .then(
+        function(data) {
+    
+    
+          if (
+            data.type ===
+            "exec"
+          ) {
+    
+            savedTeamStatistics =
+              null;
+    
+            renderDashboard(
+              data.data,
+              true
+            );
+    
+            return;
+    
+          }
+    
+    
+          if (
+            data.type ===
+            "student"
+          ) {
+    
+            savedTeamStatistics =
+              null;
+    
+            renderDashboard(
+              data.data,
+              false
+            );
+    
+            return;
+    
+          }
+    
+    
+          throw new Error(
+            data.message ||
+            "Unable to refresh data."
+          );
+    
+        }
+      )
+    
+      .catch(
+        function(error) {
+    
+          console.error(
+            error
+          );
+    
+    
+          container.innerHTML = `
+    
+            <div
+              class="empty-state"
+            >
+    
+              <h3>
+                Refresh Failed
+              </h3>
+    
+              <p>
+                ${escapeHTML(
+                  error.message
+                )}
+              </p>
+    
+              <button
+                class="
+                  dashboard-button
+                  back-button
+                "
+                onclick="backToDashboard()"
+              >
+                ← Back
+              </button>
+    
+            </div>
+    
+          `;
+    
+        }
+      );
+    
+    }
     function backToDashboard() {
 
       if (
@@ -3563,24 +3757,27 @@
 
     function returnToLogin() {
 
+      google.accounts.id.disableAutoSelect();
+    
+    
       googleCredential =
         null;
-
-
+    
+    
       currentDashboardData =
         null;
-
-
+    
+    
       currentIsExecutive =
         false;
-
-
+    
+    
       savedTeamStatistics =
         null;
-
-
+    
+    
       location.reload();
-
+    
     }
 
 
