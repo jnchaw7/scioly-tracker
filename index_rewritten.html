@@ -1,0 +1,3870 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    SciOly Tracking Portal
+  </title>
+
+
+  <script
+    src="https://accounts.google.com/gsi/client"
+    async
+    defer
+  ></script>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    body {
+
+      font-family:
+        'Segoe UI',
+        -apple-system,
+        BlinkMacSystemFont,
+        Arial,
+        sans-serif;
+
+      padding:
+        40px 20px;
+
+      margin:
+        0;
+
+      background:
+        #f4f6f9;
+
+      color:
+        #202124;
+
+    }
+
+
+    .main-wrapper {
+
+      max-width:
+        1050px;
+
+      margin:
+        0 auto;
+
+    }
+
+
+    /* ======================================================
+       NAVBAR
+       ====================================================== */
+
+    .navbar {
+
+      background:
+        #ffffff;
+
+      padding:
+        20px 30px;
+
+      border-radius:
+        14px;
+
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.06);
+
+      margin-bottom:
+        30px;
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      flex-wrap:
+        wrap;
+
+      gap:
+        15px;
+
+    }
+
+
+    h1 {
+
+      margin:
+        0;
+
+      color:
+        #1a73e8;
+
+      font-size:
+        24px;
+
+      font-weight:
+        650;
+
+    }
+
+
+    .session-tag {
+
+      background:
+        #e8f0fe;
+
+      color:
+        #1a73e8;
+
+      padding:
+        9px 16px;
+
+      border-radius:
+        30px;
+
+      font-weight:
+        600;
+
+      font-size:
+        13px;
+
+    }
+
+
+    /* ======================================================
+       LOGIN
+       ====================================================== */
+
+    .login-box {
+
+      max-width:
+        420px;
+
+      margin:
+        60px auto;
+
+      background:
+        white;
+
+      padding:
+        35px;
+
+      border-radius:
+        16px;
+
+      box-shadow:
+        0 4px 20px rgba(0,0,0,0.08);
+
+      text-align:
+        center;
+
+    }
+
+
+    .login-box h3 {
+
+      margin-top:
+        0;
+
+      font-size:
+        20px;
+
+      color:
+        #202124;
+
+    }
+
+
+    #error-msg {
+
+      color:
+        #d93025;
+
+      font-size:
+        14px;
+
+      margin-top:
+        15px;
+
+      font-weight:
+        500;
+
+      display:
+        none;
+
+    }
+
+
+    /* ======================================================
+       MAIN GRID
+       ====================================================== */
+
+    .cards-grid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        repeat(
+          auto-fill,
+          minmax(300px, 1fr)
+        );
+
+      gap:
+        20px;
+
+    }
+
+
+    /* ======================================================
+       ORDER CARDS
+       ====================================================== */
+
+    .item-card {
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        24px;
+
+      background:
+        #ffffff;
+
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.035);
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      justify-content:
+        space-between;
+
+      min-height:
+        235px;
+
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+    }
+
+
+    .item-card:hover {
+
+      transform:
+        translateY(-2px);
+
+      box-shadow:
+        0 6px 18px rgba(0,0,0,0.07);
+
+    }
+
+
+    .item-name {
+
+      font-size:
+        18px;
+
+      font-weight:
+        650;
+
+      margin-bottom:
+        10px;
+
+      color:
+        #202124;
+
+    }
+
+
+    .metrics-block {
+
+      font-size:
+        14px;
+
+      color:
+        #5f6368;
+
+      line-height:
+        1.7;
+
+    }
+
+
+    .metrics-block b {
+
+      color:
+        #202124;
+
+    }
+
+
+    /* ======================================================
+       SIGNATURES
+       ====================================================== */
+
+    .signatures-label {
+
+      margin-top:
+        10px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .signatures-value {
+
+      margin-top:
+        2px;
+
+      font-size:
+        14px;
+
+      color:
+        #202124;
+
+      font-weight:
+        600;
+
+    }
+
+
+    /* ======================================================
+       ACTUAL STATUS
+       ====================================================== */
+
+    .order-status-box {
+
+      margin-top:
+        16px;
+
+      padding:
+        10px 14px;
+
+      border-radius:
+        10px;
+
+      font-size:
+        13px;
+
+      font-weight:
+        700;
+
+      text-align:
+        center;
+
+      border:
+        1px solid transparent;
+
+    }
+
+
+    .status-pending {
+
+      background:
+        #f1f3f4;
+
+      color:
+        #5f6368;
+
+      border-color:
+        #dadce0;
+
+    }
+
+
+    .status-processing {
+
+      background:
+        #e8f0fe;
+
+      color:
+        #1967d2;
+
+      border-color:
+        #c6dafc;
+
+    }
+
+
+    .status-shipped {
+
+      background:
+        #e6f4ea;
+
+      color:
+        #188038;
+
+      border-color:
+        #b7dfc1;
+
+    }
+
+
+    .status-delivered {
+
+      background:
+        #dff3e4;
+
+      color:
+        #137333;
+
+      border-color:
+        #b7dfc1;
+
+    }
+
+
+    .status-problem {
+
+      background:
+        #fce8e6;
+
+      color:
+        #c5221f;
+
+      border-color:
+        #f6aea9;
+
+    }
+
+
+    .status-default {
+
+      background:
+        #f1f3f4;
+
+      color:
+        #5f6368;
+
+      border-color:
+        #dadce0;
+
+    }
+
+
+    /* ======================================================
+       VELOCITY
+       ====================================================== */
+
+    .delivery-estimate {
+
+      margin-top:
+        10px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+      font-weight:
+        500;
+
+    }
+
+
+    .delivery-delayed {
+
+      color:
+        #c5221f;
+
+      font-weight:
+        650;
+
+    }
+
+
+    /* ======================================================
+       LINKS
+       ====================================================== */
+
+    .url-btn {
+
+      display:
+        inline-block;
+
+      margin-top:
+        10px;
+
+      color:
+        #1a73e8;
+
+      text-decoration:
+        none;
+
+      font-weight:
+        500;
+
+      font-size:
+        14px;
+
+    }
+
+
+    .url-btn:hover {
+      text-decoration:
+        underline;
+    }
+
+
+    /* ======================================================
+       BUTTONS
+       ====================================================== */
+
+    .dashboard-buttons {
+
+      grid-column:
+        1 / -1;
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      gap:
+        10px;
+
+      flex-wrap:
+        wrap;
+
+    }
+
+
+    .button-group {
+
+      display:
+        flex;
+
+      gap:
+        10px;
+
+      flex-wrap:
+        wrap;
+
+    }
+
+
+    .dashboard-button {
+
+      border:
+        none;
+
+      padding:
+        11px 18px;
+
+      border-radius:
+        8px;
+
+      font-size:
+        14px;
+
+      font-weight:
+        600;
+
+      cursor:
+        pointer;
+
+    }
+
+
+    .dashboard-button:hover {
+
+      opacity:
+        0.92;
+
+    }
+
+
+    .signout-button {
+
+      background:
+        white;
+
+      border:
+        1px solid #dadce0;
+
+      color:
+        #5f6368;
+
+    }
+
+    .refresh-button {
+
+      background:
+        #f1f3f4;
+    
+      color:
+        #202124;
+    
+      border:
+        1px solid #dadce0;
+    
+    }
+
+
+    .order-button {
+
+      background:
+        #1a73e8;
+
+      color:
+        white;
+
+    }
+
+
+    .team-button {
+
+      background:
+        #188038;
+
+      color:
+        white;
+
+    }
+
+
+    .back-button {
+
+      background:
+        white;
+
+      border:
+        1px solid #dadce0;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    /* ======================================================
+       EMPTY STATE
+       ====================================================== */
+
+    .empty-state {
+
+      text-align:
+        center;
+
+      color:
+        #5f6368;
+
+      padding:
+        60px;
+
+      background:
+        white;
+
+      border-radius:
+        14px;
+
+      grid-column:
+        1 / -1;
+
+    }
+
+
+    /* ======================================================
+       STATISTICS CARDS
+       ====================================================== */
+
+    .stat-card {
+
+      background:
+        white;
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        24px;
+
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.035);
+
+    }
+
+
+    .stat-label {
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .stat-number {
+
+      font-size:
+        30px;
+
+      font-weight:
+        700;
+
+      margin-top:
+        5px;
+
+      color:
+        #202124;
+
+    }
+
+
+    .statistics-wide {
+
+      grid-column:
+        1 / -1;
+
+    }
+
+
+    .statistics-section-title {
+
+      font-size:
+        20px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+      margin-bottom:
+        16px;
+
+    }
+
+
+    /* ======================================================
+       HIGH-VALUE SECTION
+       ====================================================== */
+
+    .high-value-section {
+
+      grid-column:
+        1 / -1;
+
+      background:
+        #fff4f3;
+
+      border:
+        1px solid #f3c2bd;
+
+      border-radius:
+        16px;
+
+      padding:
+        24px;
+
+    }
+
+
+    .high-value-title {
+
+      font-size:
+        20px;
+
+      font-weight:
+        750;
+
+      color:
+        #b3261e;
+
+      margin-bottom:
+        6px;
+
+    }
+
+
+    .high-value-subtitle {
+
+      font-size:
+        13px;
+
+      color:
+        #7a2d27;
+
+      margin-bottom:
+        18px;
+
+    }
+
+
+    .high-value-list {
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      gap:
+        12px;
+
+    }
+
+
+    .high-value-card {
+
+      background:
+        #ffffff;
+
+      border:
+        1px solid #f0b6b0;
+
+      border-left:
+        5px solid #d93025;
+
+      border-radius:
+        10px;
+
+      padding:
+        16px 18px;
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      gap:
+        20px;
+
+      flex-wrap:
+        wrap;
+
+    }
+
+
+    .high-value-main {
+
+      min-width:
+        220px;
+
+      flex:
+        1;
+
+    }
+
+
+    .high-value-name {
+
+      font-size:
+        16px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .high-value-item {
+
+      margin-top:
+        4px;
+
+      font-size:
+        14px;
+
+      color:
+        #3c4043;
+
+    }
+
+
+    .high-value-meta {
+
+      margin-top:
+        6px;
+
+      font-size:
+        12px;
+
+      color:
+        #6b6b6b;
+
+      line-height:
+        1.5;
+
+    }
+
+
+    .high-value-price {
+
+      font-size:
+        24px;
+
+      font-weight:
+        750;
+
+      color:
+        #b3261e;
+
+      white-space:
+        nowrap;
+
+    }
+
+
+    .high-value-badge {
+
+      display:
+        inline-block;
+
+      margin-top:
+        8px;
+
+      padding:
+        5px 9px;
+
+      border-radius:
+        999px;
+
+      background:
+        #fce8e6;
+
+      color:
+        #c5221f;
+
+      font-size:
+        11px;
+
+      font-weight:
+        700;
+
+    }
+
+
+    /* ======================================================
+       EVENT CARDS
+       ====================================================== */
+
+    .event-stat-grid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        repeat(
+          auto-fill,
+          minmax(250px, 1fr)
+        );
+
+      gap:
+        16px;
+
+    }
+
+
+    .event-stat-card {
+
+      width:
+        100%;
+
+      text-align:
+        left;
+
+      background:
+        white;
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        22px;
+
+      cursor:
+        pointer;
+
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.035);
+
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
+
+    }
+
+
+    .event-stat-card:hover {
+
+      transform:
+        translateY(-2px);
+
+      box-shadow:
+        0 6px 18px rgba(0,0,0,0.08);
+
+      border-color:
+        #c6dafc;
+
+    }
+
+
+    .event-stat-name {
+
+      font-size:
+        18px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+      margin-bottom:
+        18px;
+
+    }
+
+
+    .event-stat-label {
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .event-stat-price {
+
+      font-size:
+        30px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+      margin-top:
+        4px;
+
+    }
+
+
+    .event-stat-orders {
+
+      margin-top:
+        8px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .event-stat-arrow {
+
+      margin-top:
+        18px;
+
+      font-size:
+        13px;
+
+      font-weight:
+        600;
+
+      color:
+        #1a73e8;
+
+    }
+
+
+    /* ======================================================
+       EVENT DETAILS
+       ====================================================== */
+
+    .event-detail-title {
+
+      font-size:
+        24px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .event-detail-total-label {
+
+      margin-top:
+        18px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .event-detail-total {
+
+      margin-top:
+        4px;
+
+      font-size:
+        34px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-event-card {
+
+      background:
+        white;
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        20px;
+
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.035);
+
+    }
+
+
+    .people-event-list {
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      gap:
+        14px;
+
+    }
+
+
+    .person-event-name {
+
+      font-size:
+        15px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-event-total {
+
+      margin-top:
+        4px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .event-items-list {
+
+      margin-top:
+        16px;
+
+      border-top:
+        1px solid #f1f3f4;
+
+    }
+
+
+    .event-item-row {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      gap:
+        20px;
+
+      padding:
+        13px 0;
+
+      border-bottom:
+        1px solid #f1f3f4;
+
+    }
+
+
+    .event-item-row:last-child {
+
+      border-bottom:
+        none;
+
+    }
+
+
+    .event-item-name {
+
+      font-size:
+        14px;
+
+      font-weight:
+        600;
+
+      color:
+        #202124;
+
+    }
+
+
+    .event-item-quantity {
+
+      margin-top:
+        3px;
+
+      font-size:
+        12px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .event-item-price {
+
+      font-size:
+        14px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+      white-space:
+        nowrap;
+
+    }
+
+
+    /* ======================================================
+       PEOPLE SECTION
+       ====================================================== */
+
+    .people-stat-grid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        repeat(
+          auto-fill,
+          minmax(250px, 1fr)
+        );
+
+      gap:
+        16px;
+
+    }
+
+
+    .person-stat-card {
+
+      width:
+        100%;
+
+      text-align:
+        left;
+
+      background:
+        white;
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        22px;
+
+      cursor:
+        pointer;
+
+      box-shadow:
+        0 3px 8px rgba(0,0,0,0.035);
+
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
+
+    }
+
+
+    .person-stat-card:hover {
+
+      transform:
+        translateY(-2px);
+
+      box-shadow:
+        0 6px 18px rgba(0,0,0,0.08);
+
+      border-color:
+        #c6dafc;
+
+    }
+
+
+    .person-stat-name {
+
+      font-size:
+        18px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-stat-orders {
+
+      margin-top:
+        10px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .person-stat-total {
+
+      margin-top:
+        4px;
+
+      font-size:
+        26px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    /* ======================================================
+       PERSON DETAIL
+       ====================================================== */
+
+    .person-detail-name {
+
+      font-size:
+        24px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-detail-subtitle {
+
+      margin-top:
+        5px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+    }
+
+
+    .person-detail-total {
+
+      margin-top:
+        18px;
+
+      font-size:
+        34px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-item-card {
+
+      background:
+        white;
+
+      border:
+        1px solid #e0e0e0;
+
+      border-radius:
+        14px;
+
+      padding:
+        18px;
+
+      box-shadow:
+        0 2px 6px rgba(0,0,0,0.03);
+
+    }
+
+
+    .person-item-header {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      gap:
+        15px;
+
+      align-items:
+        center;
+
+    }
+
+
+    .person-item-name {
+
+      font-size:
+        15px;
+
+      font-weight:
+        650;
+
+      color:
+        #202124;
+
+    }
+
+
+    .person-item-price {
+
+      font-size:
+        15px;
+
+      font-weight:
+        700;
+
+      color:
+        #202124;
+
+      white-space:
+        nowrap;
+
+    }
+
+
+    .person-item-details {
+
+      margin-top:
+        8px;
+
+      font-size:
+        13px;
+
+      color:
+        #5f6368;
+
+      line-height:
+        1.6;
+
+    }
+
+
+    .person-item-status {
+
+      display:
+        inline-block;
+
+      margin-top:
+        10px;
+
+      padding:
+        5px 9px;
+
+      border-radius:
+        999px;
+
+      font-size:
+        11px;
+
+      font-weight:
+        600;
+
+    }
+
+
+    /* ======================================================
+       RESPONSIVE
+       ====================================================== */
+
+    @media (
+      max-width: 600px
+    ) {
+
+      body {
+
+        padding:
+          20px 12px;
+
+      }
+
+
+      .navbar {
+
+        padding:
+          18px;
+
+      }
+
+
+      .item-card {
+
+        padding:
+          20px;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+  <div class="main-wrapper">
+
+
+    <!-- ====================================================
+         NAVBAR
+         ==================================================== -->
+
+    <div class="navbar">
+
+      <h1>
+        SciOly Tracking Portal
+      </h1>
+
+
+      <div
+        class="session-tag"
+        id="user-session"
+      >
+        Session: Awaiting Login
+      </div>
+
+    </div>
+
+
+    <!-- ====================================================
+         LOGIN
+         ==================================================== -->
+
+    <div
+      id="login-section"
+      class="login-box"
+    >
+
+      <h3>
+        Portal Sign In
+      </h3>
+
+
+      <p
+        style="
+          color: #5f6368;
+          font-size: 14px;
+          margin-bottom: 20px;
+        "
+      >
+        Authenticate with your Google account
+        to view tracking data.
+      </p>
+
+
+      <div
+        id="g_id_onload"
+        data-client_id="483790698157-mk3l3ugqgvh4uv10q3bng2g9j8j3vp8q.apps.googleusercontent.com"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="true"
+        data-auto_select="true"
+      >
+      </div>
+
+
+      <div
+        class="g_id_signin"
+        data-type="standard"
+        data-size="large"
+        data-width="350"
+      >
+      </div>
+
+
+      <div id="error-msg"></div>
+
+    </div>
+
+
+    <!-- ====================================================
+         PORTAL
+         ==================================================== -->
+
+    <div
+      id="portal-content"
+      class="cards-grid"
+      style="display: none;"
+    >
+    </div>
+
+
+  </div>
+
+
+  <script>
+
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbzag2WkgUl-_WO4-xlbGJZ3n2sfVk6AFtvzGBCowHF4PxlS0U5Yq6h3IxMV_Xie-4g/exec";
+
+
+    let googleCredential =
+      null;
+
+
+    let currentDashboardData =
+      null;
+
+
+    let currentIsExecutive =
+      false;
+
+
+    let savedTeamStatistics =
+      null;
+
+
+    /*
+     * ========================================================
+     * GOOGLE LOGIN
+     * ========================================================
+     */
+
+    function handleCredentialResponse(
+      response
+    ) {
+
+      const errorDiv =
+        document.getElementById(
+          "error-msg"
+        );
+
+
+      errorDiv.style.display =
+        "none";
+
+
+      googleCredential =
+        response.credential;
+
+
+      fetch(
+        API_URL,
+        {
+
+          method:
+            "POST",
+
+          headers: {
+
+            "Content-Type":
+              "text/plain;charset=utf-8"
+
+          },
+
+          body:
+            JSON.stringify({
+
+              token:
+                response.credential
+
+            })
+
+        }
+      )
+
+      .then(
+        function(response) {
+
+          return response.json();
+
+        }
+      )
+
+      .then(
+        function(data) {
+
+
+          if (
+            data.type ===
+            "exec"
+          ) {
+
+            renderDashboard(
+              data.data,
+              true
+            );
+
+            return;
+
+          }
+
+
+          if (
+            data.type ===
+            "student"
+          ) {
+
+            renderDashboard(
+              data.data,
+              false
+            );
+
+            return;
+
+          }
+
+
+          errorDiv.innerText =
+            data.message ||
+            "Login failed.";
+
+
+          errorDiv.style.display =
+            "block";
+
+        }
+      )
+
+      .catch(
+        function(error) {
+
+          console.error(
+            error
+          );
+
+
+          errorDiv.innerText =
+            "Error connecting to the backend database.";
+
+
+          errorDiv.style.display =
+            "block";
+
+        }
+      );
+
+    }
+
+
+    /*
+     * ========================================================
+     * PERSONAL DASHBOARD
+     * ========================================================
+     */
+
+    function renderDashboard(
+      data,
+      isExecutive
+    ) {
+
+      currentDashboardData =
+        data;
+
+
+      currentIsExecutive =
+        isExecutive;
+
+
+      document.getElementById(
+        "user-session"
+      ).innerText =
+        isExecutive
+          ? "Executive Portal: " +
+            data.email
+          : "Portal User: " +
+            data.email;
+
+
+      document.getElementById(
+        "login-section"
+      ).style.display =
+        "none";
+
+
+      const container =
+        document.getElementById(
+          "portal-content"
+        );
+
+
+      container.style.display =
+        "grid";
+
+
+      let html = `
+
+        <div
+          class="dashboard-buttons"
+        >
+
+          <div
+            class="button-group"
+          >
+
+            <button
+              class="
+                dashboard-button
+                signout-button
+              "
+              onclick="returnToLogin()"
+            >
+              ← Sign Out
+            </button>
+
+            <button
+              class="
+                dashboard-button
+                refresh-button
+              "
+              onclick="refreshDashboard()"
+            >
+              ↻ Refresh Data
+            </button>
+
+            <button
+              class="
+                dashboard-button
+                order-button
+              "
+              onclick="openOrderingForm()"
+            >
+              + Place New Order
+            </button>
+
+
+            ${
+              isExecutive
+                ? `
+
+                  <button
+                    class="
+                      dashboard-button
+                      team-button
+                    "
+                    onclick="showTeamStatistics()"
+                  >
+                    Team Statistics
+                  </button>
+
+                `
+                : ""
+            }
+
+          </div>
+
+        </div>
+
+      `;
+
+
+      if (
+        !data.items ||
+        data.items.length === 0
+      ) {
+
+        html += `
+
+          <div
+            class="empty-state"
+          >
+
+            <h3>
+              No Entries Found
+            </h3>
+
+            <p>
+              There are no active orders
+              linked to this account.
+            </p>
+
+          </div>
+
+        `;
+
+
+        container.innerHTML =
+          html;
+
+
+        return;
+
+      }
+
+
+      html +=
+        data.items
+          .map(
+            function(item) {
+
+              var statusClass =
+                getStatusClass(
+                  item.orderStatus
+                );
+
+
+              var estimateClass =
+                item.isStuck
+                  ? "delivery-estimate delivery-delayed"
+                  : "delivery-estimate";
+
+
+              return `
+
+                <div
+                  class="item-card"
+                >
+
+                  <div>
+
+                    <div
+                      class="item-name"
+                    >
+                      ${escapeHTML(
+                        item.itemName
+                      )}
+                    </div>
+
+
+                    <div
+                      class="metrics-block"
+                    >
+
+                      Quantity:
+                      <b>
+                        ${escapeHTML(
+                          item.qty
+                        )}
+                      </b>
+
+                      <br>
+
+                      Total Cost:
+                      <b>
+                        ${escapeHTML(
+                          item.price
+                        )}
+                      </b>
+
+                    </div>
+
+
+                    <div
+                      class="
+                        signatures-label
+                      "
+                    >
+                      Signatures:
+                    </div>
+
+
+                    <div
+                      class="
+                        signatures-value
+                      "
+                    >
+                      ${escapeHTML(
+                        item.signatures
+                      )}
+                    </div>
+
+
+                    <div
+                      class="
+                        order-status-box
+                        ${statusClass}
+                      "
+                    >
+                      ${escapeHTML(
+                        item.orderStatus
+                      )}
+                    </div>
+
+
+                    <div
+                      class="${estimateClass}"
+                    >
+                      ${escapeHTML(
+                        item.deliveryText
+                      )}
+                    </div>
+
+
+                    ${
+                      item.link &&
+                      item.link.startsWith(
+                        "http"
+                      )
+                        ? `
+
+                          <a
+                            class="url-btn"
+                            href="${escapeAttribute(
+                              item.link
+                            )}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Open Vendor Link ↗
+                          </a>
+
+                        `
+                        : ""
+                    }
+
+                  </div>
+
+                </div>
+
+              `;
+
+            }
+          )
+          .join("");
+
+
+      container.innerHTML =
+        html;
+
+    }
+
+
+    /*
+     * ========================================================
+     * STATUS STYLE
+     * ========================================================
+     */
+
+    function getStatusClass(
+      status
+    ) {
+
+      var normalized =
+        String(
+          status || ""
+        )
+        .toLowerCase()
+        .trim();
+
+
+      if (
+        normalized.includes(
+          "delivered"
+        )
+      ) {
+
+        return "status-delivered";
+
+      }
+
+
+      if (
+        normalized.includes(
+          "shipped"
+        )
+      ) {
+
+        return "status-shipped";
+
+      }
+
+
+      if (
+        normalized.includes(
+          "delay"
+        ) ||
+        normalized.includes(
+          "problem"
+        ) ||
+        normalized.includes(
+          "error"
+        )
+      ) {
+
+        return "status-problem";
+
+      }
+
+
+      if (
+        normalized.includes(
+          "process"
+        ) ||
+        normalized.includes(
+          "ordered"
+        ) ||
+        normalized.includes(
+          "step"
+        )
+      ) {
+
+        return "status-processing";
+
+      }
+
+
+      if (
+        normalized === "" ||
+        normalized.includes(
+          "pending"
+        )
+      ) {
+
+        return "status-pending";
+
+      }
+
+
+      return "status-default";
+
+    }
+
+
+    /*
+     * ========================================================
+     * TEAM STATISTICS
+     * ========================================================
+     */
+
+    function showTeamStatistics() {
+
+      if (
+        !currentIsExecutive
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        !googleCredential
+      ) {
+
+        alert(
+          "Your Google login session is missing. Please sign in again."
+        );
+
+        return;
+
+      }
+
+
+      const container =
+        document.getElementById(
+          "portal-content"
+        );
+
+
+      container.innerHTML = `
+
+        <div
+          class="empty-state"
+        >
+
+          <h3>
+            Loading Team Statistics...
+          </h3>
+
+          <p>
+            Getting the latest team data.
+          </p>
+
+        </div>
+
+      `;
+
+
+      fetch(
+        API_URL,
+        {
+
+          method:
+            "POST",
+
+          headers: {
+
+            "Content-Type":
+              "text/plain;charset=utf-8"
+
+          },
+
+          body:
+            JSON.stringify({
+
+              token:
+                googleCredential,
+
+              action:
+                "teamStatistics"
+
+            })
+
+        }
+      )
+
+      .then(
+        function(response) {
+
+          return response.json();
+
+        }
+      )
+
+      .then(
+        function(result) {
+
+          if (
+            result.type !==
+            "teamStatistics"
+          ) {
+
+            throw new Error(
+              result.message ||
+              "Unable to load team statistics."
+            );
+
+          }
+
+
+          savedTeamStatistics =
+            result.data;
+
+
+          renderTeamStatistics(
+            result.data
+          );
+
+        }
+      )
+
+      .catch(
+        function(error) {
+
+          console.error(
+            error
+          );
+
+
+          container.innerHTML = `
+
+            <div
+              class="empty-state"
+            >
+
+              <h3>
+                Unable to Load Team Statistics
+              </h3>
+
+              <p>
+                ${escapeHTML(
+                  error.message
+                )}
+              </p>
+
+
+              <button
+                class="
+                  dashboard-button
+                  back-button
+                "
+                onclick="backToDashboard()"
+              >
+                ← Back to Dashboard
+              </button>
+
+            </div>
+
+          `;
+
+        }
+      );
+
+    }
+
+
+    /*
+     * ========================================================
+     * TEAM STATISTICS PAGE
+     * ========================================================
+     */
+
+    function renderTeamStatistics(
+      stats
+    ) {
+
+      const container =
+        document.getElementById(
+          "portal-content"
+        );
+
+
+      var events =
+        stats.events || [];
+
+
+      var people =
+        stats.people || [];
+
+
+      var highValueOrders =
+        stats.highValueOrders || [];
+
+
+      /*
+       * ======================================================
+       * HIGH VALUE ORDERS
+       * ======================================================
+       */
+
+      var highValueHTML =
+        "";
+
+
+      if (
+        highValueOrders.length === 0
+      ) {
+
+        highValueHTML = `
+
+          <div
+            class="high-value-card"
+          >
+
+            <div
+              class="
+                high-value-main
+              "
+            >
+
+              <div
+                class="
+                  high-value-name
+                "
+              >
+                No high-value orders
+              </div>
+
+              <div
+                class="
+                  high-value-meta
+                "
+              >
+                No individual order is currently
+                over $50.
+              </div>
+
+            </div>
+
+          </div>
+
+        `;
+
+      } else {
+
+        highValueHTML =
+          highValueOrders
+            .map(
+              function(order) {
+
+                return `
+
+                  <div
+                    class="
+                      high-value-card
+                    "
+                  >
+
+                    <div
+                      class="
+                        high-value-main
+                      "
+                    >
+
+                      <div
+                        class="
+                          high-value-name
+                        "
+                      >
+                        ${escapeHTML(
+                          order.name
+                        )}
+                      </div>
+
+
+                      <div
+                        class="
+                          high-value-item
+                        "
+                      >
+                        ${escapeHTML(
+                          order.itemName
+                        )}
+                      </div>
+
+
+                      <div
+                        class="
+                          high-value-meta
+                        "
+                      >
+
+                        Event:
+                        ${escapeHTML(
+                          order.eventName
+                        )}
+
+                        <br>
+
+                        Quantity:
+                        ${escapeHTML(
+                          order.quantity
+                        )}
+
+                        <br>
+
+                        Status:
+                        ${escapeHTML(
+                          order.status
+                        )}
+
+                      </div>
+
+
+                      <div
+                        class="
+                          high-value-badge
+                        "
+                      >
+                        OVER $50
+                      </div>
+
+                    </div>
+
+
+                    <div
+                      class="
+                        high-value-price
+                      "
+                    >
+                      $${Number(
+                        order.price || 0
+                      ).toFixed(2)}
+                    </div>
+
+                  </div>
+
+                `;
+
+              }
+            )
+            .join("");
+
+      }
+
+
+      /*
+       * ======================================================
+       * EVENT CARDS
+       * ======================================================
+       */
+
+      var eventCards =
+        "";
+
+
+      if (
+        events.length === 0
+      ) {
+
+        eventCards = `
+
+          <div
+            class="empty-state"
+          >
+
+            No event data is currently available.
+
+          </div>
+
+        `;
+
+      } else {
+
+        eventCards =
+          events
+            .map(
+              function(event, index) {
+
+                return `
+
+                  <button
+                    class="
+                      event-stat-card
+                    "
+                    onclick="showEventDetails(${index})"
+                  >
+
+                    <div
+                      class="
+                        event-stat-name
+                      "
+                    >
+                      ${escapeHTML(
+                        event.eventName
+                      )}
+                    </div>
+
+
+                    <div
+                      class="
+                        event-stat-label
+                      "
+                    >
+                      Total Spending
+                    </div>
+
+
+                    <div
+                      class="
+                        event-stat-price
+                      "
+                    >
+                      $${Number(
+                        event.totalCost || 0
+                      ).toFixed(2)}
+                    </div>
+
+
+                    <div
+                      class="
+                        event-stat-orders
+                      "
+                    >
+                      ${event.orderCount}
+                      ${
+                        event.orderCount === 1
+                          ? "order"
+                          : "orders"
+                      }
+                    </div>
+
+
+                    <div
+                      class="
+                        event-stat-arrow
+                      "
+                    >
+                      View Details →
+                    </div>
+
+                  </button>
+
+                `;
+
+              }
+            )
+            .join("");
+
+      }
+
+
+      /*
+       * ======================================================
+       * PEOPLE CARDS
+       * ======================================================
+       */
+
+      var peopleCards =
+        "";
+
+
+      if (
+        people.length === 0
+      ) {
+
+        peopleCards = `
+
+          <div
+            class="empty-state"
+          >
+
+            No people found.
+
+          </div>
+
+        `;
+
+      } else {
+
+        peopleCards =
+          people
+            .map(
+              function(person, index) {
+
+                return `
+
+                  <button
+                    class="
+                      person-stat-card
+                    "
+                    onclick="showPersonDetails(${index})"
+                  >
+
+                    <div
+                      class="
+                        person-stat-name
+                      "
+                    >
+                      ${escapeHTML(
+                        person.name
+                      )}
+                    </div>
+
+
+                    <div
+                      class="
+                        person-stat-orders
+                      "
+                    >
+                      ${person.orderCount}
+                      ${
+                        person.orderCount === 1
+                          ? "order"
+                          : "orders"
+                      }
+                    </div>
+
+
+                    <div
+                      class="
+                        person-stat-total
+                      "
+                    >
+                      $${Number(
+                        person.totalCost || 0
+                      ).toFixed(2)}
+                    </div>
+
+
+                    <div
+                      class="
+                        event-stat-arrow
+                      "
+                    >
+                      View Orders →
+                    </div>
+
+                  </button>
+
+                `;
+
+              }
+            )
+            .join("");
+
+      }
+
+
+      window.statisticsEvents =
+        events;
+
+
+      window.statisticsPeople =
+        people;
+
+
+      container.innerHTML = `
+
+        <!-- TOP BUTTON -->
+
+        <div
+          class="
+            dashboard-buttons
+          "
+        >
+
+          <div
+            class="
+              button-group
+            "
+          >
+
+            <button
+              class="
+                dashboard-button
+                back-button
+              "
+              onclick="backToDashboard()"
+            >
+              ← Back to Dashboard
+            </button>
+
+            <button
+              class="
+                dashboard-button
+                refresh-button
+              "
+              onclick="showTeamStatistics()"
+            >
+              ↻ Refresh Statistics
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- OVERALL STATISTICS -->
+
+        <div
+          class="stat-card"
+        >
+
+          <div
+            class="stat-label"
+          >
+            Total Orders
+          </div>
+
+          <div
+            class="stat-number"
+          >
+            ${stats.totalOrders}
+          </div>
+
+        </div>
+
+
+        <div
+          class="stat-card"
+        >
+
+          <div
+            class="stat-label"
+          >
+            Students
+          </div>
+
+          <div
+            class="stat-number"
+          >
+            ${stats.totalStudents}
+          </div>
+
+        </div>
+
+
+        <div
+          class="stat-card"
+        >
+
+          <div
+            class="stat-label"
+          >
+            Total Quantity
+          </div>
+
+          <div
+            class="stat-number"
+          >
+            ${stats.totalQuantity}
+          </div>
+
+        </div>
+
+
+        <div
+          class="stat-card"
+        >
+
+          <div
+            class="stat-label"
+          >
+            Total Spending
+          </div>
+
+          <div
+            class="stat-number"
+          >
+            $${Number(
+              stats.totalCost || 0
+            ).toFixed(2)}
+          </div>
+
+        </div>
+
+
+        <!-- HIGH VALUE -->
+
+        <div
+          class="
+            high-value-section
+          "
+        >
+
+          <div
+            class="
+              high-value-title
+            "
+          >
+            ⚠ High-Value Orders
+          </div>
+
+
+          <div
+            class="
+              high-value-subtitle
+            "
+          >
+            Individual orders over $50
+          </div>
+
+
+          <div
+            class="
+              high-value-list
+            "
+          >
+            ${highValueHTML}
+          </div>
+
+        </div>
+
+
+        <!-- EVENTS -->
+
+        <div
+          class="
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              statistics-section-title
+            "
+          >
+            Spending by Event
+          </div>
+
+
+          <div
+            class="
+              event-stat-grid
+            "
+          >
+            ${eventCards}
+          </div>
+
+        </div>
+
+
+        <!-- PEOPLE -->
+
+        <div
+          class="
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              statistics-section-title
+            "
+          >
+            People
+          </div>
+
+
+          <div
+            class="
+              people-stat-grid
+            "
+          >
+            ${peopleCards}
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+
+    /*
+     * ========================================================
+     * EVENT DETAILS
+     * ========================================================
+     */
+
+    function showEventDetails(
+      eventIndex
+    ) {
+
+      var events =
+        window.statisticsEvents ||
+        [];
+
+
+      var event =
+        events[eventIndex];
+
+
+      if (!event) {
+        return;
+      }
+
+
+      const container =
+        document.getElementById(
+          "portal-content"
+        );
+
+
+      var peopleHTML =
+        "";
+
+
+      if (
+        !event.people ||
+        event.people.length === 0
+      ) {
+
+        peopleHTML = `
+
+          <div
+            class="empty-state"
+          >
+            No orders found for this event.
+          </div>
+
+        `;
+
+      } else {
+
+        peopleHTML =
+          event.people
+            .map(
+              function(person) {
+
+                var itemsHTML =
+                  "";
+
+
+                if (
+                  person.items &&
+                  person.items.length > 0
+                ) {
+
+                  itemsHTML =
+                    person.items
+                      .map(
+                        function(item) {
+
+                          return `
+
+                            <div
+                              class="
+                                event-item-row
+                              "
+                            >
+
+                              <div>
+
+                                <div
+                                  class="
+                                    event-item-name
+                                  "
+                                >
+                                  ${escapeHTML(
+                                    item.itemName
+                                  )}
+                                </div>
+
+
+                                <div
+                                  class="
+                                    event-item-quantity
+                                  "
+                                >
+                                  Quantity:
+                                  ${escapeHTML(
+                                    item.quantity
+                                  )}
+                                </div>
+
+                              </div>
+
+
+                              <div
+                                class="
+                                  event-item-price
+                                "
+                              >
+                                $${Number(
+                                  item.price || 0
+                                ).toFixed(2)}
+                              </div>
+
+                            </div>
+
+                          `;
+
+                        }
+                      )
+                      .join("");
+
+                }
+
+
+                return `
+
+                  <div
+                    class="
+                      person-event-card
+                    "
+                  >
+
+                    <div
+                      class="
+                        person-event-name
+                      "
+                    >
+                      ${escapeHTML(
+                        person.name
+                      )}
+                    </div>
+
+
+                    <div
+                      class="
+                        person-event-total
+                      "
+                    >
+                      $${Number(
+                        person.totalCost || 0
+                      ).toFixed(2)}
+                      total
+                    </div>
+
+
+                    <div
+                      class="
+                        event-items-list
+                      "
+                    >
+                      ${itemsHTML}
+                    </div>
+
+                  </div>
+
+                `;
+
+              }
+            )
+            .join("");
+
+      }
+
+
+      container.innerHTML = `
+
+        <div
+          class="
+            dashboard-buttons
+          "
+        >
+
+          <div
+            class="
+              button-group
+            "
+          >
+
+            <button
+              class="
+                dashboard-button
+                back-button
+              "
+              onclick="renderTeamStatisticsFromSavedData()"
+            >
+              ← Back to Team Statistics
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            stat-card
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              event-detail-title
+            "
+          >
+            ${escapeHTML(
+              event.eventName
+            )}
+          </div>
+
+
+          <div
+            class="
+              event-detail-total-label
+            "
+          >
+            Total Spending
+          </div>
+
+
+          <div
+            class="
+              event-detail-total
+            "
+          >
+            $${Number(
+              event.totalCost || 0
+            ).toFixed(2)}
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              statistics-section-title
+            "
+          >
+            Orders by Person
+          </div>
+
+
+          <div
+            class="
+              people-event-list
+            "
+          >
+            ${peopleHTML}
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+
+    /*
+     * ========================================================
+     * PERSON DETAILS
+     * ========================================================
+     */
+
+    function showPersonDetails(
+      personIndex
+    ) {
+
+      var people =
+        window.statisticsPeople ||
+        [];
+
+
+      var person =
+        people[personIndex];
+
+
+      if (!person) {
+        return;
+      }
+
+
+      const container =
+        document.getElementById(
+          "portal-content"
+        );
+
+
+      var items =
+        person.items || [];
+
+
+      var itemsHTML =
+        "";
+
+
+      if (
+        items.length === 0
+      ) {
+
+        itemsHTML = `
+
+          <div
+            class="empty-state"
+          >
+            No orders found for this person.
+          </div>
+
+        `;
+
+      } else {
+
+        itemsHTML =
+          items
+            .map(
+              function(item) {
+
+                var statusClass =
+                  getStatusClass(
+                    item.status
+                  );
+
+
+                return `
+
+                  <div
+                    class="
+                      person-item-card
+                    "
+                  >
+
+                    <div
+                      class="
+                        person-item-header
+                      "
+                    >
+
+                      <div
+                        class="
+                          person-item-name
+                        "
+                      >
+                        ${escapeHTML(
+                          item.itemName
+                        )}
+                      </div>
+
+
+                      <div
+                        class="
+                          person-item-price
+                        "
+                      >
+                        $${Number(
+                          item.price || 0
+                        ).toFixed(2)}
+                      </div>
+
+                    </div>
+
+
+                    <div
+                      class="
+                        person-item-details
+                      "
+                    >
+
+                      Quantity:
+                      ${escapeHTML(
+                        item.quantity
+                      )}
+
+                      <br>
+
+                      Event:
+                      ${escapeHTML(
+                        item.eventName
+                      )}
+
+                    </div>
+
+
+                    <div
+                      class="
+                        person-item-status
+                        ${statusClass}
+                      "
+                    >
+                      ${escapeHTML(
+                        item.status
+                      )}
+                    </div>
+
+                  </div>
+
+                `;
+
+              }
+            )
+            .join("");
+
+      }
+
+
+      container.innerHTML = `
+
+        <div
+          class="
+            dashboard-buttons
+          "
+        >
+
+          <div
+            class="
+              button-group
+            "
+          >
+
+            <button
+              class="
+                dashboard-button
+                back-button
+              "
+              onclick="renderTeamStatisticsFromSavedData()"
+            >
+              ← Back to Team Statistics
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            stat-card
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              person-detail-name
+            "
+          >
+            ${escapeHTML(
+              person.name
+            )}
+          </div>
+
+
+          <div
+            class="
+              person-detail-subtitle
+            "
+          >
+            ${person.orderCount}
+            ${
+              person.orderCount === 1
+                ? "order"
+                : "orders"
+            }
+          </div>
+
+
+          <div
+            class="
+              person-detail-total
+            "
+          >
+            $${Number(
+              person.totalCost || 0
+            ).toFixed(2)}
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            statistics-wide
+          "
+        >
+
+          <div
+            class="
+              statistics-section-title
+            "
+          >
+            Ordered Items
+          </div>
+
+
+          <div
+            class="
+              people-event-list
+            "
+          >
+            ${itemsHTML}
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+
+    /*
+     * ========================================================
+     * BACK TO TEAM STATISTICS
+     * ========================================================
+     */
+
+    function renderTeamStatisticsFromSavedData() {
+
+      if (
+        savedTeamStatistics
+      ) {
+
+        renderTeamStatistics(
+          savedTeamStatistics
+        );
+
+        return;
+
+      }
+
+
+      showTeamStatistics();
+
+    }
+
+
+    /*
+     * ========================================================
+     * REFRESH PERSONAL DASHBOARD DATA
+     * ========================================================
+     */
+    function refreshDashboard() {
+
+      if (!googleCredential) {
+    
+        alert(
+          "Your login session is missing. Please sign in again."
+        );
+    
+        return;
+    
+      }
+    
+    
+      const container =
+        document.getElementById(
+          "portal-content"
+        );
+    
+    
+      container.innerHTML = `
+    
+        <div
+          class="empty-state"
+        >
+    
+          <h3>
+            Refreshing...
+          </h3>
+    
+          <p>
+            Getting the latest order data.
+          </p>
+    
+        </div>
+    
+      `;
+    
+    
+      fetch(
+        API_URL,
+        {
+    
+          method:
+            "POST",
+    
+          headers: {
+    
+            "Content-Type":
+              "text/plain;charset=utf-8"
+    
+          },
+    
+          body:
+            JSON.stringify({
+    
+              token:
+                googleCredential
+    
+            })
+    
+        }
+      )
+    
+      .then(
+        function(response) {
+    
+          return response.json();
+    
+        }
+      )
+    
+      .then(
+        function(data) {
+    
+    
+          if (
+            data.type ===
+            "exec"
+          ) {
+    
+            savedTeamStatistics =
+              null;
+    
+            renderDashboard(
+              data.data,
+              true
+            );
+    
+            return;
+    
+          }
+    
+    
+          if (
+            data.type ===
+            "student"
+          ) {
+    
+            savedTeamStatistics =
+              null;
+    
+            renderDashboard(
+              data.data,
+              false
+            );
+    
+            return;
+    
+          }
+    
+    
+          throw new Error(
+            data.message ||
+            "Unable to refresh data."
+          );
+    
+        }
+      )
+    
+      .catch(
+        function(error) {
+    
+          console.error(
+            error
+          );
+    
+    
+          container.innerHTML = `
+    
+            <div
+              class="empty-state"
+            >
+    
+              <h3>
+                Refresh Failed
+              </h3>
+    
+              <p>
+                ${escapeHTML(
+                  error.message
+                )}
+              </p>
+    
+              <button
+                class="
+                  dashboard-button
+                  back-button
+                "
+                onclick="backToDashboard()"
+              >
+                ← Back
+              </button>
+    
+            </div>
+    
+          `;
+    
+        }
+      );
+    
+    }
+
+
+    /*
+     * ========================================================
+     * BACK TO PERSONAL DASHBOARD
+     * ========================================================
+     */
+    function backToDashboard() {
+
+      if (
+        !currentDashboardData
+      ) {
+
+        returnToLogin();
+
+        return;
+
+      }
+
+
+      renderDashboard(
+        currentDashboardData,
+        currentIsExecutive
+      );
+
+    }
+
+
+    /*
+     * ========================================================
+     * SIGN OUT
+     * ========================================================
+     */
+
+    function returnToLogin() {
+
+      google.accounts.id.disableAutoSelect();
+    
+    
+      googleCredential =
+        null;
+    
+    
+      currentDashboardData =
+        null;
+    
+    
+      currentIsExecutive =
+        false;
+    
+    
+      savedTeamStatistics =
+        null;
+    
+    
+      location.reload();
+    
+    }
+
+
+    /*
+     * ========================================================
+     * ORDER FORM
+     * ========================================================
+     */
+
+    function openOrderingForm() {
+
+      window.open(
+        "https://forms.gle/e2qgGCRH5vSSTHmF7",
+        "_blank"
+      );
+
+    }
+
+
+    /*
+     * ========================================================
+     * HTML ESCAPING
+     * ========================================================
+     */
+
+    function escapeHTML(
+      value
+    ) {
+
+      if (
+        value === null ||
+        value === undefined
+      ) {
+
+        return "";
+
+      }
+
+
+      return String(value)
+
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+
+        .replace(
+          /</g,
+          "&lt;"
+        )
+
+        .replace(
+          />/g,
+          "&gt;"
+        )
+
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
+    }
+
+
+    function escapeAttribute(
+      value
+    ) {
+
+      return escapeHTML(
+        value
+      );
+
+    }
+
+  </script>
+
+</body>
+
+</html>
