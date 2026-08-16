@@ -1,0 +1,4305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+  <meta name="scioly-portal-build" content="budget-workflow-v6">
+  <title>SciOly Orders</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    :root {
+      --ink: #111111;
+      --ink-soft: #2c2c2c;
+      --page: #f4f4f2;
+      --surface: #ffffff;
+      --surface-soft: #f7f7f6;
+      --line: #e3e3df;
+      --line-strong: #cacac4;
+      --muted: #6d6d68;
+      --muted-light: #94948e;
+      --success: #237a4b;
+      --success-bg: #eaf6ef;
+      --warning: #9a5b13;
+      --warning-bg: #fff4e5;
+      --danger: #b42318;
+      --danger-bg: #fef0ed;
+      --info: #2c5d90;
+      --info-bg: #edf4fb;
+      --radius: 18px;
+      --radius-small: 11px;
+      --shadow: 0 1px 2px rgba(17,17,17,.04), 0 10px 30px rgba(17,17,17,.045);
+      --sidebar: 232px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--page);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 3px solid rgba(17,17,17,.22);
+      outline-offset: 2px;
+    }
+    [hidden] { display: none !important; }
+
+    .login-page {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      background:
+        radial-gradient(circle at 15% 8%, rgba(0,0,0,.055), transparent 26%),
+        var(--page);
+    }
+    .login-card {
+      width: min(100%, 430px);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 38px;
+      box-shadow: var(--shadow);
+    }
+    .brand-lockup { display: flex; align-items: center; gap: 13px; }
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: -.04em;
+    }
+    .brand-name { font-size: 17px; font-weight: 750; letter-spacing: -.02em; }
+    .brand-caption { margin-top: 2px; color: var(--muted); font-size: 12px; }
+    .login-card h1 {
+      margin: 34px 0 10px;
+      font-size: clamp(28px, 7vw, 38px);
+      line-height: 1.05;
+      letter-spacing: -.045em;
+    }
+    .login-copy { margin: 0 0 26px; color: var(--muted); line-height: 1.65; }
+    .google-wrap { min-height: 44px; }
+    .error-banner {
+      display: none;
+      margin-top: 18px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      color: var(--danger);
+      background: var(--danger-bg);
+      border: 1px solid #facdc6;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0,1fr);
+    }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 18px 18px;
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+    }
+    .sidebar .brand-lockup { padding: 0 8px; }
+    .sidebar .brand-mark { width: 36px; height: 36px; border-radius: 10px; }
+    .nav-list { display: grid; gap: 5px; margin-top: 38px; }
+    .nav-button {
+      appearance: none;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 12px;
+      border: 0;
+      border-radius: 10px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+      font-weight: 650;
+      font-size: 14px;
+    }
+    .nav-button:hover { color: var(--ink); background: var(--surface-soft); }
+    .nav-button.active { color: #fff; background: var(--ink); }
+    .nav-icon { width: 19px; text-align: center; font-size: 16px; }
+    .nav-count {
+      min-width: 22px;
+      height: 20px;
+      display: inline-grid;
+      place-items: center;
+      margin-left: auto;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .nav-button.active .nav-count { color: var(--ink); background: #fff; }
+    .sidebar-bottom { margin-top: auto; padding-top: 22px; }
+    .user-block {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-soft);
+    }
+    .user-name { font-size: 13px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+    .user-email {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .signout-link {
+      width: 100%;
+      margin-top: 10px;
+      padding: 7px 0 0;
+      border: 0;
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .signout-link:hover { color: var(--ink); }
+
+    .main-content { min-width: 0; padding: 34px clamp(22px,4vw,56px) 60px; }
+    .content-width { width: min(1120px,100%); margin: 0 auto; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+    .eyebrow {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .page-title {
+      margin: 0;
+      font-size: clamp(27px,4vw,40px);
+      line-height: 1.08;
+      letter-spacing: -.045em;
+    }
+    .page-subtitle { margin: 9px 0 0; color: var(--muted); line-height: 1.5; }
+    .top-actions { display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+
+    .button {
+      appearance: none;
+      min-height: 41px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform .14s ease, border-color .14s ease, background .14s ease;
+    }
+    .button:hover { border-color: var(--ink); transform: translateY(-1px); }
+    .button-primary { border-color: var(--ink); background: var(--ink); color: #fff; }
+    .button-primary:hover { background: var(--ink-soft); }
+    .button-quiet { border-color: transparent; background: transparent; color: var(--muted); }
+    .button-quiet:hover { color: var(--ink); background: var(--surface-soft); border-color: transparent; }
+    .button-icon { width: 39px; padding: 0; }
+    .button[disabled] { opacity: .55; cursor: wait; transform: none; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 13px;
+      margin-bottom: 18px;
+    }
+    .summary-card {
+      min-width: 0;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 1px 1px rgba(17,17,17,.02);
+    }
+    .summary-label { color: var(--muted); font-size: 12px; font-weight: 650; }
+    .summary-value {
+      margin-top: 9px;
+      font-size: clamp(25px,3.5vw,34px);
+      font-weight: 780;
+      letter-spacing: -.045em;
+      font-variant-numeric: tabular-nums;
+    }
+    .summary-context { margin-top: 5px; color: var(--muted-light); font-size: 11px; }
+
+    .attention-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+    .attention-icon {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--ink);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .attention-title { font-size: 13px; font-weight: 750; }
+    .attention-copy { margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 0 0 13px;
+    }
+    .section-title { margin: 0; font-size: 18px; letter-spacing: -.025em; }
+    .section-caption { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .updated-at { color: var(--muted-light); font-size: 11px; white-space: nowrap; }
+    .orders-list { display: grid; gap: 13px; }
+
+    .order-card {
+      padding: 21px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 1px 2px rgba(17,17,17,.018);
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .order-card:hover { border-color: var(--line-strong); box-shadow: var(--shadow); }
+    .order-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+    }
+    .order-title { margin: 0; font-size: 17px; line-height: 1.3; letter-spacing: -.02em; }
+    .order-meta { display: flex; flex-wrap: wrap; gap: 5px 11px; margin-top: 8px; color: var(--muted); font-size: 12px; }
+    .order-meta span + span::before { content: "·"; margin-right: 11px; color: var(--line-strong); }
+    .status-pill {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .status-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .72; }
+    .status-delivered { color: var(--success); background: var(--success-bg); }
+    .status-cancelled, .status-problem { color: var(--danger); background: var(--danger-bg); }
+    .status-shipped { color: var(--info); background: var(--info-bg); }
+    .status-ordered { color: #5c448b; background: #f2eef9; }
+    .status-approval { color: var(--ink); background: #ececea; }
+
+    .progress-wrap { margin-top: 20px; }
+    .progress-track { height: 6px; overflow: hidden; border-radius: 999px; background: #e9e9e6; }
+    .progress-fill { height: 100%; border-radius: inherit; background: var(--ink); transition: width .35s ease; }
+    .progress-fill.delivered { background: var(--success); }
+    .progress-labels { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-top: 8px; }
+    .progress-label { color: var(--muted-light); font-size: 10px; }
+    .progress-label:nth-child(2), .progress-label:nth-child(3) { text-align: center; }
+    .progress-label:last-child { text-align: right; }
+    .progress-label.reached { color: var(--ink); font-weight: 700; }
+
+    .estimate-box {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 17px;
+      padding: 13px 14px;
+      border-left: 3px solid var(--ink);
+      border-radius: 2px 10px 10px 2px;
+      background: var(--surface-soft);
+    }
+    .estimate-box.delivered { border-left-color: var(--success); background: var(--success-bg); }
+    .estimate-box.problem { border-left-color: var(--danger); background: var(--danger-bg); }
+    .estimate-text { font-size: 13px; font-weight: 720; line-height: 1.4; }
+    .estimate-subtext { margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .confidence {
+      flex: 0 0 auto;
+      align-self: flex-start;
+      padding: 5px 7px;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      color: var(--muted);
+      background: var(--surface);
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .order-actions { display: flex; align-items: center; gap: 8px; margin-top: 15px; }
+    .details-button { margin-left: -10px; }
+    .chevron { display: inline-block; transition: transform .16s ease; }
+    .details-button[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+    .details-panel {
+      display: none;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 12px 24px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--line);
+    }
+    .details-panel.open { display: grid; }
+    .detail-label { color: var(--muted); font-size: 10px; font-weight: 650; text-transform: uppercase; letter-spacing: .055em; }
+    .detail-value { margin-top: 4px; font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
+    .detail-wide { grid-column: 1/-1; }
+
+    .history-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .search-wrap { position: relative; flex: 1; max-width: 380px; }
+    .search-input {
+      width: 100%;
+      height: 41px;
+      padding: 9px 13px 9px 36px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--ink);
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(17,17,17,.08); }
+    .search-icon { position: absolute; top: 50%; left: 13px; transform: translateY(-50%); color: var(--muted-light); font-size: 13px; }
+    .filter-group { display: flex; gap: 5px; padding: 4px; border-radius: 10px; background: #e9e9e6; }
+    .filter-button {
+      padding: 7px 10px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .filter-button.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(17,17,17,.08); }
+
+    .empty-state {
+      padding: 52px 24px;
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.44);
+      text-align: center;
+    }
+    .empty-icon { width: 44px; height: 44px; display: grid; place-items: center; margin: 0 auto 15px; border-radius: 13px; background: var(--surface); border: 1px solid var(--line); }
+    .empty-state h3 { margin: 0; font-size: 16px; }
+    .empty-state p { max-width: 430px; margin: 7px auto 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+    .loading-state { padding: 80px 0; text-align: center; color: var(--muted); }
+    .spinner {
+      width: 26px;
+      height: 26px;
+      margin: 0 auto 13px;
+      border: 3px solid var(--line);
+      border-top-color: var(--ink);
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 30;
+      max-width: min(360px,calc(100vw - 44px));
+      padding: 12px 15px;
+      border-radius: 11px;
+      background: var(--ink);
+      color: #fff;
+      box-shadow: 0 12px 35px rgba(0,0,0,.2);
+      font-size: 12px;
+      line-height: 1.45;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin-bottom: 22px; }
+    .stats-section {
+      margin-top: 16px;
+      padding: 21px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .stats-section-title { margin: 0 0 14px; font-size: 15px; letter-spacing: -.02em; }
+    .compact-list { display: grid; gap: 8px; }
+    .list-button, .list-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      text-align: left;
+    }
+    .list-button { cursor: pointer; }
+    .list-button:hover { border-color: var(--ink); }
+    .list-title { font-size: 13px; font-weight: 720; }
+    .list-meta { margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .list-value { flex: 0 0 auto; font-size: 13px; font-weight: 750; font-variant-numeric: tabular-nums; }
+    .list-arrow { margin-left: 8px; color: var(--muted-light); }
+    .high-value .list-row { background: var(--warning-bg); border-color: #f0d8b4; }
+    .detail-header { display: flex; align-items: center; gap: 13px; margin-bottom: 20px; }
+    .detail-heading h2 { margin: 0; font-size: 22px; letter-spacing: -.03em; }
+    .detail-heading p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .person-group { padding: 15px 0; border-top: 1px solid var(--line); }
+    .person-group:first-child { border-top: 0; padding-top: 0; }
+    .person-group:last-child { padding-bottom: 0; }
+    .person-group-head { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 9px; }
+    .mini-items { display: grid; gap: 6px; }
+    .mini-item { display: flex; justify-content: space-between; gap: 16px; padding: 10px 12px; border-radius: 9px; background: var(--surface-soft); font-size: 12px; }
+    .mini-item span:last-child { flex: 0 0 auto; font-weight: 700; }
+
+    @media (max-width: 900px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        height: auto;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 16px;
+        padding: 14px 18px 10px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .sidebar .brand-name, .sidebar .brand-caption { display: none; }
+      .nav-list { display: flex; align-items: center; gap: 5px; margin: 0; overflow-x: auto; }
+      .nav-button { width: auto; white-space: nowrap; }
+      .nav-icon { display: none; }
+      .sidebar-bottom { display: none; }
+      .main-content { padding-top: 28px; }
+    }
+    @media (max-width: 720px) {
+      .summary-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .summary-card:last-child { grid-column: 1/-1; }
+      .stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .topbar { flex-direction: column; }
+      .top-actions { width: 100%; }
+      .top-actions .button-primary { flex: 1; }
+      .history-toolbar { align-items: stretch; flex-direction: column; }
+      .search-wrap { max-width: none; }
+      .filter-group { align-self: flex-start; }
+    }
+    @media (max-width: 520px) {
+      .login-page { padding: 14px; }
+      .login-card { padding: 27px 22px; }
+      .sidebar { padding-inline: 12px; }
+      .main-content { padding: 23px 14px 42px; }
+      .page-title { font-size: 30px; }
+      .summary-card { padding: 17px; }
+      .order-card { padding: 17px; }
+      .order-top { flex-direction: column; gap: 11px; }
+      .order-meta span + span::before { display: none; }
+      .estimate-box { flex-direction: column; gap: 9px; }
+      .confidence { align-self: flex-start; }
+      .progress-label:nth-child(2) { text-align: left; }
+      .progress-label:nth-child(3) { text-align: right; }
+      .progress-label:nth-child(2), .progress-label:nth-child(3) { font-size: 0; }
+      .details-panel { grid-template-columns: 1fr; }
+      .detail-wide { grid-column: auto; }
+      .button-label-mobile { display: none; }
+      .attention-card { align-items: flex-start; }
+      .stats-section { padding: 17px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation-duration: .001ms !important; }
+    }
+  </style>
+  <style>
+    /* Preview-derived black + blue interface */
+    :root {
+      --ink: #f7f9fc;
+      --ink-soft: #dce5f3;
+      --page: #070b12;
+      --surface: #0d1420;
+      --surface-soft: #111c2b;
+      --line: #1d2a3c;
+      --line-strong: #2c3d55;
+      --muted: #91a0b5;
+      --muted-light: #6f8098;
+      --blue: #4f8cff;
+      --blue-bright: #6ea2ff;
+      --blue-soft: rgba(79,140,255,.12);
+      --success: #4ade9b;
+      --success-bg: rgba(45,201,128,.11);
+      --warning: #f8b86b;
+      --warning-bg: rgba(248,184,107,.10);
+      --danger: #ff7b8c;
+      --danger-bg: rgba(255,83,112,.10);
+      --info: #73a8ff;
+      --info-bg: rgba(79,140,255,.11);
+      --shadow: 0 18px 55px rgba(0,0,0,.24);
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 18% -5%, rgba(44,103,202,.18), transparent 29%),
+        radial-gradient(circle at 88% 4%, rgba(34,79,154,.10), transparent 22%),
+        var(--page);
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible {
+      outline-color: rgba(110,162,255,.72);
+    }
+
+    .login-page {
+      background:
+        radial-gradient(circle at 22% 14%, rgba(79,140,255,.19), transparent 27%),
+        radial-gradient(circle at 82% 86%, rgba(44,103,202,.11), transparent 28%),
+        var(--page);
+    }
+
+    .login-card {
+      background: rgba(13,20,32,.92);
+      border-color: var(--line);
+      box-shadow: 0 30px 80px rgba(0,0,0,.38);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand-mark {
+      background: linear-gradient(145deg, var(--blue-bright), #316ee3);
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(79,140,255,.24);
+    }
+
+    .error-banner {
+      color: #ff9ba8;
+      background: rgba(255,83,112,.09);
+      border-color: rgba(255,123,140,.25);
+    }
+
+    .content-width { width: min(1050px,100%); }
+
+    .eyebrow { color: var(--blue-bright); }
+    .page-subtitle { color: var(--muted); }
+
+    .button {
+      border-color: var(--line-strong);
+      background: var(--surface-soft);
+      color: var(--ink);
+    }
+
+    .button:hover {
+      border-color: var(--blue);
+      background: #142239;
+    }
+
+    .button-primary {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 9px 24px rgba(79,140,255,.18);
+    }
+
+    .button-primary:hover {
+      border-color: var(--blue-bright);
+      background: var(--blue-bright);
+    }
+
+    .button-quiet {
+      border-color: transparent;
+      background: transparent;
+      color: var(--muted);
+      box-shadow: none;
+    }
+
+    .button-quiet:hover {
+      color: var(--blue-bright);
+      background: var(--blue-soft);
+      border-color: transparent;
+    }
+
+    .summary-grid { gap: 14px; margin-bottom: 28px; }
+
+    .summary-card {
+      padding: 21px;
+      background: linear-gradient(150deg, #101a29, #0c131e);
+      border-color: var(--line);
+      box-shadow: 0 14px 38px rgba(0,0,0,.13);
+    }
+
+    .summary-card:hover { border-color: #34537e; }
+    .summary-label { color: var(--muted); }
+    .summary-value { color: var(--ink); }
+    .summary-context { color: var(--muted-light); }
+
+    .attention-card { display: none; }
+
+    .section-title { color: var(--ink); }
+    .section-caption, .updated-at { color: var(--muted); }
+
+    .orders-list {
+      display: block;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: 0 18px 50px rgba(0,0,0,.12);
+    }
+
+    .order-card {
+      padding: 22px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .order-card + .order-card { border-top: 1px solid var(--line); }
+
+    .order-card:hover {
+      border-color: var(--line);
+      background: rgba(255,255,255,.012);
+      box-shadow: none;
+    }
+
+    .order-title { color: var(--ink); }
+    .order-meta { color: var(--muted); }
+    .order-meta span + span::before { color: var(--line-strong); }
+
+    .status-pill {
+      color: var(--blue-bright);
+      background: var(--blue-soft);
+    }
+
+    .status-delivered { color: var(--success); background: var(--success-bg); }
+    .status-cancelled, .status-problem { color: var(--danger); background: var(--danger-bg); }
+    .status-shipped { color: #75b1ff; background: rgba(68,145,255,.12); }
+    .status-ordered { color: #ab9cff; background: rgba(139,117,255,.12); }
+    .status-approval { color: var(--blue-bright); background: var(--blue-soft); }
+
+    .progress-track { background: #1b2738; }
+    .progress-fill {
+      background: linear-gradient(90deg, #377be8, var(--blue-bright));
+      box-shadow: 0 0 15px rgba(79,140,255,.33);
+    }
+    .progress-fill.delivered { background: var(--success); box-shadow: none; }
+    .progress-label { color: var(--muted-light); }
+    .progress-label.reached { color: var(--ink-soft); }
+
+    .estimate-box {
+      border-left-color: var(--blue);
+      background: linear-gradient(90deg, rgba(79,140,255,.13), rgba(79,140,255,.055));
+    }
+
+    .estimate-box.delivered {
+      border-left-color: var(--success);
+      background: linear-gradient(90deg, rgba(45,201,128,.12), rgba(45,201,128,.045));
+    }
+
+    .estimate-box.problem {
+      border-left-color: var(--danger);
+      background: linear-gradient(90deg, rgba(255,83,112,.11), rgba(255,83,112,.04));
+    }
+
+    .estimate-text { color: var(--ink); }
+    .estimate-subtext { color: var(--muted); }
+
+    .confidence {
+      border-color: rgba(110,162,255,.25);
+      color: var(--blue-bright);
+      background: rgba(6,12,21,.45);
+    }
+
+    .details-panel { border-top-color: var(--line); }
+    .detail-label { color: var(--blue-bright); }
+    .detail-value { color: var(--ink-soft); }
+
+    .search-input {
+      border-color: var(--line-strong);
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .search-input::placeholder { color: var(--muted-light); }
+    .search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(79,140,255,.12); }
+
+    .filter-group { background: #111a27; }
+    .filter-button { color: var(--muted); }
+    .filter-button.active {
+      color: #fff;
+      background: var(--blue);
+      box-shadow: 0 6px 18px rgba(79,140,255,.16);
+    }
+
+    .empty-state {
+      border-color: var(--line-strong);
+      background: rgba(13,20,32,.52);
+    }
+    .empty-icon { background: var(--surface-soft); border-color: var(--line); }
+    .empty-state h3 { color: var(--ink); }
+    .empty-state p { color: var(--muted); }
+
+    .spinner { border-color: var(--line); border-top-color: var(--blue); }
+
+    .toast {
+      color: #fff;
+      background: #1a67e6;
+      box-shadow: 0 15px 40px rgba(15,70,158,.34);
+    }
+
+    .stats-section {
+      background: var(--surface);
+      border-color: var(--line);
+      box-shadow: 0 15px 42px rgba(0,0,0,.10);
+    }
+
+    .list-button, .list-row {
+      border-color: var(--line);
+      background: var(--surface-soft);
+      color: var(--ink);
+    }
+
+    .list-button:hover {
+      border-color: var(--blue);
+      background: #142239;
+    }
+
+    .list-meta { color: var(--muted); }
+    .list-arrow { color: var(--blue-bright); }
+    .high-value .list-row { background: var(--warning-bg); border-color: rgba(248,184,107,.22); }
+    .person-group { border-top-color: var(--line); }
+    .mini-item { background: var(--surface-soft); color: var(--ink-soft); }
+
+    .stats-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .stats-toolbar .search-wrap { width: min(100%,330px); }
+    .no-results { padding: 18px; color: var(--muted); text-align: center; font-size: 12px; }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        position: sticky;
+        height: auto;
+        display: flex;
+        grid-template-columns: none;
+        gap: 12px;
+        padding: 12px 18px;
+        border-bottom-color: var(--line);
+      }
+
+      .sidebar .brand-name { display: block; }
+      .sidebar .brand-caption { display: none; }
+      .nav-list { margin-left: auto; }
+      .sidebar-bottom { display: none; }
+      .main-content { padding-top: 34px; }
+    }
+
+    @media (max-width: 680px) {
+      .sidebar {
+        position: static;
+        flex-wrap: wrap;
+      }
+
+      .sidebar .brand-lockup { width: 100%; }
+      .nav-list {
+        width: 100%;
+        margin: 0;
+        overflow-x: auto;
+      }
+
+      .nav-button { flex: 1; justify-content: center; }
+      .main-content { padding: 28px 14px 52px; }
+      .stats-toolbar { align-items: stretch; flex-direction: column; }
+      .stats-toolbar .search-wrap { width: 100%; }
+    }
+  </style>
+  <style>
+    /* Final white + black palette, retaining the preview's blue tracking accents */
+    :root {
+      --ink: #111111;
+      --ink-soft: #2c2c2c;
+      --page: #f4f4f2;
+      --surface: #ffffff;
+      --surface-soft: #f7f7f6;
+      --line: #e3e3df;
+      --line-strong: #cacac4;
+      --muted: #6d6d68;
+      --muted-light: #94948e;
+      --blue: #3978e6;
+      --blue-bright: #4f8cff;
+      --blue-soft: rgba(57,120,230,.09);
+      --success: #237a4b;
+      --success-bg: #eaf6ef;
+      --warning: #9a5b13;
+      --warning-bg: #fff4e5;
+      --danger: #b42318;
+      --danger-bg: #fef0ed;
+      --info: #2c5d90;
+      --info-bg: #edf4fb;
+      --shadow: 0 1px 2px rgba(17,17,17,.04), 0 14px 38px rgba(17,17,17,.055);
+    }
+
+    body { background: var(--page); }
+
+    .login-page {
+      background:
+        radial-gradient(circle at 15% 8%, rgba(0,0,0,.05), transparent 26%),
+        var(--page);
+    }
+
+    .login-card {
+      background: var(--surface);
+      border-color: var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: none;
+    }
+
+    .brand-mark {
+      background: var(--ink);
+      color: #fff;
+      box-shadow: none;
+    }
+
+    .error-banner {
+      color: var(--danger);
+      background: var(--danger-bg);
+      border-color: #facdc6;
+    }
+
+    .sidebar {
+      background: rgba(255,255,255,.92);
+      border-bottom-color: var(--line);
+      backdrop-filter: blur(18px);
+    }
+
+    .sidebar .brand-name,
+    .user-name { color: var(--ink); }
+    .sidebar .brand-caption,
+    .user-email { color: var(--muted); }
+
+    .nav-button { color: var(--muted); }
+    .nav-button:hover { color: var(--ink); background: var(--surface-soft); }
+    .nav-button.active {
+      color: #fff;
+      background: var(--ink);
+      box-shadow: none;
+    }
+    .nav-count { color: var(--muted); background: #eeeeeb; }
+    .nav-button.active .nav-count { color: var(--ink); background: #fff; }
+
+    .signout-link {
+      color: var(--muted);
+      border-color: var(--line);
+      background: transparent;
+    }
+    .signout-link:hover {
+      color: var(--ink);
+      border-color: var(--line-strong);
+      background: var(--surface-soft);
+    }
+
+    .eyebrow { color: var(--muted); }
+
+    .button {
+      border-color: var(--line-strong);
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: none;
+    }
+    .button:hover { border-color: var(--ink); background: var(--surface); }
+    .button-primary {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: #fff;
+      box-shadow: none;
+    }
+    .button-primary:hover { border-color: #2d2d2d; background: #2d2d2d; }
+    .button-quiet { border-color: transparent; background: transparent; color: var(--muted); }
+    .button-quiet:hover { color: var(--ink); background: var(--surface-soft); border-color: transparent; }
+
+    .summary-card {
+      background: var(--surface);
+      border-color: var(--line);
+      box-shadow: 0 1px 1px rgba(17,17,17,.02);
+    }
+    .summary-card:hover { border-color: var(--line-strong); }
+    .summary-label { color: var(--muted); }
+    .summary-value { color: var(--ink); }
+    .summary-context { color: var(--muted-light); }
+
+    .orders-list {
+      border-color: var(--line);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .order-card + .order-card { border-top-color: var(--line); }
+    .order-card:hover { background: #fcfcfb; }
+    .order-title { color: var(--ink); }
+    .order-meta { color: var(--muted); }
+    .order-meta span + span::before { color: var(--line-strong); }
+
+    .status-pill { color: var(--blue); background: var(--blue-soft); }
+    .status-delivered { color: var(--success); background: var(--success-bg); }
+    .status-cancelled, .status-problem { color: var(--danger); background: var(--danger-bg); }
+    .status-shipped { color: var(--info); background: var(--info-bg); }
+    .status-ordered { color: #5c448b; background: #f2eef9; }
+    .status-approval { color: var(--blue); background: var(--blue-soft); }
+
+    .progress-track { background: #e9e9e6; }
+    .progress-fill {
+      background: linear-gradient(90deg, #326fd7, var(--blue-bright));
+      box-shadow: none;
+    }
+    .progress-fill.delivered { background: var(--success); }
+    .progress-label { color: var(--muted-light); }
+    .progress-label.reached { color: var(--ink); }
+
+    .estimate-box {
+      border-left-color: var(--blue);
+      background: linear-gradient(90deg, rgba(57,120,230,.10), rgba(57,120,230,.035));
+    }
+    .estimate-box.delivered {
+      border-left-color: var(--success);
+      background: var(--success-bg);
+    }
+    .estimate-box.problem {
+      border-left-color: var(--danger);
+      background: var(--danger-bg);
+    }
+    .estimate-text { color: var(--ink); }
+    .estimate-subtext { color: var(--muted); }
+    .confidence {
+      color: var(--blue);
+      background: var(--surface);
+      border-color: #cbd9ef;
+    }
+
+    .details-panel { border-top-color: var(--line); }
+    .detail-label { color: var(--muted); }
+    .detail-value { color: var(--ink-soft); }
+
+    .search-input {
+      color: var(--ink);
+      background: var(--surface);
+      border-color: var(--line-strong);
+    }
+    .search-input::placeholder { color: var(--muted-light); }
+    .search-input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(17,17,17,.08); }
+    .filter-group { background: #e9e9e6; }
+    .filter-button { color: var(--muted); }
+    .filter-button.active { color: #fff; background: var(--ink); box-shadow: none; }
+
+    .empty-state { border-color: var(--line-strong); background: rgba(255,255,255,.44); }
+    .empty-icon { background: var(--surface); border-color: var(--line); }
+    .empty-state h3 { color: var(--ink); }
+    .empty-state p, .loading-state { color: var(--muted); }
+    .spinner { border-color: var(--line); border-top-color: var(--ink); }
+    .toast { color: #fff; background: var(--ink); box-shadow: 0 12px 35px rgba(0,0,0,.2); }
+
+    .stats-section {
+      background: var(--surface);
+      border-color: var(--line);
+      box-shadow: 0 1px 2px rgba(17,17,17,.025);
+    }
+    .list-button, .list-row {
+      color: var(--ink);
+      background: var(--surface-soft);
+      border-color: var(--line);
+    }
+    .list-button:hover { border-color: var(--ink); background: var(--surface); }
+    .list-meta, .no-results { color: var(--muted); }
+    .list-arrow { color: var(--blue); }
+    .high-value .list-row { background: var(--warning-bg); border-color: #f0d8b4; }
+    .person-group { border-top-color: var(--line); }
+    .mini-item { color: var(--ink-soft); background: var(--surface-soft); }
+  </style>
+  <style>
+    /* Restored desktop shell: white left sidebar and bottom-left account controls */
+    .app-shell {
+      display: block !important;
+      min-height: 100vh;
+      padding-left: var(--sidebar);
+    }
+
+    .sidebar {
+      position: fixed !important;
+      inset: 0 auto 0 0 !important;
+      z-index: 30;
+      width: var(--sidebar) !important;
+      height: 100vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 0 !important;
+      padding: 24px 18px 18px !important;
+      background: var(--surface) !important;
+      border: 0 !important;
+      border-right: 1px solid var(--line) !important;
+      backdrop-filter: none !important;
+    }
+
+    .sidebar .brand-lockup { padding: 0 8px; }
+    .sidebar .brand-mark { width: 36px; height: 36px; border-radius: 10px; }
+
+    .nav-list {
+      width: 100% !important;
+      display: grid !important;
+      gap: 5px !important;
+      margin: 38px 0 0 !important;
+    }
+
+    .nav-button {
+      width: 100% !important;
+      justify-content: flex-start !important;
+      padding: 11px 12px !important;
+      white-space: normal !important;
+    }
+
+    .nav-icon {
+      width: 19px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .nav-count { margin-left: auto; }
+
+    .sidebar-bottom {
+      width: 100% !important;
+      display: block !important;
+      margin: auto 0 0 !important;
+      padding-top: 22px !important;
+    }
+
+    .user-block {
+      display: block;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-soft);
+    }
+
+    .user-name,
+    .user-email { display: block; }
+
+    .signout-link {
+      width: 100%;
+      display: block;
+      margin-top: 10px;
+      padding: 8px 0 0;
+      border: 0;
+      border-top: 1px solid var(--line);
+      border-radius: 0;
+      background: transparent;
+      text-align: left;
+    }
+
+    .signout-link:hover {
+      border-color: var(--line);
+      background: transparent;
+    }
+
+    .main-content {
+      width: 100%;
+      min-width: 0;
+      margin: 0 !important;
+      padding: 34px clamp(22px,4vw,56px) 60px !important;
+    }
+
+    .admin-status-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+
+    .admin-status-title { margin: 0 0 4px; font-size: 16px; }
+    .admin-status-copy { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .admin-pill {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: var(--success);
+      background: var(--success-bg);
+      font-size: 11px;
+      font-weight: 750;
+    }
+    .admin-pill.locked { color: var(--danger); background: var(--danger-bg); }
+    .admin-action-list { display: grid; gap: 12px; }
+    .admin-action {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-soft);
+    }
+    .admin-action h3 { margin: 0 0 4px; font-size: 14px; }
+    .admin-action p { max-width: 650px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .admin-danger { border-color: #f0c8c3; background: #fff8f7; }
+    .button-danger { color: #fff; border-color: var(--danger); background: var(--danger); }
+    .button-danger:hover { color: #fff; border-color: #8f1b13; background: #8f1b13; }
+    .activity-summary {
+      display: grid;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .activity-summary .summary-card { padding: 16px; }
+    .activity-summary .summary-value { font-size: 25px; }
+    .activity-columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+    .activity-panel {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-soft);
+    }
+    .activity-panel h3 { margin: 0 0 10px; font-size: 13px; }
+    .activity-panel .compact-list { max-height: 430px; overflow-y: auto; }
+    .activity-time { color: var(--muted); font-size: 11px; white-space: nowrap; }
+
+    .name-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(17,17,17,.48);
+      backdrop-filter: blur(5px);
+    }
+
+    .name-modal[hidden] { display: none !important; }
+
+    .name-modal-card {
+      width: min(100%,440px);
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface);
+      box-shadow: 0 24px 70px rgba(0,0,0,.22);
+    }
+
+    .name-modal-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .name-modal-card h2 {
+      margin: 20px 0 8px;
+      font-size: 25px;
+      letter-spacing: -.035em;
+    }
+
+    .name-modal-card p {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .name-label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .name-input {
+      width: 100%;
+      height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .name-input:focus {
+      border-color: var(--ink);
+      outline: 0;
+      box-shadow: 0 0 0 3px rgba(17,17,17,.08);
+    }
+
+    .name-email {
+      margin-top: 8px;
+      color: var(--muted-light);
+      font-size: 11px;
+    }
+
+    .name-error {
+      min-height: 18px;
+      margin-top: 9px;
+      color: var(--danger);
+      font-size: 12px;
+    }
+
+    .name-submit { width: 100%; margin-top: 5px; }
+
+    .onboarding-card { width: min(100%,520px); }
+    .onboarding-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .onboarding-step-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .onboarding-card h2 { margin-top: 24px; }
+    .onboarding-lead { margin-bottom: 18px !important; }
+    .onboarding-feature-list { display: grid; gap: 10px; margin-top: 18px; }
+    .onboarding-feature {
+      display: grid;
+      grid-template-columns: 34px minmax(0,1fr);
+      gap: 12px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-soft);
+    }
+    .onboarding-feature-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      color: #fff;
+      background: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .onboarding-feature h3 { margin: 1px 0 3px; font-size: 13px; }
+    .onboarding-feature p { margin: 0; font-size: 11px; line-height: 1.5; }
+    .onboarding-progress { display: flex; gap: 6px; margin-top: 22px; }
+    .onboarding-progress-dot {
+      height: 4px;
+      flex: 1;
+      border-radius: 999px;
+      background: var(--line);
+    }
+    .onboarding-progress-dot.active { background: var(--ink); }
+    .onboarding-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 4px; }
+    .onboarding-actions .button-primary { min-width: 145px; }
+    .onboarding-ready {
+      padding: 16px;
+      border: 1px solid #cde6d7;
+      border-radius: 13px;
+      color: var(--success);
+      background: var(--success-bg);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .guided-tour[hidden] { display: none !important; }
+
+    .tour-mask {
+      position: fixed;
+      z-index: 140;
+      background: rgba(17,17,17,.64);
+      backdrop-filter: blur(1.5px);
+      pointer-events: auto;
+    }
+
+    .tour-highlight {
+      position: relative !important;
+      z-index: 145 !important;
+      border-radius: 10px;
+      box-shadow:
+        0 0 0 4px rgba(255,255,255,.98),
+        0 0 0 8px rgba(17,17,17,.96),
+        0 12px 35px rgba(0,0,0,.28) !important;
+      animation: tourPulse 1.7s ease-in-out infinite;
+    }
+
+    @keyframes tourPulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.018); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tour-highlight { animation: none; }
+    }
+
+    .tour-tooltip {
+      position: fixed;
+      z-index: 150;
+      width: min(340px,calc(100vw - 24px));
+      padding: 17px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 15px;
+      color: #fff;
+      background: #111;
+      box-shadow: 0 22px 60px rgba(0,0,0,.35);
+    }
+
+    .tour-tooltip::before {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #111;
+      transform: rotate(45deg);
+    }
+
+    .tour-tooltip[data-placement="right"]::before { left: -6px; top: 24px; }
+    .tour-tooltip[data-placement="left"]::before { right: -6px; top: 24px; }
+    .tour-tooltip[data-placement="bottom"]::before { top: -6px; left: 24px; }
+    .tour-tooltip[data-placement="top"]::before { bottom: -6px; left: 24px; }
+
+    .tour-kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: rgba(255,255,255,.62);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .tour-tooltip h2 {
+      margin: 0 0 7px;
+      font-size: 18px;
+      letter-spacing: -.025em;
+    }
+
+    .tour-tooltip p {
+      margin: 0;
+      color: rgba(255,255,255,.74);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .tour-instruction {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 13px;
+      padding: 9px 10px;
+      border-radius: 9px;
+      color: #111;
+      background: #fff;
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .tour-click-dot {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: #111;
+      box-shadow: 0 0 0 4px rgba(17,17,17,.12);
+    }
+
+    .tour-progress {
+      height: 3px;
+      margin-top: 15px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,.16);
+    }
+
+    .tour-progress-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: #fff;
+      transition: width .2s ease;
+    }
+
+    .tour-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tour-action-group { display: flex; gap: 7px; margin-left: auto; }
+    .tour-button {
+      min-height: 34px;
+      padding: 7px 11px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 8px;
+      color: #fff;
+      background: transparent;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tour-button:hover { background: rgba(255,255,255,.1); }
+    .tour-button.primary { color: #111; background: #fff; border-color: #fff; }
+    .tour-button:disabled { opacity: .48; cursor: wait; }
+    .tour-error { min-height: 0; margin-top: 9px; color: #ffb4ad; font-size: 11px; }
+
+    @media (max-width: 560px) {
+      .tour-tooltip { padding: 15px; }
+      .tour-tooltip::before { display: none; }
+    }
+
+    @media (max-width: 900px) {
+      .app-shell { display: block !important; padding-left: 0; }
+      .sidebar {
+        position: sticky !important;
+        inset: 0 auto auto 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        display: grid !important;
+        grid-template-columns: auto 1fr;
+        gap: 16px !important;
+        padding: 14px 18px 10px !important;
+        border-right: 0 !important;
+        border-bottom: 1px solid var(--line) !important;
+      }
+      .sidebar .brand-name,
+      .sidebar .brand-caption { display: none; }
+      .nav-list {
+        width: auto;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin: 0;
+        overflow-x: auto;
+      }
+      .nav-button { width: auto; white-space: nowrap; }
+      .nav-icon { display: none; }
+      .sidebar-bottom { display: none; }
+      .main-content { padding-top: 28px !important; }
+      .admin-action { align-items: stretch; flex-direction: column; }
+      .admin-action .button { width: 100%; }
+      .activity-summary, .activity-columns { grid-template-columns: 1fr; }
+    }
+
+    /* v5 interaction polish */
+    .button,
+    .nav-button,
+    .summary-card,
+    .order-card,
+    .list-button,
+    .filter-button,
+    .admin-action,
+    .approval-entry {
+      transition:
+        color .18s ease,
+        background-color .18s ease,
+        border-color .18s ease,
+        box-shadow .22s ease,
+        transform .18s ease;
+    }
+
+    .button:active,
+    .nav-button:active,
+    .list-button:active { transform: scale(.975); }
+
+    .page-content-leave {
+      opacity: 0;
+      transform: translateY(5px);
+      transition: opacity .09s ease, transform .09s ease;
+    }
+
+    .page-content-enter { animation: pageContentIn .24s cubic-bezier(.22,.75,.25,1); }
+
+    @keyframes pageContentIn {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes appReveal {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .app-shell.app-reveal { animation: appReveal .3s cubic-bezier(.22,.75,.25,1); }
+
+    ::view-transition-old(root) { animation: .1s ease both fade-out; }
+    ::view-transition-new(root) { animation: .22s ease both fade-in; }
+    @keyframes fade-out { to { opacity: .78; } }
+    @keyframes fade-in { from { opacity: .78; } }
+
+    .sign-in-loading,
+    .waitlist-page {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(0,0,0,.05), transparent 27%),
+        var(--page);
+    }
+
+    .sign-in-loading-card,
+    .waitlist-card {
+      width: min(100%,440px);
+      padding: 34px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: 0 24px 70px rgba(17,17,17,.1);
+      text-align: center;
+    }
+
+    .sign-in-loading-card .brand-mark,
+    .waitlist-card .brand-mark { margin: 0 auto 22px; }
+    .sign-in-loading-card .spinner { width: 34px; height: 34px; margin-bottom: 18px; }
+    .sign-in-loading-card h2,
+    .waitlist-card h2 { margin: 0; font-size: 24px; letter-spacing: -.035em; }
+    .sign-in-loading-card p,
+    .waitlist-card p { margin: 9px auto 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .loading-steps { display: grid; gap: 7px; margin-top: 23px; text-align: left; }
+    .loading-step { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 11px; }
+    .loading-step-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--line-strong); }
+    .loading-step.active { color: var(--ink); font-weight: 700; }
+    .loading-step.active .loading-step-dot { background: var(--ink); box-shadow: 0 0 0 4px rgba(17,17,17,.08); }
+    .waitlist-status { display: inline-flex; margin-top: 18px; padding: 6px 9px; border-radius: 999px; color: var(--warning); background: var(--warning-bg); font-size: 10px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+    .waitlist-email { margin-top: 10px; color: var(--ink); font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
+    .waitlist-actions { display: grid; gap: 8px; margin-top: 23px; }
+
+    .login-history-list { display: grid; gap: 8px; }
+    .login-history-item {
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--surface-soft);
+      overflow: hidden;
+    }
+    .login-history-item summary {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      cursor: pointer;
+      list-style: none;
+    }
+    .login-history-item summary::-webkit-details-marker { display: none; }
+    .login-history-item summary:hover { background: rgba(17,17,17,.025); }
+    .login-history-chevron { color: var(--muted); transition: transform .18s ease; }
+    .login-history-item[open] .login-history-chevron,
+    .approval-entry[open] .login-history-chevron { transform: rotate(180deg); }
+    .login-history-detail {
+      display: grid;
+      gap: 6px;
+      padding: 0 12px 12px;
+      animation: pageContentIn .18s ease;
+    }
+    .login-time-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 9px; border-radius: 8px; background: var(--surface); color: var(--muted); font-size: 11px; }
+    .login-time-row strong { color: var(--ink); font-weight: 650; }
+
+    .approval-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-bottom: 18px; }
+    .approval-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+    .approval-toolbar .search-wrap { max-width: 430px; }
+    .approval-list { display: grid; gap: 10px; }
+    .approval-entry { border: 1px solid var(--line); border-radius: 13px; background: var(--surface); overflow: hidden; }
+    .approval-entry[open] { border-color: var(--line-strong); box-shadow: var(--shadow); }
+    .approval-entry summary {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto auto;
+      align-items: center;
+      gap: 14px;
+      padding: 15px;
+      list-style: none;
+      cursor: pointer;
+    }
+    .approval-entry summary::-webkit-details-marker { display: none; }
+    .approval-entry summary:hover { background: var(--surface-soft); }
+    .approval-email { font-size: 13px; font-weight: 750; overflow-wrap: anywhere; }
+    .approval-meta { margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .approval-status { padding: 5px 8px; border-radius: 999px; font-size: 9px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+    .approval-status.pending { color: var(--warning); background: var(--warning-bg); }
+    .approval-status.approved { color: var(--success); background: var(--success-bg); }
+    .approval-status.rejected { color: var(--danger); background: var(--danger-bg); }
+    .approval-detail { padding: 0 15px 15px; animation: pageContentIn .18s ease; }
+    .approval-order-list { display: grid; gap: 7px; margin-top: 12px; }
+    .approval-order { display: flex; justify-content: space-between; gap: 14px; padding: 10px; border-radius: 9px; background: var(--surface-soft); font-size: 11px; }
+    .approval-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .approval-note { margin-top: 12px; color: var(--muted); font-size: 10px; }
+    .nav-count.pending-count { color: #fff; background: var(--warning); }
+    .nav-button.active .nav-count.pending-count { color: #fff; background: var(--warning); }
+
+    .budget-section { margin-bottom: 30px; }
+    .budget-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+    .budget-card {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface);
+      box-shadow: 0 1px 0 rgba(17,17,17,.02);
+      transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    }
+    .budget-card:hover { transform: translateY(-1px); border-color: var(--line-strong); box-shadow: var(--shadow); }
+    .budget-card.over { border-color: rgba(181,71,62,.3); background: linear-gradient(180deg,#fff 0%,#fffafa 100%); }
+    .budget-card.pending { border-color: rgba(151,100,18,.3); }
+    .budget-card.approved { border-color: rgba(43,122,76,.28); }
+    .budget-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+    .budget-event { font-size: 14px; font-weight: 780; letter-spacing: -.015em; }
+    .budget-money { margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .budget-money strong { color: var(--ink); font-size: 16px; }
+    .budget-chip { flex: 0 0 auto; padding: 5px 8px; border-radius: 999px; background: var(--surface-soft); color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .045em; text-transform: uppercase; }
+    .budget-chip.over,.budget-chip.rejected { color: var(--danger); background: var(--danger-bg); }
+    .budget-chip.pending { color: var(--warning); background: var(--warning-bg); }
+    .budget-chip.approved { color: var(--success); background: var(--success-bg); }
+    .budget-track { height: 10px; margin-top: 14px; overflow: hidden; border-radius: 999px; background: #ecece8; }
+    .budget-fill { height: 100%; border-radius: inherit; background: var(--ink); transition: width .65s cubic-bezier(.2,.8,.2,1); }
+    .budget-card.over .budget-fill { background: var(--danger); }
+    .budget-card.pending .budget-fill { background: var(--warning); }
+    .budget-card.approved .budget-fill { background: var(--success); }
+    .budget-detail { margin-top: 11px; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .budget-alert { margin-top: 13px; padding: 11px; border-radius: 10px; color: var(--danger); background: var(--danger-bg); font-size: 11px; line-height: 1.55; }
+    .budget-card.pending .budget-alert { color: var(--warning); background: var(--warning-bg); }
+    .budget-card.approved .budget-alert { color: var(--success); background: var(--success-bg); }
+    .budget-card .approval-actions { margin-top: 11px; }
+    .order-card.budget-flagged { border-color: rgba(181,71,62,.34); }
+    .order-budget-flag { display: flex; gap: 9px; margin: 13px 0 0; padding: 10px 11px; border-radius: 9px; color: var(--danger); background: var(--danger-bg); font-size: 10px; font-weight: 650; line-height: 1.5; }
+    .order-budget-flag.approved { color: var(--success); background: var(--success-bg); }
+    .order-budget-flag.pending { color: var(--warning); background: var(--warning-bg); }
+
+    .budget-center-layout { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(300px,.8fr); gap: 18px; align-items: start; }
+    .budget-rule-form { display: grid; gap: 11px; }
+    .budget-rule-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .field-group { display: grid; gap: 6px; }
+    .field-group.full { grid-column: 1 / -1; }
+    .field-label { color: var(--muted); font-size: 10px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
+    .field-input,.field-select { width: 100%; min-height: 42px; padding: 10px 11px; border: 1px solid var(--line); border-radius: 9px; outline: none; background: var(--surface); color: var(--ink); font: inherit; font-size: 12px; }
+    .field-input:focus,.field-select:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(17,17,17,.08); }
+    .budget-rules-list { display: grid; gap: 8px; margin-top: 14px; }
+    .budget-rule-row { display: flex; justify-content: space-between; gap: 14px; padding: 11px; border-radius: 9px; background: var(--surface-soft); font-size: 11px; }
+    .budget-rule-row strong { display: block; font-size: 12px; }
+    .budget-rule-scope { margin-top: 3px; color: var(--muted); }
+
+    .tour-highlight { pointer-events: none !important; }
+
+    @media (max-width: 720px) {
+      .approval-summary { grid-template-columns: 1fr; }
+      .approval-toolbar { align-items: stretch; flex-direction: column; }
+      .approval-toolbar .search-wrap { max-width: none; }
+      .approval-entry summary,
+      .login-history-item summary { grid-template-columns: minmax(0,1fr) auto; }
+      .approval-entry summary .approval-status,
+      .login-history-item summary .activity-time { grid-column: 1; justify-self: start; }
+      .budget-grid,.budget-center-layout,.budget-rule-fields { grid-template-columns: 1fr; }
+      .field-group.full { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <section class="login-page" id="login-page">
+    <div class="login-card">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">SO</div>
+        <div>
+          <div class="brand-name">SciOly Orders</div>
+          <div class="brand-caption">Mountain View Science Olympiad</div>
+        </div>
+      </div>
+      <h1>Your orders,<br>without the guesswork.</h1>
+      <p class="login-copy">Sign in to see approval progress, delivery estimates, costs, and completed orders linked to your account.</p>
+      <div class="google-wrap">
+        <div id="g_id_onload"
+          data-client_id="483790698157-mk3l3ugqgvh4uv10q3bng2g9j8j3vp8q.apps.googleusercontent.com"
+          data-callback="handleCredentialResponse"
+          data-auto_prompt="true"
+          data-auto_select="true"
+          data-context="signin"
+          data-color_scheme="light">
+        </div>
+        <div class="g_id_signin"
+          data-type="standard"
+          data-shape="rectangular"
+          data-theme="outline"
+          data-text="signin_with"
+          data-size="large"
+          data-logo_alignment="left"
+          data-width="300">
+        </div>
+      </div>
+      <div class="error-banner" id="error-msg" role="alert"></div>
+    </div>
+  </section>
+
+  <section class="sign-in-loading" id="sign-in-loading" hidden aria-live="polite" aria-busy="true">
+    <div class="sign-in-loading-card">
+      <div class="brand-mark" aria-hidden="true">SO</div>
+      <div class="spinner" aria-hidden="true"></div>
+      <h2>Signing you in…</h2>
+      <p>We’re verifying your Google account and loading your latest order information.</p>
+      <div class="loading-steps" aria-hidden="true">
+        <div class="loading-step active"><span class="loading-step-dot"></span>Verifying your account</div>
+        <div class="loading-step"><span class="loading-step-dot"></span>Connecting to the treasury tracker</div>
+        <div class="loading-step"><span class="loading-step-dot"></span>Preparing your dashboard</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="waitlist-page" id="waitlist-page" hidden>
+    <div class="waitlist-card">
+      <div class="brand-mark" aria-hidden="true">SO</div>
+      <h2 id="waitlist-title">Approval required</h2>
+      <div class="waitlist-status" id="waitlist-status">Waiting for approval</div>
+      <div class="waitlist-email" id="waitlist-email"></div>
+      <p id="waitlist-message">External Google accounts must be approved by a Science Olympiad executive.</p>
+      <div class="waitlist-actions">
+        <button class="button button-primary" type="button" onclick="returnToLogin()">Use a school account</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="app-shell" id="app-shell" hidden>
+    <aside class="sidebar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">SO</div>
+        <div>
+          <div class="brand-name">SciOly Orders</div>
+          <div class="brand-caption">Treasury portal</div>
+        </div>
+      </div>
+
+      <nav class="nav-list" aria-label="Portal pages">
+        <button class="nav-button active" id="nav-orders" type="button" onclick="navigateTo('orders')">
+          <span class="nav-icon" aria-hidden="true">◫</span>
+          <span>Orders</span>
+          <span class="nav-count" id="active-nav-count">0</span>
+        </button>
+        <button class="nav-button" id="nav-history" type="button" onclick="navigateTo('history')">
+          <span class="nav-icon" aria-hidden="true">↺</span>
+          <span>History</span>
+          <span class="nav-count" id="history-nav-count">0</span>
+        </button>
+        <button class="nav-button" id="nav-team" type="button" onclick="navigateTo('team')" hidden>
+          <span class="nav-icon" aria-hidden="true">◎</span>
+          <span>Team insights</span>
+        </button>
+        <button class="nav-button" id="nav-approvals" type="button" onclick="navigateTo('approvals')" hidden>
+          <span class="nav-icon" aria-hidden="true">✓</span>
+          <span>External approvals</span>
+          <span class="nav-count pending-count" id="external-nav-count" hidden>0</span>
+        </button>
+        <button class="nav-button" id="nav-budgets" type="button" onclick="navigateTo('budgets')" hidden>
+          <span class="nav-icon" aria-hidden="true">$</span>
+          <span>Budget center</span>
+          <span class="nav-count pending-count" id="budget-nav-count" hidden>0</span>
+        </button>
+        <button class="nav-button" id="nav-admin" type="button" onclick="navigateTo('admin')" hidden>
+          <span class="nav-icon" aria-hidden="true">⚙</span>
+          <span>Admin controls</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="user-block" id="sidebar-user-block">
+          <div class="user-name" id="sidebar-user-name">Signed in</div>
+          <div class="user-email" id="sidebar-user-email"></div>
+          <button class="signout-link" type="button" onclick="returnToLogin()">Sign out</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="content-width" id="page-content"></div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="name-modal" id="onboarding-modal" hidden>
+    <form class="name-modal-card" id="onboarding-form" onsubmit="saveOnboardingName(event)" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+      <div class="name-modal-mark" aria-hidden="true">SO</div>
+      <h2 id="onboarding-title">What should we call you?</h2>
+      <p>Your name will appear around the portal and will be saved to your verified Google account.</p>
+      <label class="name-label" for="profile-name-input">Your name</label>
+      <input class="name-input" id="profile-name-input" name="displayName" type="text" autocomplete="name" maxlength="60" placeholder="Julian" required>
+      <div class="name-email" id="onboarding-email">Verified Google account</div>
+      <div class="name-error" id="onboarding-error" role="alert"></div>
+      <button class="button button-primary name-submit" id="onboarding-name-submit" type="submit">Save and start tour</button>
+    </form>
+  </div>
+
+  <div class="guided-tour" id="guided-tour" hidden aria-live="polite">
+    <div class="tour-mask" data-tour-mask="top"></div>
+    <div class="tour-mask" data-tour-mask="left"></div>
+    <div class="tour-mask" data-tour-mask="right"></div>
+    <div class="tour-mask" data-tour-mask="bottom"></div>
+    <section class="tour-tooltip" id="tour-tooltip" role="dialog" aria-modal="true" aria-labelledby="tour-title"></section>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzag2WkgUl-_WO4-xlbGJZ3n2sfVk6AFtvzGBCowHF4PxlS0U5Yq6h3IxMV_Xie-4g/exec";
+    const ORDER_FORM_URL = "https://forms.gle/e2qgGCRH5vSSTHmF7";
+
+    let googleCredential = null;
+    let currentDashboardData = null;
+    let currentIsExecutive = false;
+    let currentIsSuperAdmin = false;
+    let currentMaintenanceMode = false;
+    let currentUserProfile = null;
+    let savedTeamStatistics = null;
+    let savedExternalApprovals = null;
+    let savedBudgetCenter = null;
+    let externalPendingCount = 0;
+    let budgetPendingCount = 0;
+    let externalApprovalFilter = "pending";
+    let externalApprovalSearch = "";
+    let budgetApprovalFilter = "pending";
+    let budgetApprovalSearch = "";
+    let currentPage = "orders";
+    let historyFilter = "all";
+    let historySearch = "";
+    let teamEventSearch = "";
+    let teamPeopleSearch = "";
+    let lastUpdatedAt = null;
+    let toastTimer = null;
+    let onboardingName = "";
+    let guidedTourActive = false;
+    let guidedTourIndex = 0;
+    let guidedTourTarget = null;
+    let guidedTourRequiresClick = false;
+    let guidedTourLookupAttempts = 0;
+    let guidedTourTimer = null;
+    let signInRequestInFlight = false;
+    let signInLoadingTimers = [];
+    let pageTransitionTimer = null;
+    const previewParameters = new URLSearchParams(window.location.search);
+    const previewRequest = previewParameters.get("preview");
+    const publicOnboardingDemo = previewParameters.get("demo") === "onboarding";
+    const publicExecutiveDemo = previewParameters.get("demo") === "exec";
+    const previewHostAllowed =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.protocol === "file:";
+    let localPreviewMode =
+      publicOnboardingDemo
+        ? "student"
+        : publicExecutiveDemo
+          ? "exec"
+        : previewHostAllowed && (previewRequest === "student" || previewRequest === "exec" || previewRequest === "admin")
+          ? previewRequest
+          : null;
+    const previewFirstTime =
+      publicOnboardingDemo ||
+      (previewHostAllowed && previewParameters.get("firstTime") === "1");
+
+    window.addEventListener("DOMContentLoaded", function() {
+      if (localPreviewMode) startLocalPreview(localPreviewMode);
+    });
+
+    function handleCredentialResponse(response) {
+      if (localPreviewMode) return;
+      if (signInRequestInFlight) return;
+      hideLoginError();
+      if (!response || !response.credential) {
+        showLoginError(new Error("Google sign-in did not return a valid account. Please try again."));
+        return;
+      }
+      signInRequestInFlight = true;
+      googleCredential = response.credential;
+      setSignInLoading(true);
+      loadDashboard();
+    }
+
+    function startLocalPreview(mode) {
+      currentIsExecutive = mode === "exec" || mode === "admin";
+      currentIsSuperAdmin = mode === "admin";
+      currentMaintenanceMode = false;
+      currentDashboardData = buildPreviewDashboard(currentIsExecutive);
+      if (currentIsSuperAdmin) currentDashboardData.email = "jn.chaw7@gmail.com";
+      currentUserProfile = previewFirstTime
+        ? { name: "", needsName: true, onboardingComplete: false, needsOnboarding: true }
+        : {
+            name: currentIsExecutive ? "Preview Executive" : "Preview Student",
+            needsName: false,
+            onboardingComplete: true,
+            needsOnboarding: false
+          };
+      savedTeamStatistics = currentIsExecutive ? buildPreviewTeamStatistics() : null;
+      savedExternalApprovals = currentIsExecutive ? buildPreviewExternalApprovals() : null;
+      savedBudgetCenter = currentIsExecutive ? buildPreviewBudgetCenter() : null;
+      externalPendingCount = savedExternalApprovals ? savedExternalApprovals.pendingCount : 0;
+      budgetPendingCount = savedBudgetCenter ? savedBudgetCenter.pendingCount : 0;
+      lastUpdatedAt = new Date();
+      initializeApp();
+      navigateTo(currentIsSuperAdmin ? "admin" : (currentIsExecutive ? "team" : "orders"));
+      if (currentUserProfile.needsOnboarding || currentUserProfile.needsName) showOnboarding();
+      window.setTimeout(function() {
+        showToast(publicOnboardingDemo ? "Orientation demo · mock data" : (publicExecutiveDemo ? "Executive demo · mock data" : (currentIsSuperAdmin ? "Local owner preview" : (currentIsExecutive ? "Local executive preview" : "Local student preview"))));
+      }, 120);
+    }
+
+    function buildPreviewDashboard(isExecutive) {
+      return {
+        email: isExecutive ? "preview.executive@mvla.net" : "preview.student@mvla.net",
+        totalCost: 112.48,
+        eventBudgets: [
+          {
+            eventName: "Electric Vehicle",
+            personName: isExecutive ? "Preview Executive" : "Preview Student",
+            studentId: "34572",
+            budget: 50,
+            spent: 112.48,
+            remaining: 0,
+            overflowAmount: 62.48,
+            percent: 100,
+            status: "NEEDS_APPROVAL",
+            isOverBudget: true,
+            requiresApproval: true,
+            requestStatus: "",
+            triggeringOrder: { rowNum: 9001, itemName: "Pololu 50:1 gearmotor", orderTotal: 52.98 }
+          }
+        ],
+        items: [
+          {
+            rowNum: 9001,
+            personName: isExecutive ? "Preview Executive" : "Preview Student",
+            itemName: "Pololu 50:1 gearmotor",
+            eventName: "Electric Vehicle",
+            qty: "2",
+            numericQuantity: 2,
+            unitPrice: 26.49,
+            numericPrice: 52.98,
+            price: "$52.98",
+            signatures: "Step 5 of 7",
+            orderStatus: "Pending",
+            stage: "PENDING",
+            step: 5,
+            deliveryText: "Likely ordered in 2–4 days",
+            estimateConfidence: "medium",
+            estimateConfidenceLabel: "Medium",
+            estimateConfidenceDetail: "Based on the recent approval pace. This is an estimate.",
+            vendor: "AMAZON",
+            link: "https://www.amazon.com/"
+          },
+          {
+            rowNum: 9002,
+            personName: isExecutive ? "Preview Executive" : "Preview Student",
+            itemName: "BNO085 IMU",
+            eventName: "Electric Vehicle",
+            qty: "1",
+            numericQuantity: 1,
+            unitPrice: 31.75,
+            numericPrice: 31.75,
+            price: "$31.75",
+            signatures: "Completed",
+            orderStatus: "Ordered",
+            stage: "ORDERED",
+            step: 7,
+            deliveryText: "Estimated arrival in 5–7 days",
+            estimateConfidence: "low",
+            estimateConfidenceLabel: "Low",
+            estimateConfidenceDetail: "No carrier tracking is connected, so this is an approximate range.",
+            vendor: "OTHER",
+            link: "https://www.adafruit.com/"
+          },
+          {
+            rowNum: 9003,
+            personName: isExecutive ? "Preview Executive" : "Preview Student",
+            itemName: "Encoder cable set",
+            eventName: "Electric Vehicle",
+            qty: "2",
+            numericQuantity: 2,
+            unitPrice: 13.875,
+            numericPrice: 27.75,
+            price: "$27.75",
+            signatures: "Completed",
+            orderStatus: "Delivered",
+            stage: "DELIVERED",
+            step: 7,
+            isDelivered: true,
+            deliveryText: "Delivered",
+            estimateConfidence: "actual",
+            estimateConfidenceLabel: "Actual",
+            estimateConfidenceDetail: "Delivery is confirmed by the current order status.",
+            vendor: "AMAZON",
+            link: "https://www.amazon.com/"
+          }
+        ]
+      };
+    }
+
+    function buildPreviewTeamStatistics() {
+      const julianItems = [
+        { itemName: "Pololu gearmotors", eventName: "Electric Vehicle", quantity: 2, price: 52.98, status: "Pending" },
+        { itemName: "BNO085 IMU", eventName: "Electric Vehicle", quantity: 1, price: 31.75, status: "Ordered" }
+      ];
+      const juliaItems = [
+        { itemName: "Diffraction grating", eventName: "Astronomy", quantity: 2, price: 18.00, status: "Delivered" }
+      ];
+      const ericItems = [
+        { itemName: "Heat lamp stand", eventName: "Thermodynamics", quantity: 2, price: 39.96, status: "Ordered" }
+      ];
+
+      return {
+        totalOrders: 18,
+        totalStudents: 6,
+        totalQuantity: 27,
+        totalCost: 1284.73,
+        portalAccess: {
+          totalLogins: 14,
+          uniqueVisitors: 5,
+          recentLogins: [
+            { email: "100034572@mvla.net", timestamp: new Date(Date.now() - 8 * 60000).toISOString() },
+            { email: "100032279@mvla.net", timestamp: new Date(Date.now() - 52 * 60000).toISOString() },
+            { email: "preview.student@mvla.net", timestamp: new Date(Date.now() - 26 * 3600000).toISOString() }
+          ],
+          neverLoggedIn: [
+            { name: "Avery Student", email: "100039999@mvla.net" },
+            { name: "Jordan Student", email: "100038888@mvla.net" }
+          ]
+        },
+        highValueOrders: [
+          { name: "Arjun Patel", itemName: "Build clinic registration", eventName: "Team", quantity: 1, status: "Approved", price: 975.00 },
+          { name: "Julian Chaw", itemName: "Pololu gearmotors", eventName: "Electric Vehicle", quantity: 2, status: "Pending", price: 52.98 }
+        ],
+        events: [
+          {
+            eventName: "Electric Vehicle",
+            orderCount: 5,
+            totalCost: 246.40,
+            people: [
+              { name: "Julian Chaw", totalCost: 84.73, items: julianItems },
+              { name: "Maya Chen", totalCost: 161.67, items: [{ itemName: "Wheel set", quantity: 3, price: 161.67 }] }
+            ]
+          },
+          {
+            eventName: "Astronomy",
+            orderCount: 4,
+            totalCost: 112.35,
+            people: [{ name: "Julia Lee", totalCost: 18.00, items: juliaItems }]
+          },
+          {
+            eventName: "Thermodynamics",
+            orderCount: 3,
+            totalCost: 94.62,
+            people: [{ name: "Eric Shiu", totalCost: 39.96, items: ericItems }]
+          }
+        ],
+        people: [
+          { name: "Julian Chaw", orderCount: 2, totalCost: 84.73, items: julianItems },
+          { name: "Julia Lee", orderCount: 1, totalCost: 18.00, items: juliaItems },
+          { name: "Eric Shiu", orderCount: 1, totalCost: 39.96, items: ericItems },
+          { name: "Maya Chen", orderCount: 3, totalCost: 161.67, items: [{ itemName: "Wheel set", eventName: "Electric Vehicle", quantity: 3, price: 161.67, status: "Approved" }] }
+        ]
+      };
+    }
+
+    function buildPreviewExternalApprovals() {
+      return {
+        pendingCount: 2,
+        approvedCount: 1,
+        rejectedCount: 1,
+        entries: [
+          {
+            email: "mentor.robotics@gmail.com",
+            status: "PENDING",
+            firstSeen: new Date(Date.now() - 2 * 3600000).toISOString(),
+            updatedAt: "",
+            updatedBy: "",
+            names: ["Dr. Rivera"],
+            events: ["Electric Vehicle"],
+            orderCount: 2,
+            totalCost: 74.73,
+            items: [
+              { rowNum: 41, name: "Dr. Rivera", itemName: "Motor test stand", eventName: "Electric Vehicle", quantity: 1, totalCost: 49.95 },
+              { rowNum: 42, name: "Dr. Rivera", itemName: "Encoder cable set", eventName: "Electric Vehicle", quantity: 2, totalCost: 24.78 }
+            ]
+          },
+          {
+            email: "astronomy.coach@gmail.com",
+            status: "PENDING",
+            firstSeen: new Date(Date.now() - 25 * 60000).toISOString(),
+            updatedAt: "",
+            updatedBy: "",
+            names: ["Coach Lee"],
+            events: ["Astronomy"],
+            orderCount: 1,
+            totalCost: 18.00,
+            items: [{ rowNum: 43, name: "Coach Lee", itemName: "Diffraction grating", eventName: "Astronomy", quantity: 2, totalCost: 18.00 }]
+          },
+          {
+            email: "approved.mentor@gmail.com",
+            status: "APPROVED",
+            firstSeen: new Date(Date.now() - 7 * 86400000).toISOString(),
+            updatedAt: new Date(Date.now() - 6 * 86400000).toISOString(),
+            updatedBy: "100034572@mvla.net",
+            names: ["Approved Mentor"],
+            events: ["Mission Possible"],
+            orderCount: 1,
+            totalCost: 31.40,
+            items: [{ rowNum: 30, name: "Approved Mentor", itemName: "Hardware kit", eventName: "Mission Possible", quantity: 1, totalCost: 31.40 }]
+          },
+          {
+            email: "unknown.sender@gmail.com",
+            status: "REJECTED",
+            firstSeen: new Date(Date.now() - 3 * 86400000).toISOString(),
+            updatedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
+            updatedBy: "100034572@mvla.net",
+            names: ["Unknown"],
+            events: ["Unassigned event"],
+            orderCount: 1,
+            totalCost: 999.00,
+            items: [{ rowNum: 27, name: "Unknown", itemName: "Unrecognized request", eventName: "Unassigned event", quantity: 1, totalCost: 999.00 }]
+          }
+        ]
+      };
+    }
+
+    function buildPreviewBudgetCenter() {
+      return {
+        pendingCount: 2,
+        approvedCount: 1,
+        rejectedCount: 0,
+        rules: [
+          { ruleId: "DEFAULT-ELECTRIC-VEHICLE", scopeType: "DEFAULT", scopeValue: "*", eventName: "Electric Vehicle", budget: 50, updatedBy: "SYSTEM" },
+          { ruleId: "DEFAULT-ASTRONOMY", scopeType: "DEFAULT", scopeValue: "*", eventName: "Astronomy", budget: 75, updatedBy: "100034572@mvla.net" }
+        ],
+        requests: [
+          {
+            requestId: "preview-budget-1",
+            email: "preview.student@mvla.net",
+            personName: "Preview Student",
+            studentId: "34572",
+            eventName: "Electric Vehicle",
+            budget: 50,
+            spendRequested: 112.48,
+            triggeringRow: 9001,
+            triggeringItem: "Pololu 50:1 gearmotor",
+            triggeringOrderTotal: 52.98,
+            status: "PENDING",
+            requestedAt: new Date(Date.now() - 18 * 60000).toISOString(),
+            decidedAt: "",
+            decidedBy: ""
+          },
+          {
+            requestId: "preview-budget-2",
+            email: "100032279@mvla.net",
+            personName: "Maya Chen",
+            studentId: "32279",
+            eventName: "Electric Vehicle",
+            budget: 50,
+            spendRequested: 71.67,
+            triggeringRow: 42,
+            triggeringItem: "Wheel set",
+            triggeringOrderTotal: 31.67,
+            status: "PENDING",
+            requestedAt: new Date(Date.now() - 80 * 60000).toISOString(),
+            decidedAt: "",
+            decidedBy: ""
+          },
+          {
+            requestId: "preview-budget-3",
+            email: "100032037@mvla.net",
+            personName: "Julia Lee",
+            studentId: "32037",
+            eventName: "Astronomy",
+            budget: 75,
+            spendRequested: 86,
+            triggeringRow: 31,
+            triggeringItem: "Field guide",
+            triggeringOrderTotal: 18,
+            status: "APPROVED",
+            requestedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
+            decidedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+            decidedBy: "100034572@mvla.net"
+          }
+        ]
+      };
+    }
+
+    function apiRequest(payload) {
+      if (!googleCredential) {
+        return Promise.reject(new Error("Your Google login session is missing. Please sign in again."));
+      }
+      return fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ token: googleCredential, ...payload })
+      }).then(function(response) {
+        if (!response.ok) throw new Error("The portal could not reach the order database.");
+        return response.json();
+      });
+    }
+
+    function loadDashboard() {
+      apiRequest({ action: "login" })
+        .then(function(result) {
+          if (result.type === "waitlisted") {
+            showWaitlistScreen(result);
+            return;
+          }
+          if (result.type !== "student" && result.type !== "exec") {
+            throw new Error(result.message || "Login failed.");
+          }
+          currentDashboardData = result.data || { items: [], totalCost: 0 };
+          if (result.email && !currentDashboardData.email) currentDashboardData.email = result.email;
+          currentIsExecutive = result.type === "exec";
+          currentIsSuperAdmin = result.isSuperAdmin === true;
+          currentMaintenanceMode = result.maintenanceMode === true;
+          currentUserProfile = result.profile || { name: "", needsName: false, onboardingComplete: true, needsOnboarding: false };
+          const approvalSummary = result.externalApprovalSummary || {};
+          const budgetSummary = result.budgetApprovalSummary || {};
+          externalPendingCount = Number(approvalSummary.pendingCount || 0);
+          budgetPendingCount = Number(budgetSummary.pendingCount || 0);
+          savedExternalApprovals = null;
+          savedBudgetCenter = null;
+          lastUpdatedAt = new Date();
+          signInRequestInFlight = false;
+          setSignInLoading(false);
+          initializeApp();
+          navigateTo("orders");
+          if (currentUserProfile.needsOnboarding || currentUserProfile.needsName) showOnboarding();
+        })
+        .catch(function(error) {
+          signInRequestInFlight = false;
+          setSignInLoading(false);
+          document.getElementById("app-shell").hidden = true;
+          document.getElementById("login-page").hidden = false;
+          showLoginError(error);
+        });
+    }
+
+    function initializeApp() {
+      const items = getItems();
+      const displayName = getDisplayName();
+      document.getElementById("login-page").hidden = true;
+      document.getElementById("waitlist-page").hidden = true;
+      setSignInLoading(false);
+      document.getElementById("app-shell").hidden = false;
+      document.getElementById("app-shell").classList.add("app-reveal");
+      window.setTimeout(function() {
+        const shell = document.getElementById("app-shell");
+        if (shell) shell.classList.remove("app-reveal");
+      }, 340);
+      document.getElementById("sidebar-user-name").textContent = displayName;
+      document.getElementById("sidebar-user-email").textContent = currentDashboardData.email || "";
+      document.getElementById("active-nav-count").textContent = items.filter(isActiveItem).length;
+      document.getElementById("history-nav-count").textContent = items.filter(isHistoryItem).length;
+      document.getElementById("nav-team").hidden = !currentIsExecutive;
+      document.getElementById("nav-approvals").hidden = !currentIsExecutive;
+      document.getElementById("nav-budgets").hidden = !currentIsExecutive;
+      document.getElementById("nav-admin").hidden = !currentIsSuperAdmin;
+      updateExternalApprovalBadge();
+      updateBudgetApprovalBadge();
+    }
+
+    function navigateTo(page) {
+      if (page === "team" && !currentIsExecutive) return;
+      if (page === "approvals" && !currentIsExecutive) return;
+      if (page === "budgets" && !currentIsExecutive) return;
+      if (page === "admin" && !currentIsSuperAdmin) return;
+
+      const content = document.getElementById("page-content");
+      const hasExistingPage = Boolean(content && content.innerHTML.trim());
+      const changingPage = currentPage !== page;
+
+      function commitNavigation() {
+        currentPage = page;
+        ["orders", "history", "team", "approvals", "budgets", "admin"].forEach(function(name) {
+          const button = document.getElementById("nav-" + name);
+          if (button) {
+            button.classList.toggle("active", name === page);
+            button.setAttribute("aria-current", name === page ? "page" : "false");
+          }
+        });
+
+        if (page === "history") renderHistoryPage();
+        else if (page === "team") showTeamStatistics();
+        else if (page === "approvals") showExternalApprovals();
+        else if (page === "budgets") showBudgetCenter();
+        else if (page === "admin") renderAdminPage();
+        else renderOrdersPage();
+        window.scrollTo({ top: 0, behavior: changingPage ? "smooth" : "auto" });
+      }
+
+      clearTimeout(pageTransitionTimer);
+      const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!hasExistingPage || !changingPage || guidedTourActive || reduceMotion) {
+        commitNavigation();
+        return;
+      }
+
+      if (document.startViewTransition) {
+        document.startViewTransition(commitNavigation);
+        return;
+      }
+
+      content.classList.remove("page-content-enter");
+      content.classList.add("page-content-leave");
+      pageTransitionTimer = window.setTimeout(function() {
+        commitNavigation();
+        content.classList.remove("page-content-leave");
+        void content.offsetWidth;
+        content.classList.add("page-content-enter");
+        pageTransitionTimer = window.setTimeout(function() {
+          content.classList.remove("page-content-enter");
+        }, 260);
+      }, 90);
+    }
+
+    function renderOrdersPage() {
+      const items = getItems();
+      const activeItems = items.filter(isActiveItem);
+      const deliveredCount = items.filter(isDeliveredItem).length;
+      const totalCost = Number(currentDashboardData.totalCost || items.reduce(function(sum,item) {
+        return sum + Number(item.numericPrice || 0);
+      }, 0));
+      const firstName = getFirstName();
+      const pendingApprovals = activeItems.filter(function(item) {
+        return getStage(item) === "PENDING" && Number(item.step || 0) < 7;
+      }).length;
+      document.getElementById("page-content").innerHTML = `
+        ${pageHeader(
+          `Hi, ${escapeHTML(firstName)}.`,
+          "Here’s what’s happening with your Science Olympiad orders.",
+          true
+        )}
+
+        <section class="summary-grid" aria-label="Your order summary">
+          ${summaryCard("In progress", activeItems.length, pendingApprovals === 1 ? "1 is collecting approvals" : `${pendingApprovals} are collecting approvals`)}
+          ${summaryCard("Total requested", "$" + money(totalCost), "Price × quantity across your orders")}
+          ${summaryCard("Delivered", deliveredCount, deliveredCount === 1 ? "1 completed order" : `${deliveredCount} completed orders`)}
+        </section>
+
+        ${renderPersonalBudgets()}
+
+        <section aria-labelledby="active-orders-heading">
+          <div class="section-head">
+            <div>
+              <h2 class="section-title" id="active-orders-heading">Active orders</h2>
+              <p class="section-caption">Approval progress and the best currently available arrival estimate.</p>
+            </div>
+            <span class="updated-at">${formatUpdatedTime()}</span>
+          </div>
+          <div class="orders-list">
+            ${activeItems.length ? activeItems.map(renderOrderCard).join("") : emptyState(
+              "✓", "No active orders", "You’re all caught up. Delivered and cancelled orders remain available in History.", true
+            )}
+          </div>
+        </section>
+      `;
+    }
+
+    function getEventBudgets() {
+      return currentDashboardData && Array.isArray(currentDashboardData.eventBudgets)
+        ? currentDashboardData.eventBudgets
+        : [];
+    }
+
+    function renderPersonalBudgets() {
+      const budgets = getEventBudgets();
+      if (!budgets.length) return "";
+      return `
+        <section class="budget-section" id="personal-budget-section" aria-labelledby="personal-budget-heading">
+          <div class="section-head">
+            <div>
+              <h2 class="section-title" id="personal-budget-heading">Your event budgets</h2>
+              <p class="section-caption">Each limit is tracked separately for you and for each event. Cancelled requests do not count.</p>
+            </div>
+          </div>
+          <div class="budget-grid">
+            ${budgets.map(renderPersonalBudgetCard).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderPersonalBudgetCard(budget) {
+      const status = String(budget.status || "WITHIN_BUDGET").toUpperCase();
+      const tone = status === "APPROVED" ? "approved" : status === "PENDING" ? "pending" : status === "REJECTED" ? "over rejected" : budget.isOverBudget ? "over" : "";
+      const chip = status === "APPROVED" ? "Exception approved" : status === "PENDING" ? "Approval pending" : status === "REJECTED" ? "Review needed" : budget.isOverBudget ? "Over budget" : "On track";
+      const trigger = budget.triggeringOrder || null;
+      const encodedEvent = encodeURIComponent(String(budget.eventName || "")).replace(/'/g, "%27");
+      let detail = `$${money(budget.remaining)} remaining`;
+      let alert = "";
+      if (budget.isOverBudget) {
+        if (status === "APPROVED") {
+          detail = `Executive approval covers the current $${money(budget.spent)} total.`;
+          alert = trigger ? `<div class="budget-alert">Approved exception · ${escapeHTML(trigger.itemName || "Order")} first moved this event beyond the original limit.</div>` : "";
+        } else if (status === "PENDING") {
+          detail = `Waiting for an executive decision on $${money(budget.spent)}.`;
+          alert = trigger ? `<div class="budget-alert">Request sent · ${escapeHTML(trigger.itemName || "Order")} caused the tracked total to cross the approved amount.</div>` : "";
+        } else {
+          detail = `$${money(budget.overflowAmount)} over the current limit.`;
+          alert = trigger ? `<div class="budget-alert"><strong>${escapeHTML(trigger.itemName || "This order")}</strong> is the order that caused the total to overflow by $${money(budget.overflowAmount)}. More ordering requires executive approval.</div>` : `<div class="budget-alert">More ordering requires executive approval.</div>`;
+        }
+      }
+      return `
+        <article class="budget-card ${tone}">
+          <div class="budget-card-head">
+            <div>
+              <div class="budget-event">${escapeHTML(budget.eventName || "Unassigned event")}</div>
+              <div class="budget-money"><strong>$${money(budget.spent)}</strong> of $${money(budget.budget)}</div>
+            </div>
+            <span class="budget-chip ${tone.replace("over ", "")}">${escapeHTML(chip)}</span>
+          </div>
+          <div class="budget-track" role="progressbar" aria-label="${escapeAttribute(budget.eventName || "Event")} budget" aria-valuemin="0" aria-valuemax="${Number(budget.budget || 0)}" aria-valuenow="${Math.min(Number(budget.spent || 0), Number(budget.budget || 0))}">
+            <div class="budget-fill" style="width:${Math.max(0,Math.min(100,Number(budget.percent || 0)))}%"></div>
+          </div>
+          <div class="budget-detail">${escapeHTML(detail)}</div>
+          ${alert}
+          ${(status === "NEEDS_APPROVAL" || status === "REJECTED") ? `<div class="approval-actions"><button class="button button-primary" type="button" onclick="requestBudgetApproval('${encodedEvent}',this)">${status === "REJECTED" ? "Request another review" : "Request executive approval"}</button></div>` : ""}
+        </article>
+      `;
+    }
+
+    function requestBudgetApproval(encodedEvent, button) {
+      const eventName = decodeURIComponent(encodedEvent);
+      if (button) { button.disabled = true; button.textContent = "Sending…"; }
+
+      if (localPreviewMode) {
+        const budget = getEventBudgets().find(function(entry) { return String(entry.eventName || "") === eventName; });
+        if (budget) {
+          budget.status = "PENDING";
+          budget.requestStatus = "PENDING";
+          budget.requiresApproval = false;
+        }
+        if (currentIsExecutive) {
+          savedBudgetCenter = savedBudgetCenter || buildPreviewBudgetCenter();
+          budgetPendingCount = Number(savedBudgetCenter.pendingCount || 0);
+          updateBudgetApprovalBadge();
+        }
+        window.setTimeout(function() { renderOrdersPage(); showToast("Budget approval request sent."); }, 180);
+        return;
+      }
+
+      apiRequest({ action: "requestBudgetApproval", eventName: eventName })
+        .then(function(result) {
+          if (result.type !== "budgetApprovalRequested") throw new Error(result.message || "The budget request could not be sent.");
+          currentDashboardData = result.data || currentDashboardData;
+          renderOrdersPage();
+          showToast("Budget approval request sent.");
+        })
+        .catch(function(error) {
+          renderOrdersPage();
+          showToast(error.message || "The budget request could not be sent.");
+        });
+    }
+
+    function renderHistoryPage() {
+      const allHistory = getItems().filter(isHistoryItem);
+      const filtered = allHistory.filter(function(item) {
+        if (historyFilter === "delivered" && !isDeliveredItem(item)) return false;
+        if (historyFilter === "cancelled" && getStage(item) !== "CANCELLED") return false;
+        if (!historySearch) return true;
+        const haystack = [item.itemName, item.eventName, item.orderStatus, item.vendor].join(" ").toLowerCase();
+        return haystack.includes(historySearch.toLowerCase());
+      });
+
+      document.getElementById("page-content").innerHTML = `
+        ${pageHeader("Order history", "Delivered and cancelled orders linked to your account.", false)}
+        <div class="history-toolbar">
+          <label class="search-wrap">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Search order history</span>
+            <input class="search-input" id="history-search" type="search" placeholder="Search items or events" value="${escapeAttribute(historySearch)}" oninput="updateHistorySearch(this.value)">
+          </label>
+          <div class="filter-group" aria-label="History filter">
+            ${historyFilterButton("all", "All")}
+            ${historyFilterButton("delivered", "Delivered")}
+            ${historyFilterButton("cancelled", "Cancelled")}
+          </div>
+        </div>
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">${filtered.length} ${filtered.length === 1 ? "order" : "orders"}</h2>
+            <p class="section-caption">History uses current final statuses; dates are not shown because they are not in the portal data yet.</p>
+          </div>
+        </div>
+        <div class="orders-list">
+          ${filtered.length ? filtered.map(renderOrderCard).join("") : emptyState(
+            "↺", allHistory.length ? "No matching orders" : "No order history yet",
+            allHistory.length ? "Try another search or filter." : "Orders will appear here after they are delivered or cancelled.", false
+          )}
+        </div>
+      `;
+      const input = document.getElementById("history-search");
+      if (input && historySearch) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      }
+    }
+
+    function getBudgetFlagForOrder(item) {
+      return getEventBudgets().find(function(budget) {
+        return budget && budget.triggeringOrder && Number(budget.triggeringOrder.rowNum || 0) === Number(item.rowNum || 0);
+      }) || null;
+    }
+
+    function renderOrderCard(item) {
+      const stage = getStage(item);
+      const status = getFriendlyStatus(item);
+      const progress = getProgress(item);
+      const confidence = getConfidence(item);
+      const qty = Number(item.numericQuantity || item.qty || 1);
+      const unitPrice = Number(item.unitPrice);
+      const showUnitPrice = Number.isFinite(unitPrice) && qty > 1;
+      const id = "details-" + String(item.rowNum || Math.random()).replace(/[^a-zA-Z0-9_-]/g, "");
+      const validLink = safeHttpUrl(item.link);
+      const estimateTone = isDeliveredItem(item) ? "delivered" : (item.isStuck || stage === "CANCELLED" ? "problem" : "");
+      const estimateText = item.deliveryText || fallbackDeliveryText(item);
+      const budgetFlag = getBudgetFlagForOrder(item);
+      const budgetFlagStatus = budgetFlag ? String(budgetFlag.status || "NEEDS_APPROVAL").toUpperCase() : "";
+      const budgetFlagTone = budgetFlagStatus === "APPROVED" ? "approved" : budgetFlagStatus === "PENDING" ? "pending" : "";
+
+      return `
+        <article class="order-card ${budgetFlag ? "budget-flagged" : ""}">
+          <div class="order-top">
+            <div>
+              <h3 class="order-title">${escapeHTML(item.itemName || "Unnamed item")}</h3>
+              <div class="order-meta">
+                <span>${escapeHTML(item.eventName || "Unassigned event")}</span>
+                <span>Qty ${escapeHTML(item.qty || qty)}</span>
+                <span>${escapeHTML(item.price || "$" + money(item.numericPrice))} total</span>
+              </div>
+            </div>
+            <span class="status-pill ${status.className}">${escapeHTML(status.label)}</span>
+          </div>
+
+          ${budgetFlag ? `<div class="order-budget-flag ${budgetFlagTone}"><span aria-hidden="true">${budgetFlagStatus === "APPROVED" ? "✓" : budgetFlagStatus === "PENDING" ? "…" : "!"}</span><span>${budgetFlagStatus === "APPROVED" ? "Executive budget exception approved for this event total." : budgetFlagStatus === "PENDING" ? "This order crossed the event budget; the exception request is waiting for an executive." : `This is the order that pushed ${escapeHTML(budgetFlag.eventName || "this event")} over its $${money(budgetFlag.budget)} limit.`}</span></div>` : ""}
+
+          ${stage === "CANCELLED" ? "" : `
+            <div class="progress-wrap" aria-label="Order progress: ${escapeAttribute(status.label)}">
+              <div class="progress-track"><div class="progress-fill ${isDeliveredItem(item) ? "delivered" : ""}" style="width:${progress.percent}%"></div></div>
+              <div class="progress-labels">
+                ${["Submitted","Approved","Ordered","Delivered"].map(function(label,index) {
+                  return `<span class="progress-label ${index <= progress.reached ? "reached" : ""}">${label}</span>`;
+                }).join("")}
+              </div>
+            </div>
+          `}
+
+          <div class="estimate-box ${estimateTone}">
+            <div>
+              <div class="estimate-text">${escapeHTML(estimateText)}</div>
+              <div class="estimate-subtext">${escapeHTML(confidence.detail)}</div>
+            </div>
+            <span class="confidence">${escapeHTML(confidence.label)}</span>
+          </div>
+
+          <div class="order-actions">
+            <button class="button button-quiet details-button" data-tour="order-details" type="button" aria-expanded="false" aria-controls="${id}" onclick="toggleDetails(this)">
+              Order details <span class="chevron" aria-hidden="true">⌄</span>
+            </button>
+            ${validLink ? `<a class="button button-quiet" href="${escapeAttribute(validLink)}" target="_blank" rel="noopener noreferrer">View item ↗</a>` : ""}
+          </div>
+
+          <div class="details-panel" id="${id}">
+            <div>
+              <div class="detail-label">Approval record</div>
+              <div class="detail-value">${escapeHTML(item.signatures || "Pending")}</div>
+            </div>
+            <div>
+              <div class="detail-label">Current order status</div>
+              <div class="detail-value">${escapeHTML(item.orderStatus || "Pending")}</div>
+            </div>
+            ${showUnitPrice ? `
+              <div>
+                <div class="detail-label">Price calculation</div>
+                <div class="detail-value">$${money(unitPrice)} each × ${qty} = ${escapeHTML(item.price)}</div>
+              </div>
+            ` : ""}
+            <div>
+              <div class="detail-label">Vendor type</div>
+              <div class="detail-value">${escapeHTML(formatVendor(item.vendor))}</div>
+            </div>
+            <div class="detail-wide">
+              <div class="detail-label">Estimate explanation</div>
+              <div class="detail-value">${escapeHTML(confidence.fullDetail)}</div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function pageHeader(title, subtitle, showOrderButton) {
+      return `
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">${currentIsExecutive ? "Executive account" : "Personal dashboard"}</div>
+            <h1 class="page-title">${escapeHTML(title)}</h1>
+            <p class="page-subtitle">${escapeHTML(subtitle)}</p>
+          </div>
+          <div class="top-actions">
+            <button class="button button-icon" id="refresh-button" type="button" onclick="refreshDashboard()" aria-label="Refresh order data" title="Refresh">↻</button>
+            ${showOrderButton ? `<button class="button button-primary" data-tour="place-order" type="button" onclick="openOrderingForm()"><span aria-hidden="true">＋</span> Place new order</button>` : ""}
+          </div>
+        </header>
+      `;
+    }
+
+    function summaryCard(label, value, context) {
+      return `<div class="summary-card"><div class="summary-label">${escapeHTML(label)}</div><div class="summary-value">${escapeHTML(value)}</div><div class="summary-context">${escapeHTML(context)}</div></div>`;
+    }
+
+    function getAttentionMessage(activeItems, pendingApprovals, stuckCount) {
+      if (stuckCount > 0) return { icon: "!", title: `${stuckCount} ${stuckCount === 1 ? "order needs" : "orders need"} attention`, copy: "Approval progress appears slower than expected. The estimate on the affected order explains why." };
+      if (pendingApprovals > 0) return { icon: "→", title: `${pendingApprovals} ${pendingApprovals === 1 ? "order is" : "orders are"} moving through approvals`, copy: "No action is required from you right now. The portal will update as signatures are completed." };
+      if (activeItems.length > 0) return { icon: "✓", title: "Your active orders have cleared approvals", copy: "They are now awaiting purchase, shipment, or delivery confirmation." };
+      return { icon: "✓", title: "Everything is up to date", copy: "You do not currently have any orders in progress." };
+    }
+
+    function getItems() {
+      return currentDashboardData && Array.isArray(currentDashboardData.items) ? currentDashboardData.items : [];
+    }
+
+    function getStage(item) {
+      const explicit = String(item.stage || "").trim().toUpperCase();
+      if (explicit) return explicit;
+      const status = String(item.orderStatus || "").toLowerCase();
+      if (status.includes("deliver")) return "DELIVERED";
+      if (status.includes("cancel")) return "CANCELLED";
+      if (status.includes("ship") || status.includes("transit")) return "SHIPPED";
+      if (status.includes("order") || status.includes("purchas")) return "ORDERED";
+      return "PENDING";
+    }
+
+    function isDeliveredItem(item) {
+      return Boolean(item.isDelivered) || getStage(item) === "DELIVERED";
+    }
+
+    function isHistoryItem(item) {
+      const stage = getStage(item);
+      return isDeliveredItem(item) || stage === "CANCELLED";
+    }
+
+    function isActiveItem(item) { return !isHistoryItem(item); }
+
+    function getFriendlyStatus(item) {
+      const stage = getStage(item);
+      const step = Math.max(0, Math.min(7, Number(item.step || 0)));
+      if (stage === "DELIVERED") return { label: "Delivered", className: "status-delivered" };
+      if (stage === "CANCELLED") return { label: "Cancelled", className: "status-cancelled" };
+      if (stage === "SHIPPED") return { label: "Shipped", className: "status-shipped" };
+      if (stage === "ORDERED") return { label: "Ordered", className: "status-ordered" };
+      if (step >= 7 || /complete/i.test(String(item.signatures || ""))) return { label: "Approved · Awaiting order", className: "status-approval" };
+      if (step > 0) return { label: `Approvals ${step} of 7`, className: "status-approval" };
+      return { label: "Preparing paperwork", className: "status-approval" };
+    }
+
+    function getProgress(item) {
+      const stage = getStage(item);
+      const step = Math.max(0, Math.min(7, Number(item.step || 0)));
+      if (stage === "DELIVERED") return { percent: 100, reached: 3 };
+      if (stage === "SHIPPED") return { percent: 86, reached: 2 };
+      if (stage === "ORDERED") return { percent: 71, reached: 2 };
+      if (step >= 7 || /complete/i.test(String(item.signatures || ""))) return { percent: 50, reached: 1 };
+      return { percent: Math.max(8, 8 + (step / 7) * 39), reached: 0 };
+    }
+
+    function getConfidence(item) {
+      const stage = getStage(item);
+      const actual = isDeliveredItem(item) || stage === "CANCELLED" || String(item.estimateConfidence || "").toLowerCase() === "actual";
+      if (actual) {
+        return {
+          label: "Confirmed",
+          detail: stage === "CANCELLED" ? "This is a confirmed final status." : "Delivery is confirmed by the current order status.",
+          fullDetail: item.estimateConfidenceDetail || (stage === "CANCELLED" ? "Cancellation is confirmed by the current order status." : "Delivery is confirmed by the current order status.")
+        };
+      }
+      const level = String(item.estimateConfidenceLabel || item.estimateConfidence || "Low");
+      const detail = item.estimateConfidenceDetail || fallbackConfidenceDetail(item);
+      return {
+        label: `${capitalize(level)} confidence`,
+        detail: "Estimated timing — not carrier tracking.",
+        fullDetail: detail
+      };
+    }
+
+    function fallbackConfidenceDetail(item) {
+      const stage = getStage(item);
+      const confidence = String(item.estimateConfidence || "low").toLowerCase();
+      if (confidence === "high") return "Based on a stronger amount of historical timing data.";
+      if (confidence === "medium") return "Based on a limited but useful amount of historical timing data.";
+      if (stage === "ORDERED" && String(item.vendor || "").toUpperCase() === "AMAZON") return "The estimate may still rely on the default Amazon delivery timing while more history is collected.";
+      if (stage === "ORDERED" || stage === "SHIPPED") return "More completed delivery history is needed before this estimate becomes stronger.";
+      return "The estimator is still learning from approval history.";
+    }
+
+    function fallbackDeliveryText(item) {
+      const stage = getStage(item);
+      if (stage === "DELIVERED") return "Delivered";
+      if (stage === "CANCELLED") return "Order cancelled";
+      if (stage === "SHIPPED") return "In transit — arrival estimate unavailable";
+      if (stage === "ORDERED") return "Ordered — arrival estimate unavailable";
+      if (Number(item.step || 0) >= 7) return "Approved — awaiting purchase";
+      return "Approval timing is being estimated";
+    }
+
+    function formatVendor(vendor) {
+      const value = String(vendor || "").toUpperCase();
+      if (value === "AMAZON") return "Amazon";
+      if (value === "OTHER") return "Other vendor";
+      return "Not identified";
+    }
+
+    function toggleDetails(button) {
+      const panel = document.getElementById(button.getAttribute("aria-controls"));
+      if (!panel) return;
+      const expanded = button.getAttribute("aria-expanded") === "true";
+      button.setAttribute("aria-expanded", String(!expanded));
+      panel.classList.toggle("open", !expanded);
+    }
+
+    function updateHistorySearch(value) {
+      historySearch = value;
+      renderHistoryPage();
+    }
+
+    function setHistoryFilter(filter) {
+      historyFilter = filter;
+      renderHistoryPage();
+    }
+
+    function historyFilterButton(value, label) {
+      return `<button class="filter-button ${historyFilter === value ? "active" : ""}" type="button" onclick="setHistoryFilter('${value}')" aria-pressed="${historyFilter === value}">${label}</button>`;
+    }
+
+    function refreshDashboard() {
+      if (guidedTourOwnsAction("refresh")) return;
+
+      if (localPreviewMode) {
+        lastUpdatedAt = new Date();
+        if (currentPage === "team") renderTeamStatistics(savedTeamStatistics);
+        else if (currentPage === "budgets") renderBudgetCenter(savedBudgetCenter || buildPreviewBudgetCenter());
+        else if (currentPage === "admin") renderAdminPage();
+        else if (currentPage === "history") renderHistoryPage();
+        else renderOrdersPage();
+        showToast("Local preview refreshed.");
+        return;
+      }
+
+      const button = document.getElementById("refresh-button");
+      if (button) { button.disabled = true; button.textContent = "…"; }
+      apiRequest({})
+        .then(function(result) {
+          if (result.type === "waitlisted") {
+            showWaitlistScreen(result);
+            return;
+          }
+          if (result.type !== "student" && result.type !== "exec") throw new Error(result.message || "Unable to refresh data.");
+          currentDashboardData = result.data || { items: [], totalCost: 0 };
+          if (result.email && !currentDashboardData.email) currentDashboardData.email = result.email;
+          currentIsExecutive = result.type === "exec";
+          currentIsSuperAdmin = result.isSuperAdmin === true;
+          currentMaintenanceMode = result.maintenanceMode === true;
+          currentUserProfile = result.profile || currentUserProfile || { name: "", needsName: false, onboardingComplete: true, needsOnboarding: false };
+          const approvalSummary = result.externalApprovalSummary || {};
+          const budgetSummary = result.budgetApprovalSummary || {};
+          externalPendingCount = Number(approvalSummary.pendingCount || externalPendingCount || 0);
+          budgetPendingCount = Number(budgetSummary.pendingCount || budgetPendingCount || 0);
+          savedTeamStatistics = null;
+          savedExternalApprovals = null;
+          savedBudgetCenter = null;
+          lastUpdatedAt = new Date();
+          initializeApp();
+          const allowedPage =
+            (currentPage === "team" && !currentIsExecutive) ||
+            (currentPage === "approvals" && !currentIsExecutive) ||
+            (currentPage === "budgets" && !currentIsExecutive) ||
+            (currentPage === "admin" && !currentIsSuperAdmin)
+              ? "orders"
+              : currentPage;
+          navigateTo(allowedPage);
+          if (currentUserProfile.needsOnboarding || currentUserProfile.needsName) showOnboarding();
+          showToast("Order data refreshed.");
+        })
+        .catch(function(error) {
+          showToast(error.message || "Refresh failed.");
+          if (button) { button.disabled = false; button.textContent = "↻"; }
+        });
+    }
+
+    function showTeamStatistics() {
+      if (!currentIsExecutive) return;
+      currentPage = "team";
+      if (savedTeamStatistics) {
+        renderTeamStatistics(savedTeamStatistics);
+        return;
+      }
+      document.getElementById("page-content").innerHTML = loadingState("Loading team insights…");
+      apiRequest({ action: "teamStatistics" })
+        .then(function(result) {
+          if (result.type !== "teamStatistics") throw new Error(result.message || "Unable to load team statistics.");
+          savedTeamStatistics = result.data || {};
+          renderTeamStatistics(savedTeamStatistics);
+        })
+        .catch(function(error) {
+          document.getElementById("page-content").innerHTML = pageHeader("Team insights", "Team-wide order and spending information.", false) + emptyState("!", "Unable to load team insights", error.message || "Please try again.", false);
+        });
+    }
+
+    function renderTeamStatistics(stats) {
+      if (!currentIsExecutive) {
+        navigateTo("orders");
+        return;
+      }
+
+      const events = Array.isArray(stats.events) ? stats.events : [];
+      const people = Array.isArray(stats.people) ? stats.people : [];
+      const highValue = Array.isArray(stats.highValueOrders) ? stats.highValueOrders : [];
+      const portalAccess = stats.portalAccess || {};
+      const recentLogins = Array.isArray(portalAccess.recentLogins) ? portalAccess.recentLogins : [];
+      const neverLoggedIn = Array.isArray(portalAccess.neverLoggedIn) ? portalAccess.neverLoggedIn : [];
+      window.statisticsEvents = events;
+      window.statisticsPeople = people;
+
+      document.getElementById("page-content").innerHTML = `
+        ${pageHeader("Team insights", "A clean overview of ordering activity across the team.", false)}
+        <section class="stats-grid" aria-label="Team statistics">
+          ${summaryCard("Orders", Number(stats.totalOrders || 0), "All tracked line items")}
+          ${summaryCard("Students", Number(stats.totalStudents || 0), "Linked identities")}
+          ${summaryCard("Total quantity", Number(stats.totalQuantity || 0), "Items requested")}
+          ${summaryCard("Total spending", "$" + money(stats.totalCost), "Price × quantity")}
+        </section>
+
+        <section class="stats-section high-value">
+          <h2 class="stats-section-title">High-value orders</h2>
+          <div class="compact-list">
+            ${highValue.length ? highValue.map(function(order) {
+              return `<div class="list-row"><div><div class="list-title">${escapeHTML(order.itemName || "Unnamed item")}</div><div class="list-meta">${escapeHTML(order.name || "Unknown")} · ${escapeHTML(order.eventName || "Unassigned event")} · Qty ${escapeHTML(order.quantity || 1)}</div></div><div class="list-value">$${money(order.price)}</div></div>`;
+            }).join("") : `<div class="list-row"><div><div class="list-title">No high-value orders</div><div class="list-meta">No individual order is currently over $50.</div></div></div>`}
+          </div>
+        </section>
+
+        <section class="stats-section">
+          <div class="stats-toolbar">
+            <h2 class="stats-section-title" style="margin:0">Spending by event</h2>
+            <label class="search-wrap">
+              <span class="search-icon" aria-hidden="true">⌕</span>
+              <span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Search events</span>
+              <input class="search-input" id="team-event-search" type="search" placeholder="Search events" value="${escapeAttribute(teamEventSearch)}" oninput="updateTeamEventSearch(this.value)">
+            </label>
+          </div>
+          <div class="compact-list" id="event-results">
+            ${renderEventSearchResults(events, teamEventSearch)}
+          </div>
+        </section>
+
+        <section class="stats-section">
+          <div class="stats-toolbar">
+            <h2 class="stats-section-title" style="margin:0">People</h2>
+            <label class="search-wrap">
+              <span class="search-icon" aria-hidden="true">⌕</span>
+              <span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Search people</span>
+              <input class="search-input" id="team-people-search" type="search" placeholder="Search people" value="${escapeAttribute(teamPeopleSearch)}" oninput="updateTeamPeopleSearch(this.value)">
+            </label>
+          </div>
+          <div class="compact-list" id="people-results">
+            ${renderPeopleSearchResults(people, teamPeopleSearch)}
+          </div>
+        </section>
+
+        <section class="stats-section">
+          <div class="stats-toolbar">
+            <div>
+              <h2 class="stats-section-title" style="margin:0">Portal activity</h2>
+              <p class="section-caption" style="margin-top:4px">A visit is recorded once when someone enters the portal, not whenever they refresh or search.</p>
+            </div>
+          </div>
+          <div class="activity-summary">
+            ${summaryCard("Recorded visits", Number(portalAccess.totalLogins || 0), "Every successful portal entry")}
+            ${summaryCard("Unique visitors", Number(portalAccess.uniqueVisitors || 0), "Verified Google accounts")}
+            ${summaryCard("Never logged in", neverLoggedIn.length, "Accounts found in Master")}
+          </div>
+          <div class="activity-columns">
+            <div class="activity-panel">
+              <h3>Recent logins</h3>
+              <p class="section-caption" style="margin:-4px 0 10px">Select an account to expand its recent portal visits.</p>
+              ${renderLoginHistory(recentLogins)}
+            </div>
+            <div class="activity-panel">
+              <h3>Never logged in</h3>
+              <div class="compact-list">
+                ${neverLoggedIn.length ? neverLoggedIn.slice(0,30).map(function(person) {
+                  return `<div class="list-row"><div><div class="list-title">${escapeHTML(person.name || "Unknown")}</div><div class="list-meta">${escapeHTML(person.email || "No email")}</div></div></div>`;
+                }).join("") : `<div class="no-results">Everyone currently listed in Master has visited the portal.</div>`}
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderLoginHistory(entries) {
+      if (!entries.length) return `<div class="no-results">No portal logins have been recorded yet.</div>`;
+
+      const groups = {};
+      entries.forEach(function(entry) {
+        const email = String(entry.email || "Unknown");
+        if (!groups[email]) groups[email] = [];
+        groups[email].push(entry.timestamp);
+      });
+
+      return `<div class="login-history-list">${Object.keys(groups).map(function(email) {
+        const timestamps = groups[email];
+        return `
+          <details class="login-history-item">
+            <summary>
+              <div>
+                <div class="list-title">${escapeHTML(email)}</div>
+                <div class="list-meta">${timestamps.length} ${timestamps.length === 1 ? "visit" : "visits"} in the recent log</div>
+              </div>
+              <span class="activity-time">${escapeHTML(formatAccessTime(timestamps[0]))}</span>
+              <span class="login-history-chevron" aria-hidden="true">⌄</span>
+            </summary>
+            <div class="login-history-detail">
+              ${timestamps.map(function(timestamp, index) {
+                return `<div class="login-time-row"><span>${index === 0 ? "Most recent" : "Successful entry"}</span><strong>${escapeHTML(formatFullAccessTime(timestamp))}</strong></div>`;
+              }).join("")}
+            </div>
+          </details>
+        `;
+      }).join("")}</div>`;
+    }
+
+    function formatAccessTime(value) {
+      const date = new Date(value);
+      if (!Number.isFinite(date.getTime())) return "Unknown time";
+      return date.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    }
+
+    function formatFullAccessTime(value) {
+      const date = new Date(value);
+      if (!Number.isFinite(date.getTime())) return "Unknown time";
+      return date.toLocaleString([], { weekday: "short", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit" });
+    }
+
+    function updateTeamEventSearch(value) {
+      teamEventSearch = String(value || "");
+      const target = document.getElementById("event-results");
+      if (target) target.innerHTML = renderEventSearchResults(window.statisticsEvents || [], teamEventSearch);
+    }
+
+    function updateTeamPeopleSearch(value) {
+      teamPeopleSearch = String(value || "");
+      const target = document.getElementById("people-results");
+      if (target) target.innerHTML = renderPeopleSearchResults(window.statisticsPeople || [], teamPeopleSearch);
+    }
+
+    function renderEventSearchResults(events, query) {
+      const normalized = String(query || "").trim().toLowerCase();
+      const matches = events
+        .map(function(event, index) { return { event: event, index: index }; })
+        .filter(function(entry) {
+          return !normalized || String(entry.event.eventName || "").toLowerCase().includes(normalized);
+        });
+
+      if (!matches.length) {
+        return `<div class="no-results">${events.length ? "No events match your search." : "No event data is currently available."}</div>`;
+      }
+
+      return matches.map(function(entry) {
+        const event = entry.event;
+        return `<button class="list-button" type="button" onclick="showEventDetails(${entry.index})"><div><div class="list-title">${escapeHTML(event.eventName || "Unassigned event")}</div><div class="list-meta">${Number(event.orderCount || 0)} ${Number(event.orderCount || 0) === 1 ? "order" : "orders"}</div></div><div class="list-value">$${money(event.totalCost)} <span class="list-arrow">→</span></div></button>`;
+      }).join("");
+    }
+
+    function renderPeopleSearchResults(people, query) {
+      const normalized = String(query || "").trim().toLowerCase();
+      const matches = people
+        .map(function(person, index) { return { person: person, index: index }; })
+        .filter(function(entry) {
+          return !normalized || String(entry.person.name || "").toLowerCase().includes(normalized);
+        });
+
+      if (!matches.length) {
+        return `<div class="no-results">${people.length ? "No people match your search." : "No people found."}</div>`;
+      }
+
+      return matches.map(function(entry) {
+        const person = entry.person;
+        return `<button class="list-button" type="button" onclick="showPersonDetails(${entry.index})"><div><div class="list-title">${escapeHTML(person.name || "Unknown")}</div><div class="list-meta">${Number(person.orderCount || 0)} ${Number(person.orderCount || 0) === 1 ? "order" : "orders"}</div></div><div class="list-value">$${money(person.totalCost)} <span class="list-arrow">→</span></div></button>`;
+      }).join("");
+    }
+
+    function showEventDetails(index) {
+      if (!currentIsExecutive) return;
+      const event = (window.statisticsEvents || [])[index];
+      if (!event) return;
+      const people = Array.isArray(event.people) ? event.people : [];
+      document.getElementById("page-content").innerHTML = `
+        <div class="detail-header">
+          <button class="button button-icon" type="button" onclick="renderTeamStatistics(savedTeamStatistics)" aria-label="Back to team insights">←</button>
+          <div class="detail-heading"><h2>${escapeHTML(event.eventName || "Unassigned event")}</h2><p>$${money(event.totalCost)} total spending</p></div>
+        </div>
+        <section class="stats-section">
+          <h3 class="stats-section-title">Orders by person</h3>
+          ${people.length ? people.map(function(person) {
+            const items = Array.isArray(person.items) ? person.items : [];
+            return `<div class="person-group"><div class="person-group-head"><div class="list-title">${escapeHTML(person.name || "Unknown")}</div><div class="list-value">$${money(person.totalCost)}</div></div><div class="mini-items">${items.map(function(item) {
+              return `<div class="mini-item"><span>${escapeHTML(item.itemName || "Unnamed item")} · Qty ${escapeHTML(item.quantity || 1)}</span><span>$${money(item.price)}</span></div>`;
+            }).join("")}</div></div>`;
+          }).join("") : `<div class="list-meta">No orders found for this event.</div>`}
+        </section>
+      `;
+    }
+
+    function showPersonDetails(index) {
+      if (!currentIsExecutive) return;
+      const person = (window.statisticsPeople || [])[index];
+      if (!person) return;
+      const items = Array.isArray(person.items) ? person.items : [];
+      document.getElementById("page-content").innerHTML = `
+        <div class="detail-header">
+          <button class="button button-icon" type="button" onclick="renderTeamStatistics(savedTeamStatistics)" aria-label="Back to team insights">←</button>
+          <div class="detail-heading"><h2>${escapeHTML(person.name || "Unknown")}</h2><p>${Number(person.orderCount || 0)} ${Number(person.orderCount || 0) === 1 ? "order" : "orders"} · $${money(person.totalCost)} total</p></div>
+        </div>
+        <section class="stats-section">
+          <h3 class="stats-section-title">Ordered items</h3>
+          <div class="compact-list">
+            ${items.length ? items.map(function(item) {
+              return `<div class="list-row"><div><div class="list-title">${escapeHTML(item.itemName || "Unnamed item")}</div><div class="list-meta">${escapeHTML(item.eventName || "Unassigned event")} · Qty ${escapeHTML(item.quantity || 1)} · ${escapeHTML(item.status || "Pending")}</div></div><div class="list-value">$${money(item.price)}</div></div>`;
+            }).join("") : `<div class="list-row"><div class="list-meta">No orders found for this person.</div></div>`}
+          </div>
+        </section>
+      `;
+    }
+
+    function updateExternalApprovalBadge() {
+      const badge = document.getElementById("external-nav-count");
+      if (!badge) return;
+      badge.textContent = String(externalPendingCount || 0);
+      badge.hidden = !currentIsExecutive || externalPendingCount <= 0;
+    }
+
+    function showExternalApprovals() {
+      if (!currentIsExecutive) {
+        navigateTo("orders");
+        return;
+      }
+
+      currentPage = "approvals";
+      if (savedExternalApprovals) {
+        renderExternalApprovals(savedExternalApprovals);
+        return;
+      }
+
+      document.getElementById("page-content").innerHTML = loadingState("Checking external form emails…");
+      if (localPreviewMode) {
+        savedExternalApprovals = buildPreviewExternalApprovals();
+        renderExternalApprovals(savedExternalApprovals);
+        return;
+      }
+
+      apiRequest({ action: "externalApprovals" })
+        .then(function(result) {
+          if (result.type !== "externalApprovals") throw new Error(result.message || "Unable to load external approvals.");
+          savedExternalApprovals = result.data || { pendingCount: 0, approvedCount: 0, rejectedCount: 0, entries: [] };
+          externalPendingCount = Number(savedExternalApprovals.pendingCount || 0);
+          updateExternalApprovalBadge();
+          renderExternalApprovals(savedExternalApprovals);
+        })
+        .catch(function(error) {
+          document.getElementById("page-content").innerHTML = pageHeader("External approvals", "Review non-school accounts found in the ordering sheet.", false) + emptyState("!", "Unable to load approvals", error.message || "Please try again.", false);
+        });
+    }
+
+    function renderExternalApprovals(data) {
+      if (!currentIsExecutive) return;
+      const entries = Array.isArray(data.entries) ? data.entries : [];
+      const query = externalApprovalSearch.trim().toLowerCase();
+      const status = externalApprovalFilter.toUpperCase();
+      const filtered = entries.filter(function(entry) {
+        if (String(entry.status || "PENDING").toUpperCase() !== status) return false;
+        if (!query) return true;
+        const itemNames = Array.isArray(entry.items) ? entry.items.map(function(item) { return item.itemName; }) : [];
+        const haystack = [entry.email]
+          .concat(entry.names || [], entry.events || [], itemNames)
+          .join(" ")
+          .toLowerCase();
+        return haystack.includes(query);
+      });
+
+      document.getElementById("page-content").innerHTML = `
+        ${pageHeader("External approvals", "Approve mentors and other non-school accounts before their orders enter the tracking portal.", false)}
+
+        <section class="approval-summary" aria-label="External account summary">
+          ${summaryCard("Waiting", Number(data.pendingCount || 0), "Requires an executive decision")}
+          ${summaryCard("Approved", Number(data.approvedCount || 0), "Allowed until moved back")}
+          ${summaryCard("Rejected", Number(data.rejectedCount || 0), "Kept out of portal results")}
+        </section>
+
+        <section class="stats-section">
+          <div class="approval-toolbar">
+            <label class="search-wrap">
+              <span class="search-icon" aria-hidden="true">⌕</span>
+              <span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Search external accounts</span>
+              <input class="search-input" type="search" placeholder="Search email, name, event, or item" value="${escapeAttribute(externalApprovalSearch)}" oninput="updateExternalApprovalSearch(this.value)">
+            </label>
+            <div class="filter-group" aria-label="Approval status filter">
+              ${externalApprovalFilterButton("pending", "Waiting")}
+              ${externalApprovalFilterButton("approved", "Approved")}
+              ${externalApprovalFilterButton("rejected", "Rejected")}
+            </div>
+          </div>
+
+          <div class="approval-list">
+            ${filtered.length ? filtered.map(renderExternalApprovalEntry).join("") : `<div class="no-results">${entries.length ? "No accounts match this search and status." : "No external form emails have been found in Master column J."}</div>`}
+          </div>
+        </section>
+
+        <p class="section-caption" style="margin-top:14px">School accounts ending exactly in @mvla.net are accepted automatically. Approval decisions are saved in the hidden _ExternalEmailApprovals sheet.</p>
+      `;
+    }
+
+    function renderExternalApprovalEntry(entry) {
+      const status = String(entry.status || "PENDING").toUpperCase();
+      const statusClass = status.toLowerCase();
+      const names = Array.isArray(entry.names) && entry.names.length ? entry.names.join(", ") : "Name unavailable";
+      const events = Array.isArray(entry.events) && entry.events.length ? entry.events.join(", ") : "No event listed";
+      const items = Array.isArray(entry.items) ? entry.items : [];
+      const encodedEmail = encodeURIComponent(String(entry.email || "")).replace(/'/g, "%27");
+      return `
+        <details class="approval-entry">
+          <summary>
+            <div>
+              <div class="approval-email">${escapeHTML(entry.email || "Unknown email")}</div>
+              <div class="approval-meta">${escapeHTML(names)} · ${Number(entry.orderCount || 0)} ${Number(entry.orderCount || 0) === 1 ? "order" : "orders"} · $${money(entry.totalCost)}</div>
+            </div>
+            <span class="approval-status ${statusClass}">${status === "PENDING" ? "Waiting" : capitalize(status)}</span>
+            <span class="login-history-chevron" aria-hidden="true">⌄</span>
+          </summary>
+          <div class="approval-detail">
+            <div class="approval-meta"><strong style="color:var(--ink)">Events:</strong> ${escapeHTML(events)}</div>
+            <div class="approval-meta"><strong style="color:var(--ink)">First detected:</strong> ${escapeHTML(formatFullAccessTime(entry.firstSeen))}</div>
+            ${entry.updatedBy ? `<div class="approval-meta"><strong style="color:var(--ink)">Last decision:</strong> ${escapeHTML(formatFullAccessTime(entry.updatedAt))} by ${escapeHTML(entry.updatedBy)}</div>` : ""}
+            <div class="approval-order-list">
+              ${items.length ? items.map(function(item) {
+                return `<div class="approval-order"><span><strong>${escapeHTML(item.itemName || "Unnamed item")}</strong><br><span class="approval-meta">${escapeHTML(item.eventName || "Unassigned event")} · Qty ${escapeHTML(item.quantity || 1)}</span></span><strong>$${money(item.totalCost)}</strong></div>`;
+              }).join("") : `<div class="no-results">No current Master rows remain for this saved sender.</div>`}
+            </div>
+            <div class="approval-actions">
+              ${status !== "APPROVED" ? `<button class="button button-primary" type="button" onclick="changeExternalApproval(event,'${encodedEmail}','APPROVED',this)">Approve sender</button>` : ""}
+              ${status !== "REJECTED" ? `<button class="button" type="button" onclick="changeExternalApproval(event,'${encodedEmail}','REJECTED',this)">Reject sender</button>` : ""}
+              ${status !== "PENDING" ? `<button class="button button-quiet" type="button" onclick="changeExternalApproval(event,'${encodedEmail}','PENDING',this)">Move to waiting</button>` : ""}
+            </div>
+            <div class="approval-note">The decision applies to this exact normalized email. It does not automatically approve a different Gmail address belonging to the same person.</div>
+          </div>
+        </details>
+      `;
+    }
+
+    function externalApprovalFilterButton(value, label) {
+      return `<button class="filter-button ${externalApprovalFilter === value ? "active" : ""}" type="button" onclick="setExternalApprovalFilter('${value}')" aria-pressed="${externalApprovalFilter === value}">${label}</button>`;
+    }
+
+    function setExternalApprovalFilter(value) {
+      externalApprovalFilter = value;
+      renderExternalApprovals(savedExternalApprovals || { entries: [] });
+    }
+
+    function updateExternalApprovalSearch(value) {
+      externalApprovalSearch = String(value || "");
+      renderExternalApprovals(savedExternalApprovals || { entries: [] });
+      const input = document.querySelector(".approval-toolbar .search-input");
+      if (input) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      }
+    }
+
+    function changeExternalApproval(event, encodedEmail, status, button) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      if (!currentIsExecutive) return;
+      const email = decodeURIComponent(encodedEmail);
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Saving…";
+      }
+
+      if (localPreviewMode) {
+        const entry = (savedExternalApprovals.entries || []).find(function(item) { return item.email === email; });
+        if (entry) {
+          entry.status = status;
+          entry.updatedAt = new Date().toISOString();
+          entry.updatedBy = currentDashboardData && currentDashboardData.email || "preview.executive@mvla.net";
+        }
+        recalculateExternalApprovalCounts();
+        window.setTimeout(function() {
+          renderExternalApprovals(savedExternalApprovals);
+          showToast(status === "APPROVED" ? "External sender approved." : status === "REJECTED" ? "External sender rejected." : "Sender returned to the waitlist.");
+        }, 180);
+        return;
+      }
+
+      apiRequest({ action: "setExternalApproval", email: email, status: status })
+        .then(function(result) {
+          if (result.type !== "externalApprovals") throw new Error(result.message || "The approval could not be saved.");
+          savedExternalApprovals = result.data || { pendingCount: 0, approvedCount: 0, rejectedCount: 0, entries: [] };
+          externalPendingCount = Number(savedExternalApprovals.pendingCount || 0);
+          updateExternalApprovalBadge();
+          renderExternalApprovals(savedExternalApprovals);
+          showToast(status === "APPROVED" ? "External sender approved." : status === "REJECTED" ? "External sender rejected." : "Sender returned to the waitlist.");
+        })
+        .catch(function(error) {
+          renderExternalApprovals(savedExternalApprovals || { entries: [] });
+          showToast(error.message || "The approval could not be saved.");
+        });
+    }
+
+    function recalculateExternalApprovalCounts() {
+      const entries = savedExternalApprovals && Array.isArray(savedExternalApprovals.entries) ? savedExternalApprovals.entries : [];
+      savedExternalApprovals.pendingCount = entries.filter(function(entry) { return entry.status === "PENDING"; }).length;
+      savedExternalApprovals.approvedCount = entries.filter(function(entry) { return entry.status === "APPROVED"; }).length;
+      savedExternalApprovals.rejectedCount = entries.filter(function(entry) { return entry.status === "REJECTED"; }).length;
+      externalPendingCount = savedExternalApprovals.pendingCount;
+      updateExternalApprovalBadge();
+    }
+
+    function updateBudgetApprovalBadge() {
+      const badge = document.getElementById("budget-nav-count");
+      if (!badge) return;
+      badge.textContent = String(budgetPendingCount || 0);
+      badge.hidden = !currentIsExecutive || budgetPendingCount <= 0;
+    }
+
+    function showBudgetCenter() {
+      if (!currentIsExecutive) {
+        navigateTo("orders");
+        return;
+      }
+
+      currentPage = "budgets";
+      if (savedBudgetCenter) {
+        renderBudgetCenter(savedBudgetCenter);
+        return;
+      }
+
+      document.getElementById("page-content").innerHTML = loadingState("Loading event budgets…");
+      if (localPreviewMode) {
+        savedBudgetCenter = buildPreviewBudgetCenter();
+        budgetPendingCount = Number(savedBudgetCenter.pendingCount || 0);
+        updateBudgetApprovalBadge();
+        renderBudgetCenter(savedBudgetCenter);
+        return;
+      }
+
+      apiRequest({ action: "budgetCenter" })
+        .then(function(result) {
+          if (result.type !== "budgetCenter") throw new Error(result.message || "Unable to load the budget center.");
+          savedBudgetCenter = result.data || { pendingCount: 0, approvedCount: 0, rejectedCount: 0, requests: [], rules: [] };
+          budgetPendingCount = Number(savedBudgetCenter.pendingCount || 0);
+          updateBudgetApprovalBadge();
+          renderBudgetCenter(savedBudgetCenter);
+        })
+        .catch(function(error) {
+          document.getElementById("page-content").innerHTML = pageHeader("Budget center", "Review event limits and overage requests.", false) + emptyState("!", "Unable to load budgets", error.message || "Please try again.", false);
+        });
+    }
+
+    function renderBudgetCenter(data) {
+      if (!currentIsExecutive) return;
+      const requests = Array.isArray(data.requests) ? data.requests : [];
+      const rules = Array.isArray(data.rules) ? data.rules : [];
+      const query = budgetApprovalSearch.trim().toLowerCase();
+      const status = budgetApprovalFilter.toUpperCase();
+      const filtered = requests.filter(function(request) {
+        if (String(request.status || "PENDING").toUpperCase() !== status) return false;
+        if (!query) return true;
+        return [request.email, request.personName, request.studentId, request.eventName, request.triggeringItem]
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+      });
+
+      document.getElementById("page-content").innerHTML = `
+        ${pageHeader("Budget center", "Set per-event limits and decide when a student needs an exception.", false)}
+
+        <section class="approval-summary" aria-label="Budget approval summary">
+          ${summaryCard("Waiting", Number(data.pendingCount || 0), "Student requests to review")}
+          ${summaryCard("Approved", Number(data.approvedCount || 0), "Exceptions granted")}
+          ${summaryCard("Rejected", Number(data.rejectedCount || 0), "Exceptions not granted")}
+        </section>
+
+        <div class="budget-center-layout">
+          <section class="stats-section">
+            <div class="approval-toolbar">
+              <label class="search-wrap">
+                <span class="search-icon" aria-hidden="true">⌕</span>
+                <span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Search budget requests</span>
+                <input class="search-input" id="budget-approval-search" type="search" placeholder="Search person, email, event, or item" value="${escapeAttribute(budgetApprovalSearch)}" oninput="updateBudgetApprovalSearch(this.value)">
+              </label>
+              <div class="filter-group" aria-label="Budget request filter">
+                ${budgetApprovalFilterButton("pending", "Waiting")}
+                ${budgetApprovalFilterButton("approved", "Approved")}
+                ${budgetApprovalFilterButton("rejected", "Rejected")}
+              </div>
+            </div>
+            <div class="approval-list">
+              ${filtered.length ? filtered.map(renderBudgetRequestEntry).join("") : `<div class="no-results">${requests.length ? "No budget requests match this search and status." : "No one has requested an over-budget exception yet."}</div>`}
+            </div>
+          </section>
+
+          <aside class="stats-section">
+            <h2 class="stats-section-title">Budget rules</h2>
+            <p class="section-caption">A default rule gives every person their own separate limit for that event. Add an email or student-ID override when one person needs a different amount.</p>
+            <form class="budget-rule-form" id="budget-rule-form" onsubmit="saveBudgetLimit(event)">
+              <input id="budget-rule-id" type="hidden" value="">
+              <div class="budget-rule-fields">
+                <label class="field-group full">
+                  <span class="field-label">Event</span>
+                  <input class="field-input" id="budget-rule-event" type="text" placeholder="Electric Vehicle" required>
+                </label>
+                <label class="field-group">
+                  <span class="field-label">Limit</span>
+                  <input class="field-input" id="budget-rule-amount" type="number" min="0.01" max="1000000" step="0.01" placeholder="50.00" required>
+                </label>
+                <label class="field-group">
+                  <span class="field-label">Who it applies to</span>
+                  <select class="field-select" id="budget-rule-scope" onchange="updateBudgetScopeField()">
+                    <option value="DEFAULT">Everyone in this event</option>
+                    <option value="EMAIL">One email</option>
+                    <option value="STUDENT_ID">One student ID</option>
+                    <option value="PERSON_NAME">One exact name</option>
+                  </select>
+                </label>
+                <label class="field-group full" id="budget-scope-value-group" hidden>
+                  <span class="field-label" id="budget-scope-value-label">Email</span>
+                  <input class="field-input" id="budget-rule-scope-value" type="text" placeholder="student@mvla.net">
+                </label>
+              </div>
+              <div class="approval-actions">
+                <button class="button button-primary" id="budget-rule-save" type="submit">Save budget</button>
+                <button class="button button-quiet" type="button" onclick="resetBudgetRuleForm()">Clear</button>
+              </div>
+            </form>
+            <div class="budget-rules-list">
+              ${rules.length ? rules.map(renderBudgetRule).join("") : `<div class="no-results">No event budgets are configured.</div>`}
+            </div>
+          </aside>
+        </div>
+
+        <p class="section-caption" style="margin-top:14px">The backend recalculates totals from Master. Approval requests are snapshots: if someone orders more after an exception is approved, the new amount requires another review.</p>
+      `;
+    }
+
+    function budgetApprovalFilterButton(value, label) {
+      return `<button class="filter-button ${budgetApprovalFilter === value ? "active" : ""}" type="button" onclick="setBudgetApprovalFilter('${value}')" aria-pressed="${budgetApprovalFilter === value}">${label}</button>`;
+    }
+
+    function setBudgetApprovalFilter(value) {
+      budgetApprovalFilter = value;
+      renderBudgetCenter(savedBudgetCenter || { requests: [], rules: [] });
+    }
+
+    function updateBudgetApprovalSearch(value) {
+      budgetApprovalSearch = String(value || "");
+      renderBudgetCenter(savedBudgetCenter || { requests: [], rules: [] });
+      const input = document.getElementById("budget-approval-search");
+      if (input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+    }
+
+    function renderBudgetRequestEntry(request) {
+      const status = String(request.status || "PENDING").toUpperCase();
+      const requestId = encodeURIComponent(String(request.requestId || "")).replace(/'/g, "%27");
+      return `
+        <details class="approval-entry">
+          <summary>
+            <div>
+              <div class="approval-email">${escapeHTML(request.personName || "Unknown")} · ${escapeHTML(request.eventName || "Unassigned event")}</div>
+              <div class="approval-meta">${escapeHTML(request.email || "No email")} · $${money(request.spendRequested)} of $${money(request.budget)}</div>
+            </div>
+            <span class="approval-status ${status.toLowerCase()}">${status === "PENDING" ? "Waiting" : capitalize(status)}</span>
+            <span class="login-history-chevron" aria-hidden="true">⌄</span>
+          </summary>
+          <div class="approval-detail">
+            <div class="approval-meta"><strong style="color:var(--ink)">Triggered by:</strong> ${escapeHTML(request.triggeringItem || "Unnamed item")} · $${money(request.triggeringOrderTotal)} · Master row ${Number(request.triggeringRow || 0)}</div>
+            <div class="approval-meta"><strong style="color:var(--ink)">Requested total:</strong> $${money(request.spendRequested)} ($${money(Math.max(0,Number(request.spendRequested || 0) - Number(request.budget || 0)))} over)</div>
+            <div class="approval-meta"><strong style="color:var(--ink)">Requested:</strong> ${escapeHTML(formatFullAccessTime(request.requestedAt))}</div>
+            ${request.decidedBy ? `<div class="approval-meta"><strong style="color:var(--ink)">Decision:</strong> ${escapeHTML(formatFullAccessTime(request.decidedAt))} by ${escapeHTML(request.decidedBy)}</div>` : ""}
+            ${status === "PENDING" ? `<div class="approval-actions"><button class="button button-primary" type="button" onclick="changeBudgetApproval(event,'${requestId}','APPROVED',this)">Approve exception</button><button class="button" type="button" onclick="changeBudgetApproval(event,'${requestId}','REJECTED',this)">Reject</button></div>` : ""}
+            <div class="approval-note">Approval covers only the $${money(request.spendRequested)} total shown here, not unlimited future orders.</div>
+          </div>
+        </details>
+      `;
+    }
+
+    function changeBudgetApproval(event, encodedId, status, button) {
+      if (event) { event.preventDefault(); event.stopPropagation(); }
+      if (!currentIsExecutive) return;
+      const requestId = decodeURIComponent(encodedId);
+      if (button) { button.disabled = true; button.textContent = "Saving…"; }
+
+      if (localPreviewMode) {
+        const request = (savedBudgetCenter.requests || []).find(function(entry) { return entry.requestId === requestId; });
+        if (request) {
+          request.status = status;
+          request.decidedAt = new Date().toISOString();
+          request.decidedBy = currentDashboardData && currentDashboardData.email || "preview.executive@mvla.net";
+        }
+        recalculateBudgetApprovalCounts();
+        window.setTimeout(function() { renderBudgetCenter(savedBudgetCenter); showToast(status === "APPROVED" ? "Budget exception approved." : "Budget exception rejected."); }, 180);
+        return;
+      }
+
+      apiRequest({ action: "setBudgetApproval", requestId: requestId, status: status })
+        .then(function(result) {
+          if (result.type !== "budgetCenter") throw new Error(result.message || "The budget decision could not be saved.");
+          savedBudgetCenter = result.data || savedBudgetCenter;
+          budgetPendingCount = Number(savedBudgetCenter.pendingCount || 0);
+          updateBudgetApprovalBadge();
+          renderBudgetCenter(savedBudgetCenter);
+          showToast(status === "APPROVED" ? "Budget exception approved." : "Budget exception rejected.");
+        })
+        .catch(function(error) { renderBudgetCenter(savedBudgetCenter || { requests: [], rules: [] }); showToast(error.message || "The budget decision could not be saved."); });
+    }
+
+    function recalculateBudgetApprovalCounts() {
+      const requests = savedBudgetCenter && Array.isArray(savedBudgetCenter.requests) ? savedBudgetCenter.requests : [];
+      savedBudgetCenter.pendingCount = requests.filter(function(request) { return request.status === "PENDING"; }).length;
+      savedBudgetCenter.approvedCount = requests.filter(function(request) { return request.status === "APPROVED"; }).length;
+      savedBudgetCenter.rejectedCount = requests.filter(function(request) { return request.status === "REJECTED"; }).length;
+      budgetPendingCount = savedBudgetCenter.pendingCount;
+      updateBudgetApprovalBadge();
+    }
+
+    function renderBudgetRule(rule) {
+      const encodedId = encodeURIComponent(String(rule.ruleId || "")).replace(/'/g, "%27");
+      const scope = rule.scopeType === "DEFAULT" ? "Each person separately" : `${String(rule.scopeType || "").replace("_", " ").toLowerCase()}: ${rule.scopeValue || ""}`;
+      return `<div class="budget-rule-row"><div><strong>${escapeHTML(rule.eventName || "Unassigned event")} · $${money(rule.budget)}</strong><div class="budget-rule-scope">${escapeHTML(scope)}</div></div><button class="button button-quiet" type="button" onclick="editBudgetRule('${encodedId}')">Edit</button></div>`;
+    }
+
+    function editBudgetRule(encodedId) {
+      const ruleId = decodeURIComponent(encodedId);
+      const rule = (savedBudgetCenter.rules || []).find(function(entry) { return entry.ruleId === ruleId; });
+      if (!rule) return;
+      document.getElementById("budget-rule-id").value = rule.ruleId || "";
+      document.getElementById("budget-rule-event").value = rule.eventName || "";
+      document.getElementById("budget-rule-amount").value = Number(rule.budget || 0).toFixed(2);
+      document.getElementById("budget-rule-scope").value = rule.scopeType || "DEFAULT";
+      document.getElementById("budget-rule-scope-value").value = rule.scopeType === "DEFAULT" ? "" : (rule.scopeValue || "");
+      updateBudgetScopeField();
+      document.getElementById("budget-rule-save").textContent = "Update budget";
+      document.getElementById("budget-rule-event").focus();
+    }
+
+    function updateBudgetScopeField() {
+      const scope = document.getElementById("budget-rule-scope");
+      const group = document.getElementById("budget-scope-value-group");
+      const label = document.getElementById("budget-scope-value-label");
+      const input = document.getElementById("budget-rule-scope-value");
+      if (!scope || !group || !label || !input) return;
+      group.hidden = scope.value === "DEFAULT";
+      input.required = scope.value !== "DEFAULT";
+      const labels = { EMAIL: "Exact email", STUDENT_ID: "Student ID", PERSON_NAME: "Exact person name" };
+      const placeholders = { EMAIL: "student@mvla.net", STUDENT_ID: "100034572", PERSON_NAME: "Julian Chaw" };
+      label.textContent = labels[scope.value] || "Scope value";
+      input.placeholder = placeholders[scope.value] || "";
+    }
+
+    function resetBudgetRuleForm() {
+      const form = document.getElementById("budget-rule-form");
+      if (form) form.reset();
+      const id = document.getElementById("budget-rule-id");
+      const save = document.getElementById("budget-rule-save");
+      if (id) id.value = "";
+      if (save) save.textContent = "Save budget";
+      updateBudgetScopeField();
+    }
+
+    function saveBudgetLimit(event) {
+      if (event) event.preventDefault();
+      if (!currentIsExecutive) return;
+      const rule = {
+        ruleId: document.getElementById("budget-rule-id").value,
+        eventName: document.getElementById("budget-rule-event").value,
+        budget: document.getElementById("budget-rule-amount").value,
+        scopeType: document.getElementById("budget-rule-scope").value,
+        scopeValue: document.getElementById("budget-rule-scope-value").value
+      };
+      const save = document.getElementById("budget-rule-save");
+      if (save) { save.disabled = true; save.textContent = "Saving…"; }
+
+      if (localPreviewMode) {
+        const rules = savedBudgetCenter.rules || [];
+        const existing = rules.find(function(entry) { return entry.ruleId === rule.ruleId; });
+        const next = { ruleId: rule.ruleId || "preview-rule-" + Date.now(), eventName: rule.eventName.trim(), budget: Number(rule.budget), scopeType: rule.scopeType, scopeValue: rule.scopeType === "DEFAULT" ? "*" : rule.scopeValue.trim(), updatedBy: currentDashboardData.email };
+        if (existing) Object.assign(existing, next); else rules.push(next);
+        window.setTimeout(function() { renderBudgetCenter(savedBudgetCenter); showToast("Budget rule saved."); }, 180);
+        return;
+      }
+
+      apiRequest({ action: "setBudgetLimit", rule: rule })
+        .then(function(result) {
+          if (result.type !== "budgetCenter") throw new Error(result.message || "The budget rule could not be saved.");
+          savedBudgetCenter = result.data || savedBudgetCenter;
+          renderBudgetCenter(savedBudgetCenter);
+          showToast("Budget rule saved.");
+        })
+        .catch(function(error) { renderBudgetCenter(savedBudgetCenter || { requests: [], rules: [] }); showToast(error.message || "The budget rule could not be saved."); });
+    }
+
+    function renderAdminPage() {
+      if (!currentIsSuperAdmin) {
+        navigateTo("orders");
+        return;
+      }
+
+      const maintenanceLabel = currentMaintenanceMode ? "Maintenance on" : "Portal online";
+      const maintenanceCopy = currentMaintenanceMode
+        ? "Everyone except the two owner accounts is currently blocked from the portal."
+        : "Students and executives can currently sign in and use the portal normally.";
+      document.getElementById("page-content").innerHTML = `
+        ${pageHeader("Admin controls", "Owner-only controls verified by the backend using your Google email.", false)}
+
+        <section class="admin-status-card">
+          <div>
+            <h2 class="admin-status-title">Portal access</h2>
+            <p class="admin-status-copy">${escapeHTML(maintenanceCopy)}</p>
+          </div>
+          <span class="admin-pill ${currentMaintenanceMode ? "locked" : ""}">${escapeHTML(maintenanceLabel)}</span>
+        </section>
+
+        <section class="stats-section">
+          <h2 class="stats-section-title">Access and maintenance</h2>
+          <div class="admin-action-list">
+            <div class="admin-action">
+              <div>
+                <h3>${currentMaintenanceMode ? "Reopen the portal" : "Enter maintenance mode"}</h3>
+                <p>${currentMaintenanceMode ? "Allow students and executives to sign in again." : "Immediately deny portal access to everyone except 100034572@mvla.net and jn.chaw7@gmail.com."}</p>
+              </div>
+              <button class="button ${currentMaintenanceMode ? "button-primary" : ""}" id="maintenance-admin-button" type="button" onclick="toggleMaintenanceMode()">
+                ${currentMaintenanceMode ? "Turn portal back on" : "Start maintenance"}
+              </button>
+            </div>
+
+            <div class="admin-action">
+              <div>
+                <h3>Reset onboarding</h3>
+                <p>Clears saved names and orientation completion only. The reset works while the portal is online or in maintenance mode. Everyone, including you, will immediately receive the first-time guide again. Login records and estimator history are preserved.</p>
+              </div>
+              <button class="button" id="reset-onboarding-button" type="button" onclick="resetOnboarding()">Reset onboarding</button>
+            </div>
+          </div>
+        </section>
+
+        <p class="section-caption" style="margin-top:14px">Signed in as ${escapeHTML(currentDashboardData && currentDashboardData.email || "verified owner")}. These controls cannot be enabled by changing the page HTML.</p>
+      `;
+    }
+
+    function toggleMaintenanceMode() {
+      if (!currentIsSuperAdmin) return;
+      const enable = !currentMaintenanceMode;
+      const confirmed = window.confirm(
+        enable
+          ? "Turn on maintenance mode? Everyone except the two owner accounts will be blocked immediately."
+          : "Turn the portal back on for students and executives?"
+      );
+      if (!confirmed) return;
+      runAdminAction(
+        { action: "setMaintenanceMode", enabled: enable },
+        enable ? "Maintenance mode is on." : "The portal is back online."
+      );
+    }
+
+    function resetOnboarding() {
+      if (!currentIsSuperAdmin) return;
+      const confirmation = window.prompt('Type RESET ONBOARDING to make the orientation new for everyone again.');
+      if (confirmation !== "RESET ONBOARDING") {
+        if (confirmation !== null) showToast('Reset cancelled: type "RESET ONBOARDING" exactly.');
+        return;
+      }
+      runAdminAction(
+        { action: "resetUserProfiles", confirmation: confirmation },
+        "Names and onboarding were reset. Login and estimator history were preserved."
+      );
+    }
+
+    function runAdminAction(payload, successMessage) {
+      if (!currentIsSuperAdmin) return;
+      setAdminControlsDisabled(true);
+
+      if (localPreviewMode) {
+        if (payload.action === "setMaintenanceMode") currentMaintenanceMode = payload.enabled === true;
+        if (payload.action === "resetUserProfiles") {
+          currentUserProfile = { name: "", needsName: true, onboardingComplete: false, onboardingVersion: 0, needsOnboarding: true };
+          onboardingName = "";
+        }
+        window.setTimeout(function() {
+          renderAdminPage();
+          showToast(successMessage);
+          if (payload.action === "resetUserProfiles") showOnboarding();
+        }, 180);
+        return;
+      }
+
+      apiRequest(payload)
+        .then(function(result) {
+          if (result.type !== "adminAction") throw new Error(result.message || "The admin action failed.");
+          currentMaintenanceMode = result.maintenanceMode === true;
+          currentIsSuperAdmin = result.isSuperAdmin === true;
+          if (payload.action === "resetUserProfiles") {
+            currentUserProfile = { name: "", needsName: true, onboardingComplete: false, onboardingVersion: 0, needsOnboarding: true };
+            onboardingName = "";
+          }
+          renderAdminPage();
+          showToast(successMessage);
+          if (payload.action === "resetUserProfiles") showOnboarding();
+        })
+        .catch(function(error) {
+          renderAdminPage();
+          showToast(error.message || "The admin action failed.");
+        });
+    }
+
+    function setAdminControlsDisabled(disabled) {
+      ["maintenance-admin-button", "reset-onboarding-button"].forEach(function(id) {
+        const button = document.getElementById(id);
+        if (button) button.disabled = disabled;
+      });
+    }
+
+    function getDisplayName() {
+      if (currentUserProfile && currentUserProfile.name) return currentUserProfile.name;
+      const item = getItems().find(function(entry) { return entry.personName && entry.personName !== "Unknown"; });
+      if (item) return item.personName;
+      const email = String(currentDashboardData && currentDashboardData.email || "");
+      return email ? email.split("@")[0] : (currentIsExecutive ? "Executive" : "Student");
+    }
+
+    function getFirstName() {
+      return getDisplayName().trim().split(/\s+/)[0] || "there";
+    }
+
+    function showOnboarding() {
+      const modal = document.getElementById("onboarding-modal");
+      onboardingName = currentUserProfile && currentUserProfile.name ? currentUserProfile.name : "";
+      if (!onboardingName || (currentUserProfile && currentUserProfile.needsName)) {
+        if (!modal) return;
+        const input = document.getElementById("profile-name-input");
+        const email = document.getElementById("onboarding-email");
+        const error = document.getElementById("onboarding-error");
+        if (input) input.value = onboardingName;
+        if (email) email.textContent = currentDashboardData && currentDashboardData.email || "Verified Google account";
+        if (error) error.textContent = "";
+        modal.hidden = false;
+        setNamePromptBusy(false, "Save and start tour");
+        window.setTimeout(function() {
+          if (input) {
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
+          }
+        }, 0);
+        return;
+      }
+
+      if (modal) modal.hidden = true;
+      startGuidedTour();
+    }
+
+    function saveOnboardingName(event) {
+      if (event) event.preventDefault();
+      const input = document.getElementById("profile-name-input");
+      const error = document.getElementById("onboarding-error");
+      const name = String(input && input.value || "").replace(/\s+/g, " ").trim();
+      if (!name) {
+        if (error) error.textContent = "Please enter your name.";
+        if (input) input.focus();
+        return;
+      }
+      if (name.length > 60) {
+        if (error) error.textContent = "Your name must be 60 characters or fewer.";
+        if (input) input.focus();
+        return;
+      }
+
+      onboardingName = name;
+      setNamePromptBusy(true, "Saving…");
+      if (localPreviewMode) {
+        currentUserProfile = { name: name, needsName: false, onboardingComplete: false, onboardingVersion: 0, needsOnboarding: true };
+        document.getElementById("onboarding-modal").hidden = true;
+        initializeApp();
+        startGuidedTour();
+        return;
+      }
+
+      apiRequest({ action: "saveProfile", name: name })
+        .then(function(result) {
+          if (result.type !== "profileSaved" || !result.profile) throw new Error(result.message || "Your name could not be saved.");
+          currentUserProfile = result.profile;
+          document.getElementById("onboarding-modal").hidden = true;
+          initializeApp();
+          startGuidedTour();
+        })
+        .catch(function(saveError) {
+          if (error) error.textContent = saveError.message || "Your name could not be saved. Please try again.";
+          setNamePromptBusy(false, "Save and start tour");
+        });
+    }
+
+    function setNamePromptBusy(disabled, text) {
+      const button = document.getElementById("onboarding-name-submit");
+      const input = document.getElementById("profile-name-input");
+      if (button) { button.disabled = disabled; button.textContent = text; }
+      if (input) input.disabled = disabled;
+    }
+
+    function getGuidedTourSteps() {
+      const steps = [
+        {
+          target: "#nav-orders",
+          page: "orders",
+          title: "Orders is your home base",
+          copy: "This page shows every active request, its approval progress, cost, and the best available arrival estimate.",
+          instruction: "This left-side tab always brings you back to your dashboard. Select Next when you are ready."
+        },
+        {
+          target: "[data-tour='order-details']",
+          fallback: "#active-orders-heading",
+          page: "orders",
+          title: "Open an order for more detail",
+          copy: "Order details shows the approval record, vendor type, price calculation, and why the estimate has its confidence level.",
+          instruction: "After the orientation, you can expand any card here. Select Next to continue.",
+          fallbackInstruction: "You have no active order to open yet. Select Next to continue."
+        },
+        {
+          target: "#personal-budget-section",
+          fallback: "#active-orders-heading",
+          page: "orders",
+          title: "Your event budgets stay separate",
+          copy: "Each bar compares your own spending in one event with that event's assigned limit. If an order crosses the limit, the triggering order is flagged here.",
+          instruction: "The bar updates automatically from your orders. Select Next to continue."
+        },
+        {
+          target: "[data-tour='place-order']",
+          page: "orders",
+          action: "place-order",
+          title: "Submit a new request",
+          copy: "Use this button whenever you need treasury to purchase something. The orientation only points it out and will not open the form.",
+          instruction: "Select Next to continue without opening the ordering form."
+        },
+        {
+          target: "#nav-history",
+          page: "orders",
+          title: "Completed orders stay in History",
+          copy: "Delivered and cancelled requests move here, so the Orders page stays focused on work that is still active.",
+          instruction: "Select Next and the guide will move to History for you."
+        },
+        {
+          target: "#history-search",
+          page: "history",
+          title: "Find an older request quickly",
+          copy: "History can filter by item, event, vendor, or final status as you type.",
+          instruction: "You can use this search after the tour. Select Next to continue."
+        },
+        {
+          target: "#refresh-button",
+          page: "history",
+          action: "refresh",
+          title: "Pull in the newest tracking data",
+          copy: "Refresh checks the treasury tracker again. The orientation only highlights it and does not send another request.",
+          instruction: "Select Next to continue."
+        }
+      ];
+
+      if (currentIsExecutive) {
+        steps.push({
+          target: "#nav-team",
+          page: "history",
+          title: "Executives get Team insights",
+          copy: "Only backend-whitelisted executive accounts can open team-wide spending, people, events, and portal activity.",
+          instruction: "Select Next and the guide will open Team insights for you."
+        });
+        steps.push({
+          target: "#team-event-search",
+          fallback: "#nav-team",
+          waitForPrimary: true,
+          page: "team",
+          title: "Search the team instantly",
+          copy: "Start typing an event in this box. The People section below has its own live search, so you can also find a specific student without pressing Enter.",
+          instruction: "Both searches are available after the tour. Select Next to continue.",
+          fallbackInstruction: "Team data is still loading. Select Next; both searches remain available afterward."
+        });
+        steps.push({
+          target: "#nav-approvals",
+          page: "team",
+          title: "Review external form emails",
+          copy: "Any non-school email found in Master column J waits here. Approving a mentor allows that exact email; rejecting it keeps its orders out of portal results.",
+          instruction: "Select Next to continue without changing an approval."
+        });
+        steps.push({
+          target: "#nav-budgets",
+          page: "approvals",
+          title: "Budget exceptions wait in Budget center",
+          copy: "Executives can approve a student's current overage and set default or person-specific event limits here.",
+          instruction: "Select Next to continue without changing a budget."
+        });
+      }
+
+      steps.push({
+        target: "#sidebar-user-block",
+        fallback: "#nav-orders",
+        page: currentIsExecutive ? "budgets" : "history",
+        title: "You know the whole tracking hub",
+        copy: "Your name and verified email stay attached to this account. Use Sign out only when you want Google auto sign-in disabled on this browser.",
+        requireClick: false,
+        final: true
+      });
+
+      return steps;
+    }
+
+    function startGuidedTour() {
+      const modal = document.getElementById("onboarding-modal");
+      if (modal) modal.hidden = true;
+      guidedTourActive = true;
+      guidedTourIndex = 0;
+      document.body.classList.add("tour-active");
+
+      if (!window.__sciOlyTourListenersInstalled) {
+        document.addEventListener("click", handleGuidedTourTargetClick);
+        window.addEventListener("resize", updateGuidedTourLayout);
+        window.addEventListener("scroll", updateGuidedTourLayout, true);
+        window.__sciOlyTourListenersInstalled = true;
+      }
+
+      goToGuidedTourStep(0);
+    }
+
+    function goToGuidedTourStep(index) {
+      if (!guidedTourActive) return;
+      const steps = getGuidedTourSteps();
+      if (index < 0) index = 0;
+      if (index >= steps.length) {
+        completeOnboarding();
+        return;
+      }
+
+      clearTimeout(guidedTourTimer);
+      clearGuidedTourTarget();
+      guidedTourIndex = index;
+      guidedTourLookupAttempts = 0;
+      guidedTourRequiresClick = false;
+
+      const step = steps[guidedTourIndex];
+      const root = document.getElementById("guided-tour");
+      if (root) root.hidden = false;
+
+      if (step.page && currentPage !== step.page) navigateTo(step.page);
+      guidedTourTimer = window.setTimeout(locateGuidedTourTarget, 180);
+    }
+
+    function locateGuidedTourTarget() {
+      if (!guidedTourActive) return;
+      const steps = getGuidedTourSteps();
+      const step = steps[guidedTourIndex];
+      if (!step) return;
+
+      const primary = document.querySelector(step.target);
+      const primaryUsable = isTourTargetUsable(primary);
+      if (!primaryUsable && step.waitForPrimary && guidedTourLookupAttempts < 30) {
+        guidedTourLookupAttempts += 1;
+        guidedTourTimer = window.setTimeout(locateGuidedTourTarget, 120);
+        return;
+      }
+
+      const fallback = step.fallback ? document.querySelector(step.fallback) : null;
+      let target = primaryUsable ? primary : (isTourTargetUsable(fallback) ? fallback : null);
+      let requiresClick = false;
+
+      if (!target && guidedTourLookupAttempts < 20) {
+        guidedTourLookupAttempts += 1;
+        guidedTourTimer = window.setTimeout(locateGuidedTourTarget, 120);
+        return;
+      }
+
+      if (!target) {
+        target = document.querySelector("#nav-orders");
+        requiresClick = false;
+      }
+      if (!target) return;
+
+      target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+      guidedTourTimer = window.setTimeout(function() {
+        mountGuidedTourStep(target, step, requiresClick);
+      }, 240);
+    }
+
+    function isTourTargetUsable(target) {
+      if (!target) return false;
+      const rect = target.getBoundingClientRect();
+      const style = window.getComputedStyle(target);
+      return rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden";
+    }
+
+    function mountGuidedTourStep(target, step, requiresClick) {
+      if (!guidedTourActive || !document.documentElement.contains(target)) {
+        locateGuidedTourTarget();
+        return;
+      }
+
+      clearGuidedTourTarget();
+      guidedTourTarget = target;
+      guidedTourRequiresClick = false;
+      guidedTourTarget.classList.add("tour-highlight");
+
+      const steps = getGuidedTourSteps();
+      const tooltip = document.getElementById("tour-tooltip");
+      if (!tooltip) return;
+
+      const instruction = step.instruction || step.fallbackInstruction || (step.final ? "Finish the tour when you are ready." : "Select Next to continue.");
+      const progress = Math.round(((guidedTourIndex + 1) / steps.length) * 100);
+      tooltip.style.visibility = "hidden";
+      tooltip.innerHTML = `
+        <div class="tour-kicker"><span>Interactive orientation</span><span>${guidedTourIndex + 1} of ${steps.length}</span></div>
+        <h2 id="tour-title">${escapeHTML(step.title)}</h2>
+        <p>${escapeHTML(step.copy)}</p>
+        <div class="tour-instruction"><span class="tour-click-dot" aria-hidden="true"></span><span>${escapeHTML(instruction)}</span></div>
+        <div class="tour-progress" aria-label="Orientation progress"><div class="tour-progress-fill" style="width:${progress}%"></div></div>
+        <div class="tour-error" id="tour-error" role="alert"></div>
+        <div class="tour-actions">
+          <button class="tour-button" type="button" onclick="guidedTourSkip()">Skip tour</button>
+          <div class="tour-action-group">
+            ${guidedTourIndex > 0 ? `<button class="tour-button" type="button" onclick="guidedTourBack()">Back</button>` : ""}
+            <button class="tour-button primary" type="button" onclick="guidedTourContinue()">${step.final ? "Finish tour" : "Next"}</button>
+          </div>
+        </div>
+      `;
+
+      updateGuidedTourLayout();
+      tooltip.style.visibility = "visible";
+    }
+
+    function updateGuidedTourLayout() {
+      if (!guidedTourActive || !guidedTourTarget || !isTourTargetUsable(guidedTourTarget)) return;
+      const rect = guidedTourTarget.getBoundingClientRect();
+      updateTourMasks(rect);
+      positionTourTooltip(rect);
+    }
+
+    function updateTourMasks(rect) {
+      const padding = 8;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const left = Math.max(0, rect.left - padding);
+      const top = Math.max(0, rect.top - padding);
+      const right = Math.min(viewportWidth, rect.right + padding);
+      const bottom = Math.min(viewportHeight, rect.bottom + padding);
+      setTourMask("top", 0, 0, viewportWidth, top);
+      setTourMask("left", top, 0, left, Math.max(0, bottom - top));
+      setTourMask("right", top, right, Math.max(0, viewportWidth - right), Math.max(0, bottom - top));
+      setTourMask("bottom", bottom, 0, viewportWidth, Math.max(0, viewportHeight - bottom));
+    }
+
+    function setTourMask(name, top, left, width, height) {
+      const mask = document.querySelector(`[data-tour-mask='${name}']`);
+      if (!mask) return;
+      mask.style.top = top + "px";
+      mask.style.left = left + "px";
+      mask.style.width = width + "px";
+      mask.style.height = height + "px";
+    }
+
+    function positionTourTooltip(rect) {
+      const tooltip = document.getElementById("tour-tooltip");
+      if (!tooltip) return;
+      const gap = 18;
+      const margin = 12;
+      const width = tooltip.offsetWidth;
+      const height = tooltip.offsetHeight;
+      let placement = "right";
+      let left = rect.right + gap;
+      let top = rect.top;
+
+      if (left + width > window.innerWidth - margin) {
+        if (rect.left - gap - width >= margin) {
+          placement = "left";
+          left = rect.left - gap - width;
+          top = rect.top;
+        } else if (rect.bottom + gap + height <= window.innerHeight - margin) {
+          placement = "bottom";
+          left = rect.left;
+          top = rect.bottom + gap;
+        } else {
+          placement = "top";
+          left = rect.left;
+          top = rect.top - gap - height;
+        }
+      }
+
+      left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
+      top = Math.max(margin, Math.min(top, window.innerHeight - height - margin));
+      tooltip.dataset.placement = placement;
+      tooltip.style.left = left + "px";
+      tooltip.style.top = top + "px";
+    }
+
+    function handleGuidedTourTargetClick(event) {
+      if (!guidedTourActive || !guidedTourRequiresClick || !guidedTourTarget) return;
+      const tooltip = document.getElementById("tour-tooltip");
+      if (tooltip && tooltip.contains(event.target)) return;
+      if (event.target !== guidedTourTarget && !guidedTourTarget.contains(event.target)) return;
+      guidedTourRequiresClick = false;
+      guidedTourTimer = window.setTimeout(function() {
+        goToGuidedTourStep(guidedTourIndex + 1);
+      }, 120);
+    }
+
+    function guidedTourOwnsAction(action) {
+      return false;
+    }
+
+    function guidedTourBack() {
+      goToGuidedTourStep(guidedTourIndex - 1);
+    }
+
+    function guidedTourContinue() {
+      const step = getGuidedTourSteps()[guidedTourIndex];
+      if (step && step.final) completeOnboarding();
+      else goToGuidedTourStep(guidedTourIndex + 1);
+    }
+
+    function guidedTourSkip() {
+      completeOnboarding();
+    }
+
+    function completeOnboarding() {
+      const error = document.getElementById("tour-error");
+      setGuidedTourBusy(true, "Finishing…");
+      if (localPreviewMode) {
+        currentUserProfile = { name: onboardingName, needsName: false, onboardingComplete: true, onboardingVersion: 3, needsOnboarding: false };
+        finishOnboarding();
+        return;
+      }
+
+      apiRequest({ action: "completeOnboarding" })
+        .then(function(result) {
+          if (result.type !== "onboardingComplete" || !result.profile) throw new Error(result.message || "Orientation could not be completed.");
+          currentUserProfile = result.profile;
+          finishOnboarding();
+        })
+        .catch(function(completeError) {
+          if (error) error.textContent = completeError.message || "Orientation could not be completed. Please try again.";
+          setGuidedTourBusy(false, "Finish tour");
+        });
+    }
+
+    function setGuidedTourBusy(disabled, text) {
+      const tooltip = document.getElementById("tour-tooltip");
+      if (!tooltip) return;
+      tooltip.querySelectorAll("button").forEach(function(button) { button.disabled = disabled; });
+      const primary = tooltip.querySelector(".tour-button.primary");
+      if (primary) primary.textContent = text;
+      else if (disabled) {
+        const actions = tooltip.querySelector(".tour-action-group");
+        if (actions) actions.insertAdjacentHTML("beforeend", `<button class="tour-button primary" type="button" disabled>${escapeHTML(text)}</button>`);
+      }
+    }
+
+    function clearGuidedTourTarget() {
+      if (guidedTourTarget) guidedTourTarget.classList.remove("tour-highlight");
+      guidedTourTarget = null;
+    }
+
+    function hideGuidedTour() {
+      clearTimeout(guidedTourTimer);
+      clearGuidedTourTarget();
+      guidedTourActive = false;
+      guidedTourRequiresClick = false;
+      document.body.classList.remove("tour-active");
+      const root = document.getElementById("guided-tour");
+      if (root) root.hidden = true;
+    }
+
+    function finishOnboarding() {
+      const modal = document.getElementById("onboarding-modal");
+      if (modal) modal.hidden = true;
+      hideGuidedTour();
+      initializeApp();
+      navigateTo(currentPage === "team" && !currentIsExecutive ? "orders" : currentPage);
+      showToast("Welcome, " + getFirstName() + ".");
+    }
+
+    function setSignInLoading(enabled) {
+      const loading = document.getElementById("sign-in-loading");
+      if (!loading) return;
+      signInLoadingTimers.forEach(function(timer) { clearTimeout(timer); });
+      signInLoadingTimers = [];
+      loading.hidden = !enabled;
+      if (!enabled) return;
+
+      const steps = Array.from(loading.querySelectorAll(".loading-step"));
+      steps.forEach(function(step, index) { step.classList.toggle("active", index === 0); });
+      [650, 1350].forEach(function(delay, stepIndex) {
+        signInLoadingTimers.push(window.setTimeout(function() {
+          steps.forEach(function(step, index) { step.classList.toggle("active", index === stepIndex + 1); });
+        }, delay));
+      });
+    }
+
+    function showWaitlistScreen(result) {
+      signInRequestInFlight = false;
+      setSignInLoading(false);
+      document.getElementById("login-page").hidden = true;
+      document.getElementById("app-shell").hidden = true;
+      document.getElementById("waitlist-page").hidden = false;
+      document.getElementById("waitlist-email").textContent = result.email || "External Google account";
+      const rejected = String(result.status || "").toUpperCase() === "REJECTED";
+      document.getElementById("waitlist-title").textContent = rejected ? "Account not approved" : "Waiting for approval";
+      document.getElementById("waitlist-status").textContent = rejected ? "Not approved" : "Waiting for executive review";
+      document.getElementById("waitlist-message").textContent = result.message || "Students should use their @mvla.net account. Mentor Gmail accounts must be approved by an executive.";
+    }
+
+    function showInitialLoading() {
+      setSignInLoading(true);
+    }
+
+    function loadingState(text) {
+      return `<div class="loading-state"><div class="spinner"></div>${escapeHTML(text)}</div>`;
+    }
+
+    function emptyState(icon, title, copy, showOrderButton) {
+      return `<div class="empty-state"><div class="empty-icon" aria-hidden="true">${escapeHTML(icon)}</div><h3>${escapeHTML(title)}</h3><p>${escapeHTML(copy)}</p>${showOrderButton ? `<button class="button button-primary" style="margin-top:18px" type="button" onclick="openOrderingForm()">＋ Place new order</button>` : ""}</div>`;
+    }
+
+    function formatUpdatedTime() {
+      if (!lastUpdatedAt) return "";
+      return "Updated " + lastUpdatedAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    }
+
+    function openOrderingForm() {
+      if (guidedTourOwnsAction("place-order")) return;
+      window.open(ORDER_FORM_URL, "_blank", "noopener,noreferrer");
+    }
+
+    function returnToLogin() {
+      if (window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect();
+
+      if (localPreviewMode) {
+        window.location.href = window.location.href.split("?")[0].split("#")[0];
+        return;
+      }
+
+      googleCredential = null;
+      currentDashboardData = null;
+      currentIsExecutive = false;
+      currentIsSuperAdmin = false;
+      currentMaintenanceMode = false;
+      currentUserProfile = null;
+      savedTeamStatistics = null;
+      savedExternalApprovals = null;
+      externalPendingCount = 0;
+      signInRequestInFlight = false;
+      location.reload();
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() { toast.classList.remove("show"); }, 2600);
+    }
+
+    function showLoginError(error) {
+      signInRequestInFlight = false;
+      setSignInLoading(false);
+      const errorDiv = document.getElementById("error-msg");
+      errorDiv.textContent = error && error.message ? error.message : "Error connecting to the order database.";
+      errorDiv.style.display = "block";
+    }
+
+    function hideLoginError() {
+      const errorDiv = document.getElementById("error-msg");
+      if (errorDiv) errorDiv.style.display = "none";
+    }
+
+    function safeHttpUrl(value) {
+      const url = String(value || "").trim();
+      return /^https?:\/\//i.test(url) ? url : "";
+    }
+
+    function money(value) {
+      const number = Number(value || 0);
+      return Number.isFinite(number) ? number.toFixed(2) : "0.00";
+    }
+
+    function capitalize(value) {
+      const text = String(value || "").toLowerCase();
+      return text ? text.charAt(0).toUpperCase() + text.slice(1) : "Low";
+    }
+
+    function escapeHTML(value) {
+      if (value === null || value === undefined) return "";
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function escapeAttribute(value) { return escapeHTML(value); }
+  </script>
+</body>
+</html>
