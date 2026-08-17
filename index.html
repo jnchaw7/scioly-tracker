@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#111111">
-  <meta name="scioly-portal-build" content="unified-release-manager-v23.5">
-  <meta name="scioly-portal-version" content="v23.5">
+  <meta name="scioly-portal-build" content="additive-upload-picker-v23.6">
+  <meta name="scioly-portal-version" content="v23.6">
   <title>SciOly Orders</title>
   <script>
     (function() {
@@ -4248,6 +4248,35 @@
       color:#8b5c13;
       border-color:#e0c58e;
       background:var(--warning-bg);
+    }
+    .release-file-chip-v235.uploaded-v236 {
+      border-color:#b8d8c4;
+      background:var(--success-bg);
+    }
+    .release-file-remove-v236 {
+      display:inline-grid;
+      place-items:center;
+      width:18px;
+      height:18px;
+      margin:-2px -3px -2px 1px;
+      padding:0;
+      border:0;
+      border-radius:50%;
+      background:transparent;
+      color:inherit;
+      font:inherit;
+      font-size:13px;
+      font-weight:900;
+      line-height:1;
+      cursor:pointer;
+      opacity:.62;
+      transition:opacity 100ms ease, background 100ms ease;
+    }
+    .release-file-remove-v236:hover,
+    .release-file-remove-v236:focus-visible {
+      opacity:1;
+      background:rgba(127,127,127,.12);
+      outline:none;
     }
     .release-manager-actions {
       display:flex;
@@ -12653,6 +12682,9 @@
     let releaseFilesV235 = new Map();
     let releaseManualFilesV235 = new Map();
     let releaseFilesUploadedV235 = false;
+    // v23.6 tracks uploads per file slot so adding one new file does not
+    // resend/rewrite the already-uploaded selected files.
+    let releaseUploadedSlotsV236 = new Set();
     let releaseWizardUploadPromiseV235 = null;
     let releaseWizardUploadCompleteV235 = false;
     let releaseWizardUploadErrorV235 = "";
@@ -12687,43 +12719,124 @@
       })[slot] || slot;
     }
 
+    function syncReleaseFilesUploadedV236() {
+      if (!releaseFilesV235.size) {
+        releaseFilesUploadedV235 = true;
+        return true;
+      }
+      let complete = true;
+      releaseFilesV235.forEach(function(file,slot) {
+        if (!releaseUploadedSlotsV236.has(slot)) complete = false;
+      });
+      releaseFilesUploadedV235 = complete;
+      return complete;
+    }
+
+    function refreshReleaseSelectedFilesV236(message,kind) {
+      const target = document.getElementById("release-selected-files-v235");
+      if (target) target.innerHTML = renderReleaseSelectedFilesV235();
+      const note = document.getElementById("release-file-note-v235");
+      if (note && message !== undefined) {
+        note.textContent = message;
+        note.style.color = kind === "error" ? "var(--danger)" : kind === "success" ? "var(--success)" : "";
+      }
+      const input = document.getElementById("release-files-input-v235");
+      if (input) input.value = "";
+    }
+
     function handleReleaseFilesV235(fileList) {
-      releaseFilesV235 = new Map();
-      releaseManualFilesV235 = new Map();
-      releaseFilesUploadedV235 = false;
+      // v23.6: additive picker. Choosing more files no longer wipes the old list.
       const unsupported = [];
+      const duplicates = [];
+      const added = [];
 
       Array.from(fileList || []).forEach(function(file) {
         const lower = String(file.name || "").trim().toLowerCase();
         const slot = RELEASE_FILE_SLOTS_V235[lower];
+
         if (slot) {
+          if (releaseFilesV235.has(slot)) {
+            duplicates.push(releaseFileLabelV235(slot));
+            return;
+          }
           releaseFilesV235.set(slot,file);
-        } else if (lower === "code.gs" || lower === "appsscript.json") {
-          releaseManualFilesV235.set(lower,file);
-        } else {
-          unsupported.push(file.name);
+          releaseUploadedSlotsV236.delete(slot);
+          added.push(releaseFileLabelV235(slot));
+          return;
         }
+
+        if (lower === "code.gs" || lower === "appsscript.json") {
+          if (releaseManualFilesV235.has(lower)) {
+            duplicates.push(file.name);
+            return;
+          }
+          releaseManualFilesV235.set(lower,file);
+          added.push(file.name);
+          return;
+        }
+
+        unsupported.push(file.name);
       });
 
-      const target = document.getElementById("release-selected-files-v235");
-      if (target) target.innerHTML = renderReleaseSelectedFilesV235();
-      const note = document.getElementById("release-file-note-v235");
-      if (note) {
-        note.textContent = unsupported.length
-          ? `Ignored unsupported file${unsupported.length === 1 ? "" : "s"}: ${unsupported.join(", ")}`
-          : releaseFilesV235.size || releaseManualFilesV235.size
-            ? "Ready. You can upload all selected Git files with one button, or start Publish Update and the upload will happen automatically."
-            : "Choose the files from the update package.";
+      syncReleaseFilesUploadedV236();
+
+      let message = "";
+      if (unsupported.length) {
+        message = `Ignored unsupported file${unsupported.length === 1 ? "" : "s"}: ${unsupported.join(", ")}`;
+      } else if (duplicates.length) {
+        message = `${duplicates.join(", ")} ${duplicates.length === 1 ? "is" : "are"} already selected. Click × on the old file first if you want to replace it.`;
+      } else if (added.length) {
+        message = `Added ${added.length} file${added.length === 1 ? "" : "s"}. Existing selections were kept.`;
+      } else {
+        message = releaseFilesV235.size || releaseManualFilesV235.size
+          ? "Selected files are ready."
+          : "Choose the files from the update package.";
       }
+      refreshReleaseSelectedFilesV236(message);
+    }
+
+    function removeReleaseFileV236(kind,key) {
+      const decoded = decodeURIComponent(String(key || ""));
+      if (kind === "git") {
+        releaseFilesV235.delete(decoded);
+        releaseUploadedSlotsV236.delete(decoded);
+      } else if (kind === "manual") {
+        releaseManualFilesV235.delete(decoded);
+      }
+
+      syncReleaseFilesUploadedV236();
+      releaseWizardUploadCompleteV235 = releaseFilesUploadedV235 || !releaseFilesV235.size;
+      releaseWizardUploadErrorV235 = "";
+
+      refreshReleaseSelectedFilesV236(
+        "Removed from this upload selection. This does not delete or undo a file that was already committed to the DEV branch."
+      );
+    }
+
+    function clearReleaseFilesV236() {
+      releaseFilesV235.clear();
+      releaseManualFilesV235.clear();
+      releaseUploadedSlotsV236.clear();
+      releaseFilesUploadedV235 = true;
+      releaseWizardUploadCompleteV235 = true;
+      releaseWizardUploadErrorV235 = "";
+      refreshReleaseSelectedFilesV236("Upload selection cleared.");
     }
 
     function renderReleaseSelectedFilesV235() {
       const chips = [];
       releaseFilesV235.forEach(function(file,slot) {
-        chips.push(`<span class="release-file-chip-v235">${escapeHTML(releaseFileLabelV235(slot))}</span>`);
+        const uploaded = releaseUploadedSlotsV236.has(slot);
+        chips.push(`<span class="release-file-chip-v235 ${uploaded ? "uploaded-v236" : ""}">
+          <span>${escapeHTML(releaseFileLabelV235(slot))}${uploaded ? " · uploaded" : ""}</span>
+          <button class="release-file-remove-v236" type="button" aria-label="Remove ${escapeAttribute(releaseFileLabelV235(slot))}" title="Remove from selection" onclick="removeReleaseFileV236('git','${escapeAttribute(encodeURIComponent(slot))}')">×</button>
+        </span>`);
       });
       releaseManualFilesV235.forEach(function(file,name) {
-        chips.push(`<span class="release-file-chip-v235 manual">${escapeHTML(file.name)} · manual Apps Script</span>`);
+        chips.push(`<span class="release-file-chip-v235 manual">
+          <span>${escapeHTML(file.name)} · manual Apps Script</span>
+          <button class="release-file-remove-v236" type="button" aria-label="Remove ${escapeAttribute(file.name)}" title="Remove from selection" onclick="removeReleaseFileV236('manual','${escapeAttribute(encodeURIComponent(name))}')">×</button>
+        </span>`);
       });
       return chips.length ? chips.join("") : `<span class="meta">No files selected yet.</span>`;
     }
@@ -12751,18 +12864,38 @@
         throw new Error("Choose at least one GitHub file first.");
       }
 
-      if (button) { button.disabled = true; button.textContent = "Uploading all…"; }
-      setReleaseManagerUploadStatusV235(`Encoding ${releaseFilesV235.size} file${releaseFilesV235.size === 1 ? "" : "s"}…`);
+      const pendingSlots = [];
+      releaseFilesV235.forEach(function(file,slot) {
+        if (!releaseUploadedSlotsV236.has(slot)) pendingSlots.push(slot);
+      });
+
+      if (!pendingSlots.length) {
+        syncReleaseFilesUploadedV236();
+        setReleaseManagerUploadStatusV235("All currently selected Git files are already uploaded to DEV.","success");
+        if (quiet) return {count:0,uploads:[],alreadyUploaded:true};
+        return {count:0,uploads:[],alreadyUploaded:true};
+      }
+
+      if (button) { button.disabled = true; button.textContent = "Uploading new files…"; }
+      setReleaseManagerUploadStatusV235(`Encoding ${pendingSlots.length} new file${pendingSlots.length === 1 ? "" : "s"}…`);
 
       try {
-        const files = await readReleaseFilesV235();
-        setReleaseManagerUploadStatusV235(`Uploading ${files.length} file${files.length === 1 ? "" : "s"} to DEV…`);
+        const files = [];
+        for (const slot of pendingSlots) {
+          const file = releaseFilesV235.get(slot);
+          if (!file) continue;
+          const encoded = await readDeveloperFile(file);
+          files.push({slot:slot,file:encoded});
+        }
+
+        setReleaseManagerUploadStatusV235(`Uploading ${files.length} new file${files.length === 1 ? "" : "s"} to DEV…`);
 
         if (localPreviewMode) {
           await new Promise(function(resolve){ setTimeout(resolve,350); });
-          releaseFilesUploadedV235 = true;
+          files.forEach(function(entry){ releaseUploadedSlotsV236.add(entry.slot); });
+          syncReleaseFilesUploadedV236();
           const result = {count:files.length,uploads:files.map(function(entry){ return {slot:entry.slot,branch:"dev"}; })};
-          setReleaseManagerUploadStatusV235(`${files.length} file${files.length === 1 ? "" : "s"} uploaded to DEV.`,"success");
+          refreshReleaseSelectedFilesV236(`${files.length} new file${files.length === 1 ? "" : "s"} uploaded to DEV.`,"success");
           return result;
         }
 
@@ -12771,15 +12904,20 @@
           files:files
         });
         if (result.type !== "releaseManagerUploadAllV235") throw new Error(result.message || "The DEV upload failed.");
-        releaseFilesUploadedV235 = true;
-        setReleaseManagerUploadStatusV235(`${Number(result.data && result.data.count || files.length)} file${files.length === 1 ? "" : "s"} uploaded to DEV.`,"success");
+
+        files.forEach(function(entry){ releaseUploadedSlotsV236.add(entry.slot); });
+        syncReleaseFilesUploadedV236();
+        refreshReleaseSelectedFilesV236(
+          `${Number(result.data && result.data.count || files.length)} new file${files.length === 1 ? "" : "s"} uploaded to DEV. Previously uploaded selected files were not resent.`,
+          "success"
+        );
         return result.data || {};
       } catch (error) {
-        releaseFilesUploadedV235 = false;
+        syncReleaseFilesUploadedV236();
         setReleaseManagerUploadStatusV235(error.message || "The DEV upload failed.","error");
         throw error;
       } finally {
-        if (button) { button.disabled = false; button.textContent = "Upload all selected to DEV"; }
+        if (button) { button.disabled = false; button.textContent = "Upload selected changes to DEV"; }
       }
     }
 
@@ -12825,13 +12963,13 @@
         <div class="treasury-toolbar">
           <div>
             <h2 class="stats-section-title" style="margin:0">Release Manager</h2>
-            <p class="section-caption" style="margin-top:4px">One release flow: upload everything to DEV, stage the notes, test DEV, then one Publish button promotes code and announces it to students.</p>
+            <p class="section-caption" style="margin-top:4px">One release flow: add only the files you changed, remove mistakes with ×, upload the pending changes to DEV, test, then Publish.</p>
           </div>
           <span class="admin-pill ${configReady ? "" : "locked"}">${configReady ? "Ready" : "Setup needed"}</span>
         </div>
 
         <div class="release-manager-steps">
-          <div class="release-manager-step"><span class="release-manager-step-number">1</span><span><strong>Upload DEV</strong><br>All selected Git files in one action.</span></div>
+          <div class="release-manager-step"><span class="release-manager-step-number">1</span><span><strong>Upload DEV</strong><br>Add files over time; only pending changes upload.</span></div>
           <div class="release-manager-step"><span class="release-manager-step-number">2</span><span><strong>Stage + test</strong><br>Release notes + stable DEV website.</span></div>
           <div class="release-manager-step"><span class="release-manager-step-number">3</span><span><strong>Publish</strong><br>DEV → main + student update popup.</span></div>
         </div>
@@ -12853,13 +12991,13 @@
 
         <div class="release-manager-drop">
           <div class="developer-upload-name">Update files</div>
-          <div class="developer-upload-path">Choose any/all files from the package. GitHub files are mapped automatically by filename. Code.gs and appsscript.json are shown as manual Apps Script files and are never committed to GitHub.</div>
+          <div class="developer-upload-path">Choose files in one or several batches. New picks are added to the list instead of replacing it. Click × to remove a file. If a filename slot is already selected, remove the old one before choosing its replacement.</div>
           <input class="release-manager-file-input" id="release-files-input-v235" type="file" multiple accept=".html,.java,.yml,.yaml,.xml,.gs,.json" onchange="handleReleaseFilesV235(this.files)">
           <div class="release-selected-files-v235" id="release-selected-files-v235">${renderReleaseSelectedFilesV235()}</div>
           <div class="developer-upload-state" id="release-file-note-v235">Choose the files from the update package.</div>
           <div class="release-manager-actions">
             <div class="release-manager-actions-left">
-              <button class="button" type="button" onclick="uploadAllReleaseFilesV235(this,false).catch(function(error){showToast(error.message||'Upload failed.');})">Upload all selected to DEV</button>
+              <button class="button" type="button" onclick="uploadAllReleaseFilesV235(this,false).catch(function(error){showToast(error.message||'Upload failed.');})">Upload selected changes to DEV</button>
               ${devUrl ? `<a class="button button-quiet" href="${escapeAttribute(devUrl)}" target="_blank" rel="noopener">Open DEV website ↗</a>` : ""}
             </div>
             <div class="release-manager-actions-right">
