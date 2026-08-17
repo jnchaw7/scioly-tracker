@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#111111">
-  <meta name="scioly-portal-build" content="real-dev-branch-deployment-center-v23.3">
-  <meta name="scioly-portal-version" content="v23.3">
+  <meta name="scioly-portal-build" content="dev-recovery-last-click-wins-v23.4">
+  <meta name="scioly-portal-version" content="v23.4">
   <title>SciOly Orders</title>
   <script>
     (function() {
@@ -4036,6 +4036,106 @@
     }
 
   </style>
+
+  <style>
+
+    /* ==========================================================
+       v23.4 DEV recovery + module reset center
+       ========================================================== */
+    .dev-recovery-banner {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      padding:12px 13px;
+      border:1px solid #e0c58e;
+      border-radius:12px;
+      background:var(--warning-bg);
+      color:#704500;
+      font-size:9px;
+      line-height:1.55;
+    }
+    .dev-recovery-banner strong { font-size:10px; }
+    .dev-recovery-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+    .dev-reset-card {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:center;
+      gap:12px;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--surface-soft);
+      overflow:hidden;
+    }
+    .dev-reset-card-title {
+      color:var(--ink);
+      font-size:10px;
+      font-weight:900;
+    }
+    .dev-reset-card-copy {
+      margin-top:3px;
+      color:var(--muted);
+      font-size:8.5px;
+      line-height:1.5;
+    }
+    .meeting-recovery-list {
+      display:grid;
+      gap:8px;
+      margin-top:12px;
+    }
+    .meeting-recovery-row {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:12px;
+      align-items:center;
+      padding:11px 12px;
+      border:1px solid var(--line);
+      border-radius:11px;
+      background:var(--surface-soft);
+    }
+    .meeting-recovery-title {
+      color:var(--ink);
+      font-size:10px;
+      font-weight:900;
+      overflow-wrap:anywhere;
+    }
+    .meeting-recovery-meta {
+      margin-top:3px;
+      color:var(--muted);
+      font-size:8.5px;
+      line-height:1.5;
+    }
+    .meeting-recovery-actions {
+      display:flex;
+      align-items:center;
+      gap:7px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .dev-tool-locked {
+      padding:13px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      color:var(--muted);
+      background:var(--surface-soft);
+      font-size:9px;
+      line-height:1.55;
+    }
+    @media (max-width:760px) {
+      .dev-recovery-grid { grid-template-columns:1fr; }
+      .dev-reset-card,
+      .meeting-recovery-row { grid-template-columns:1fr; }
+      .meeting-recovery-actions { justify-content:flex-start; }
+    }
+
+  </style>
 </head>
 <body>
   <section class="login-page" id="login-page">
@@ -5306,7 +5406,10 @@
           signInRequestInFlight = false;
           setSignInLoading(false);
           initializeApp();
-          navigateTo("orders");
+          // v23.4: a real browser refresh/redeploy returns to the page the user
+          // was actually viewing instead of forcing Orders/top-of-page.
+          const savedViewV234 = portalReadViewStateV234();
+          navigateTo(savedViewV234 && savedViewV234.page ? savedViewV234.page : "orders");
           if (currentUserProfile.needsOnboarding || currentUserProfile.needsName) showOnboarding();
           window.setTimeout(afterPortalLoginReleaseCheck, 120);
         })
@@ -6308,10 +6411,10 @@
           unreadMessageCount = Number(savedInbox.unreadCount || 0);
           inboxMessageCount = Number(savedInbox.messageCount || 0);
           updateInboxBadge();
-          renderInbox(savedInbox);
+          if (currentPage === "inbox") renderInbox(savedInbox);
         })
         .catch(function(error) {
-          document.getElementById("page-content").innerHTML = pageHeader("Inbox", "Messages and tracker notifications.", false) + emptyState("!", "Unable to load inbox", error.message || "Please try again.", false);
+          if (currentPage === "inbox") document.getElementById("page-content").innerHTML = pageHeader("Inbox", "Messages and tracker notifications.", false) + emptyState("!", "Unable to load inbox", error.message || "Please try again.", false);
         });
     }
 
@@ -6599,10 +6702,10 @@
           savedMaterialRequests = result.data || { printers: [], myRequests: [], assignedRequests: [], summary: {} };
           materialSummary = savedMaterialRequests.summary || materialSummary;
           updateMaterialsBadge();
-          renderMaterialRequests(savedMaterialRequests);
+          if (currentPage === "materials") renderMaterialRequests(savedMaterialRequests);
         })
         .catch(function(error) {
-          document.getElementById("page-content").innerHTML = pageHeader("3D Printing", "Upload STL files and track each print batch.", false) + emptyState("!", "Unable to load requests", error.message || "Please try again.", false);
+          if (currentPage === "materials") document.getElementById("page-content").innerHTML = pageHeader("3D Printing", "Upload STL files and track each print batch.", false) + emptyState("!", "Unable to load requests", error.message || "Please try again.", false);
         });
     }
 
@@ -7093,17 +7196,17 @@
       window.printQueueSelection = window.printQueueSelection || {};
 
       if (savedMaterialRequests) {
-        renderPrintingQueue(savedMaterialRequests);
+        if (currentPage === "printqueue") renderPrintingQueue(savedMaterialRequests);
         return;
       }
 
-      document.getElementById("page-content").innerHTML = loadingState("Loading your print queue…");
+      if (currentPage === "printqueue") document.getElementById("page-content").innerHTML = loadingState("Loading your print queue…");
 
       if (localPreviewMode) {
         savedMaterialRequests = buildPreviewMaterialRequests(currentDashboardData.email, true);
         materialSummary = savedMaterialRequests.summary;
         updateMaterialsBadge();
-        renderPrintingQueue(savedMaterialRequests);
+        if (currentPage === "printqueue") renderPrintingQueue(savedMaterialRequests);
         return;
       }
 
@@ -7113,10 +7216,10 @@
           savedMaterialRequests = result.data || { assignedRequests: [], summary: {} };
           materialSummary = savedMaterialRequests.summary || materialSummary;
           updateMaterialsBadge();
-          renderPrintingQueue(savedMaterialRequests);
+          if (currentPage === "printqueue") renderPrintingQueue(savedMaterialRequests);
         })
         .catch(function(error) {
-          document.getElementById("page-content").innerHTML = pageHeader("Print queue", "Assigned STL batches and downloads.", false) + emptyState("!", "Unable to load the print queue", error.message || "Please try again.", false);
+          if (currentPage === "printqueue") document.getElementById("page-content").innerHTML = pageHeader("Print queue", "Assigned STL batches and downloads.", false) + emptyState("!", "Unable to load the print queue", error.message || "Please try again.", false);
         });
     }
 
@@ -7633,18 +7736,18 @@
       if (!currentIsExecutive) return;
       currentPage = "team";
       if (savedTeamStatistics) {
-        renderTeamStatistics(savedTeamStatistics);
+        if (currentPage === "team") renderTeamStatistics(savedTeamStatistics);
         return;
       }
-      document.getElementById("page-content").innerHTML = loadingState("Loading team insights…");
+      if (currentPage === "team") document.getElementById("page-content").innerHTML = loadingState("Loading team insights…");
       apiRequest({ action: "teamStatistics" })
         .then(function(result) {
           if (result.type !== "teamStatistics") throw new Error(result.message || "Unable to load team statistics.");
           savedTeamStatistics = result.data || {};
-          renderTeamStatistics(savedTeamStatistics);
+          if (currentPage === "team") renderTeamStatistics(savedTeamStatistics);
         })
         .catch(function(error) {
-          document.getElementById("page-content").innerHTML = pageHeader("Team insights", "Team-wide order and spending information.", false) + emptyState("!", "Unable to load team insights", error.message || "Please try again.", false);
+          if (currentPage === "team") document.getElementById("page-content").innerHTML = pageHeader("Team insights", "Team-wide order and spending information.", false) + emptyState("!", "Unable to load team insights", error.message || "Please try again.", false);
         });
     }
 
@@ -8008,14 +8111,14 @@
 
       currentPage = "approvals";
       if (savedExternalApprovals) {
-        renderExternalApprovals(savedExternalApprovals);
+        if (currentPage === "approvals") renderExternalApprovals(savedExternalApprovals);
         return;
       }
 
-      document.getElementById("page-content").innerHTML = loadingState("Checking external form emails…");
+      if (currentPage === "approvals") document.getElementById("page-content").innerHTML = loadingState("Checking external form emails…");
       if (localPreviewMode) {
         savedExternalApprovals = buildPreviewExternalApprovals();
-        renderExternalApprovals(savedExternalApprovals);
+        if (currentPage === "approvals") renderExternalApprovals(savedExternalApprovals);
         return;
       }
 
@@ -8025,10 +8128,10 @@
           savedExternalApprovals = result.data || { pendingCount: 0, approvedCount: 0, rejectedCount: 0, entries: [] };
           externalPendingCount = Number(savedExternalApprovals.pendingCount || 0);
           updateExternalApprovalBadge();
-          renderExternalApprovals(savedExternalApprovals);
+          if (currentPage === "approvals") renderExternalApprovals(savedExternalApprovals);
         })
         .catch(function(error) {
-          document.getElementById("page-content").innerHTML = pageHeader("External approvals", "Review non-school accounts connected to order activity.", false) + emptyState("!", "Unable to load approvals", error.message || "Please try again.", false);
+          if (currentPage === "approvals") document.getElementById("page-content").innerHTML = pageHeader("External approvals", "Review non-school accounts connected to order activity.", false) + emptyState("!", "Unable to load approvals", error.message || "Please try again.", false);
         });
     }
 
@@ -8204,16 +8307,16 @@
 
       currentPage = "budgets";
       if (savedBudgetCenter) {
-        renderBudgetCenter(savedBudgetCenter);
+        if (currentPage === "budgets") renderBudgetCenter(savedBudgetCenter);
         return;
       }
 
-      document.getElementById("page-content").innerHTML = loadingState("Loading event budgets…");
+      if (currentPage === "budgets") document.getElementById("page-content").innerHTML = loadingState("Loading event budgets…");
       if (localPreviewMode) {
         savedBudgetCenter = buildPreviewBudgetCenter();
         budgetPendingCount = Number(savedBudgetCenter.pendingCount || 0);
         updateBudgetApprovalBadge();
-        renderBudgetCenter(savedBudgetCenter);
+        if (currentPage === "budgets") renderBudgetCenter(savedBudgetCenter);
         return;
       }
 
@@ -8223,10 +8326,10 @@
           savedBudgetCenter = result.data || { pendingCount: 0, approvedCount: 0, rejectedCount: 0, requests: [], rules: [] };
           budgetPendingCount = Number(savedBudgetCenter.pendingCount || 0);
           updateBudgetApprovalBadge();
-          renderBudgetCenter(savedBudgetCenter);
+          if (currentPage === "budgets") renderBudgetCenter(savedBudgetCenter);
         })
         .catch(function(error) {
-          document.getElementById("page-content").innerHTML = pageHeader("Budget center", "Review event limits and overage requests.", false) + emptyState("!", "Unable to load budgets", error.message || "Please try again.", false);
+          if (currentPage === "budgets") document.getElementById("page-content").innerHTML = pageHeader("Budget center", "Review event limits and overage requests.", false) + emptyState("!", "Unable to load budgets", error.message || "Please try again.", false);
         });
     }
 
@@ -8542,9 +8645,9 @@
       if (!currentIsSuperAdmin) { navigateTo("orders"); return; }
       currentPage = "treasury";
       if (savedTreasuryAutomation) {
-        renderTreasuryAutomation(savedTreasuryAutomation);
+        if (currentPage === "treasury") renderTreasuryAutomation(savedTreasuryAutomation);
       } else {
-        document.getElementById("page-content").innerHTML = loadingState("Loading treasury automation…");
+        if (currentPage === "treasury") document.getElementById("page-content").innerHTML = loadingState("Loading treasury automation…");
       }
       apiRequest({ action: "treasuryAutomationData" })
         .then(function(result) {
@@ -8552,10 +8655,10 @@
           savedTreasuryAutomation = result.data || {};
           treasuryRevision = String(savedTreasuryAutomation.revision || "");
           updateTreasuryBadge();
-          renderTreasuryAutomation(savedTreasuryAutomation);
+          if (currentPage === "treasury") renderTreasuryAutomation(savedTreasuryAutomation);
         })
         .catch(function(error) {
-          document.getElementById("page-content").innerHTML = pageHeader("Treasury automation", "Select orders for the treasury worker and follow approval batches.", false) + emptyState("!", "Unable to load treasury automation", error.message || "Please try again.", false);
+          if (currentPage === "treasury") document.getElementById("page-content").innerHTML = pageHeader("Treasury automation", "Select orders for the treasury worker and follow approval batches.", false) + emptyState("!", "Unable to load treasury automation", error.message || "Please try again.", false);
         });
     }
 
@@ -11611,7 +11714,7 @@
       const website = state.website || {};
       const worker = state.worker || {};
       const hasToken = state.hasToken === true;
-      const ready = hasToken && website.repo && worker.repo;
+      const ready = Boolean(hasToken && !state.error && website.repo && worker.repo && website.prodExists && website.devExists && worker.prodExists && worker.devExists);
       const devUrl = safeHttpUrl(website.devUrl || "");
       const websiteDevGit = developerDeploymentGithubUrl(website.owner,website.repo,website.devBranch);
       const workerDevGit = developerDeploymentGithubUrl(worker.owner,worker.repo,worker.devBranch);
@@ -11623,7 +11726,7 @@
               <h2 class="stats-section-title" style="margin:0">Developer Deployment Center</h2>
               <p class="section-caption" style="margin-top:4px">This is the real staging system: files upload only to <strong>dev</strong> branches first. Students remain on <strong>main</strong>. Test the Vercel dev deployment, then promote dev → main when it is ready.</p>
             </div>
-            <span class="admin-pill ${ready ? "" : "locked"}">${ready ? "Git staging configured" : "Setup required"}</span>
+            <span class="admin-pill ${ready ? "" : "locked"}">${ready ? "Git staging ready" : (state.error ? "Git access needs attention" : "Setup required")}</span>
           </div>
 
           ${state.error ? `<div class="approval-note warning" style="margin-top:12px"><strong>Deployment setup:</strong> ${escapeHTML(state.error)}</div>` : ""}
@@ -11923,6 +12026,419 @@
       renderAdminPageBeforeV233DeveloperCenter();
       window.setTimeout(appendDeveloperDeploymentCenter,0);
     };
+
+
+    /* ========================================================================
+     * v23.4 DEV RECOVERY / PRESERVATION / LAST-CLICK-WINS
+     * ======================================================================== */
+
+    let savedAdminDevRecoveryV234 = null;
+
+    function configuredDevOriginV234() {
+      const state = savedDeveloperDeploymentState || {};
+      const raw = state.website && state.website.devUrl ? String(state.website.devUrl) : "";
+      if (!raw) return "";
+      try { return new URL(raw).origin.toLowerCase(); }
+      catch (error) { return ""; }
+    }
+
+    function isConfiguredRealDevSiteV234() {
+      const configured = configuredDevOriginV234();
+      return Boolean(
+        currentIsSuperAdmin &&
+        configured &&
+        window.location.origin.toLowerCase() === configured
+      );
+    }
+
+    function devRequestBaseV234(action) {
+      return {
+        action:action,
+        origin:window.location.origin
+      };
+    }
+
+    function renderMeetingRecoveryRowV234(item) {
+      const state = String(item.state || "QUEUED").toUpperCase();
+      const running = state === "MINUTES_RUNNING";
+      return `<div class="meeting-recovery-row">
+        <div>
+          <div class="meeting-recovery-title">${escapeHTML(item.itemName || "Unnamed item")}</div>
+          <div class="meeting-recovery-meta">
+            ${escapeHTML(item.personName || "Unknown")} · ${escapeHTML(item.eventName || "Unassigned event")}
+            · ${escapeHTML(treasuryStateLabel(state))}
+            ${item.updatedAt ? ` · ${escapeHTML(formatAccessTime(item.updatedAt))}` : ""}
+          </div>
+          ${item.message ? `<div class="meeting-recovery-meta">${escapeHTML(item.message)}</div>` : ""}
+        </div>
+        <div class="meeting-recovery-actions">
+          <span class="developer-branch-pill ${running ? "error" : "dev"}">${escapeHTML(state.replace(/_/g," "))}</span>
+          <button class="button button-quiet" type="button" onclick="releaseMeetingQueueItemV234('${escapeAttribute(encodeURIComponent(item.queueId || ""))}',this)">Release from queue</button>
+        </div>
+      </div>`;
+    }
+
+    function renderAdminDevRecoveryCenterV234(data) {
+      data = data || {};
+      const queue = Array.isArray(data.minutesQueue) ? data.minutesQueue : [];
+      const runs = Array.isArray(data.activeAppRuns) ? data.activeAppRuns : [];
+      const githubError = String(data.githubError || "");
+      const cards = [
+        ["TREASURY","Treasury automation","Clears Treasury queue + worker run state. Master orders and Student Portal Orders are preserved."],
+        ["PRINTING","3D printing jobs","Clears print requests and trashes the portal-managed STL storage folder. Printer roster is preserved."],
+        ["INBOX","Inbox / messages","Clears portal message threads and automated Inbox messages."],
+        ["BUDGET_APPROVALS","Budget approvals","Clears item-level budget/high-value approval request state, then recalculates gates."],
+        ["EXTERNAL_APPROVALS","External approvals","Clears external-account approval decisions and recalculates email gates."],
+        ["EVENT_BUDGETS","Custom event budgets","Clears custom budget rows and restores the normal seeded/default budget sheet behavior."],
+        ["PRINTER_ROSTER","Printer roster","Clears added printer volunteers and restores the built-in printer roster."],
+        ["ACCESS_LOG","Login history","Clears portal access/login history only."],
+        ["PROFILES","User profiles & orientation","Clears saved display names/orientation completion. This is the ONLY reset here that intentionally makes users repeat orientation."]
+      ];
+
+      return `<section class="stats-section" id="admin-dev-recovery-center-v234">
+        <div class="treasury-toolbar">
+          <div>
+            <h2 class="stats-section-title" style="margin:0">DEV Recovery & Reset Center</h2>
+            <p class="section-caption" style="margin-top:4px">Super-admin recovery tools for the configured Vercel DEV website. Normal code uploads and dev → main promotions do not reset portal data.</p>
+          </div>
+          <span class="admin-pill locked">DEV only</span>
+        </div>
+
+        <div class="dev-recovery-banner" style="margin-top:12px">
+          <div>
+            <strong>Updates preserve saved state.</strong><br>
+            Uploading a new index/Java/YAML/pom file, refreshing the page, or promoting DEV → main does not clear profiles, orientation, orders, Inbox, printing, budgets, or Treasury state. Orientation version remains ${escapeHTML(String(data.onboardingVersion || 6))}.
+          </div>
+          <span class="developer-branch-pill dev">No automatic resets</span>
+        </div>
+
+        <div style="margin-top:18px">
+          <div class="treasury-toolbar">
+            <div>
+              <h3 class="stats-section-title" style="margin:0">Meeting worker recovery queue</h3>
+              <p class="section-caption" style="margin-top:4px">See every item currently QUEUED / MINUTES_RUNNING / FAILED / BLOCKED. Release individual stale rows, or reset only the meeting worker.</p>
+            </div>
+            <div class="treasury-selection-actions">
+              <button class="button" type="button" onclick="refreshAdminDevRecoveryV234(this)">Refresh queue</button>
+              <button class="button danger-button" type="button" onclick="confirmResetMeetingWorkerV234()">Reset meeting worker</button>
+            </div>
+          </div>
+
+          ${githubError ? `<div class="approval-note warning" style="margin-top:10px"><strong>GitHub worker status could not be checked:</strong> ${escapeHTML(githubError)}<br>The queue is still shown from Sheets.</div>` : ""}
+          ${runs.length ? `<div class="approval-note warning" style="margin-top:10px"><strong>${runs.length} App.java run${runs.length === 1 ? " is" : "s are"} active.</strong> Reset meeting worker first if a MINUTES_RUNNING row is stuck.</div>` : ""}
+          <div class="meeting-recovery-list">
+            ${queue.length ? queue.map(renderMeetingRecoveryRowV234).join("") : `<div class="no-results">The meeting worker recovery queue is empty.</div>`}
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line)">
+          <h3 class="stats-section-title" style="margin:0">Reset one portal module</h3>
+          <p class="section-caption" style="margin-top:4px">These buttons do not touch Master, Form Responses, Manual Entries, Student Portal Orders, GitHub credentials, or deployment configuration.</p>
+          <div class="dev-recovery-grid">
+            ${cards.map(function(card) {
+              const dangerousProfile = card[0] === "PROFILES";
+              return `<div class="dev-reset-card">
+                <div>
+                  <div class="dev-reset-card-title">${escapeHTML(card[1])}</div>
+                  <div class="dev-reset-card-copy">${escapeHTML(card[2])}</div>
+                </div>
+                <button class="button ${dangerousProfile ? "danger-button" : ""}" type="button" onclick="confirmPortalModuleResetV234('${escapeAttribute(card[0])}','${escapeAttribute(card[1])}')">Reset</button>
+              </div>`;
+            }).join("")}
+          </div>
+        </div>
+      </section>`;
+    }
+
+    function appendAdminDevRecoveryCenterV234() {
+      if (!currentIsSuperAdmin) return;
+      const content = document.getElementById("page-content");
+      if (!content || document.getElementById("admin-dev-recovery-center-v234")) return;
+
+      const host = document.createElement("div");
+      host.id = "admin-dev-recovery-host-v234";
+
+      if (!isConfiguredRealDevSiteV234()) {
+        host.innerHTML = `<section class="stats-section">
+          <h2 class="stats-section-title" style="margin:0">DEV Recovery & Reset Center</h2>
+          <div class="dev-tool-locked" style="margin-top:10px">
+            Recovery/reset buttons are intentionally hidden on the normal student/production website.
+            Save the Vercel DEV preview URL in Developer Deployment Center, then open that DEV site as a super-admin to use them.
+          </div>
+        </section>`;
+        content.appendChild(host);
+        return;
+      }
+
+      host.innerHTML = `<section class="stats-section"><h2 class="stats-section-title">DEV Recovery & Reset Center</h2>${skeletonLoading("Loading meeting worker queue…")}</section>`;
+      content.appendChild(host);
+
+      apiRequest(devRequestBaseV234("adminDevRecoveryState"))
+        .then(function(result) {
+          if (result.type !== "adminDevRecoveryState") throw new Error(result.message || "Recovery state could not be loaded.");
+          savedAdminDevRecoveryV234 = result.data || {};
+          const target = document.getElementById("admin-dev-recovery-host-v234");
+          if (target) target.innerHTML = renderAdminDevRecoveryCenterV234(savedAdminDevRecoveryV234);
+        })
+        .catch(function(error) {
+          const target = document.getElementById("admin-dev-recovery-host-v234");
+          if (target) target.innerHTML = `<section class="stats-section"><h2 class="stats-section-title">DEV Recovery & Reset Center</h2><div class="approval-note warning">${escapeHTML(error.message || "Recovery state could not be loaded.")}</div></section>`;
+        });
+    }
+
+    function refreshAdminDevRecoveryV234(button) {
+      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      if (button) { button.disabled = true; button.textContent = "Refreshing…"; }
+      return apiRequest(devRequestBaseV234("adminDevRecoveryState"))
+        .then(function(result) {
+          if (result.type !== "adminDevRecoveryState") throw new Error(result.message || "Recovery state could not be refreshed.");
+          savedAdminDevRecoveryV234 = result.data || {};
+          const host = document.getElementById("admin-dev-recovery-host-v234");
+          if (host) host.innerHTML = renderAdminDevRecoveryCenterV234(savedAdminDevRecoveryV234);
+          return result;
+        })
+        .catch(function(error) {
+          showToast(error.message || "Recovery state could not be refreshed.");
+          if (button) { button.disabled = false; button.textContent = "Refresh queue"; }
+        });
+    }
+
+    function releaseMeetingQueueItemV234(encodedQueueId,button) {
+      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      const queueId = decodeURIComponent(encodedQueueId || "");
+      if (!queueId) return;
+      if (button) { button.disabled = true; button.textContent = "Releasing…"; }
+
+      apiRequest({
+        ...devRequestBaseV234("adminDevReleaseTreasuryQueueItem"),
+        queueId:queueId
+      }).then(function(result) {
+        if (result.type !== "adminDevRecoveryState") throw new Error(result.message || "The queue item could not be released.");
+        savedAdminDevRecoveryV234 = result.data || {};
+        const host = document.getElementById("admin-dev-recovery-host-v234");
+        if (host) host.innerHTML = renderAdminDevRecoveryCenterV234(savedAdminDevRecoveryV234);
+        savedTreasuryAutomation = null;
+        treasuryK12SeedRevision = "";
+        showToast("Item released. It can be selected for meeting minutes again.");
+      }).catch(function(error) {
+        if (button) { button.disabled = false; button.textContent = "Release from queue"; }
+        showToast(error.message || "The queue item could not be released.");
+      });
+    }
+
+    function confirmResetMeetingWorkerV234() {
+      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      openPortalModal(`
+        <div class="portal-modal-head">
+          <div>
+            <h2 class="portal-modal-title" id="portal-modal-title">Reset the meeting worker?</h2>
+            <p class="portal-modal-copy">This attempts to cancel active App.java meeting/K12 work, then releases every QUEUED, MINUTES_RUNNING, FAILED, or BLOCKED minutes row. It does not delete orders from Master or Student Portal Orders.</p>
+          </div>
+          <button class="modal-close" type="button" onclick="closePortalModal()" aria-label="Close">×</button>
+        </div>
+        <div class="approval-actions">
+          <button class="button danger-button" id="confirm-meeting-reset-v234" type="button" onclick="resetMeetingWorkerV234(this)">Reset meeting worker</button>
+          <button class="button button-quiet" type="button" onclick="closePortalModal()">Cancel</button>
+        </div>
+      `);
+    }
+
+    function resetMeetingWorkerV234(button) {
+      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      if (button) { button.disabled = true; button.textContent = "Resetting…"; }
+      apiRequest(devRequestBaseV234("adminDevResetMeetingWorker"))
+        .then(function(result) {
+          if (result.type !== "adminDevRecoveryState") throw new Error(result.message || "Meeting worker reset failed.");
+          savedAdminDevRecoveryV234 = result.data || {};
+          savedTreasuryAutomation = null;
+          treasurySelection.clear();
+          treasuryK12Selection.clear();
+          treasuryK12SeedRevision = "";
+          closePortalModal();
+          const host = document.getElementById("admin-dev-recovery-host-v234");
+          if (host) host.innerHTML = renderAdminDevRecoveryCenterV234(savedAdminDevRecoveryV234);
+          const reset = result.resetResult || {};
+          showToast(`Meeting worker reset. ${Number(reset.released || 0)} queue item(s) released.`);
+        })
+        .catch(function(error) {
+          showToast(error.message || "Meeting worker reset failed.");
+          if (button) { button.disabled = false; button.textContent = "Reset meeting worker"; }
+        });
+    }
+
+    function confirmPortalModuleResetV234(module,label) {
+      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      const phrase = "RESET " + String(module || "").toUpperCase();
+      const profileWarning = module === "PROFILES"
+        ? `<div class="approval-note warning"><strong>This one intentionally resets orientation.</strong> Normal deployments never do this.</div>`
+        : "";
+      openPortalModal(`
+        <div class="portal-modal-head">
+          <div>
+            <h2 class="portal-modal-title" id="portal-modal-title">Reset ${escapeHTML(label)}?</h2>
+            <p class="portal-modal-copy">Only this portal-owned module will be reset. Core order sources and deployment settings are preserved.</p>
+          </div>
+          <button class="modal-close" type="button" onclick="closePortalModal()" aria-label="Close">×</button>
+        </div>
+        ${profileWarning}
+        <label class="field-group" style="margin-top:12px">
+          <span class="field-label">Type ${escapeHTML(phrase)} to confirm</span>
+          <input class="field-input" id="module-reset-confirmation-v234" autocomplete="off" placeholder="${escapeAttribute(phrase)}">
+        </label>
+        <div class="approval-actions">
+          <button class="button danger-button" id="module-reset-button-v234" type="button" onclick="runPortalModuleResetV234('${escapeAttribute(module)}','${escapeAttribute(label)}',this)">Reset ${escapeHTML(label)}</button>
+          <button class="button button-quiet" type="button" onclick="closePortalModal()">Cancel</button>
+        </div>
+      `);
+    }
+
+    function runPortalModuleResetV234(module,label,button) {
+      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      const input = document.getElementById("module-reset-confirmation-v234");
+      const confirmation = String(input && input.value || "").trim();
+      if (button) { button.disabled = true; button.textContent = "Resetting…"; }
+
+      apiRequest({
+        ...devRequestBaseV234("adminDevResetModule"),
+        module:module,
+        confirmation:confirmation
+      }).then(function(result) {
+        if (result.type !== "adminDevModuleReset") throw new Error(result.message || "Module reset failed.");
+        savedAdminDevRecoveryV234 = result.recovery || savedAdminDevRecoveryV234;
+
+        if (module === "TREASURY") {
+          savedTreasuryAutomation = null;
+          treasurySelection.clear();
+          treasuryK12Selection.clear();
+          treasuryK12SeedRevision = "";
+        } else if (module === "PRINTING" || module === "PRINTER_ROSTER") {
+          savedMaterialRequests = null;
+          materialSummary = {myOpenCount:0,myReadyCount:0,assignedOpenCount:0,recentRequests:[],dashboardRequests:[]};
+        } else if (module === "INBOX") {
+          savedInbox = null;
+          unreadMessageCount = 0;
+          inboxMessageCount = 0;
+        } else if (module === "BUDGET_APPROVALS") {
+          savedBudgetCenter = null;
+          budgetPendingCount = 0;
+        } else if (module === "EXTERNAL_APPROVALS") {
+          savedExternalApprovals = null;
+          externalPendingCount = 0;
+        }
+
+        closePortalModal();
+        const host = document.getElementById("admin-dev-recovery-host-v234");
+        if (host && savedAdminDevRecoveryV234) host.innerHTML = renderAdminDevRecoveryCenterV234(savedAdminDevRecoveryV234);
+        showToast(`${label} reset complete.`);
+      }).catch(function(error) {
+        showToast(error.message || "Module reset failed.");
+        if (button) { button.disabled = false; button.textContent = "Reset " + label; }
+      });
+    }
+
+    // Admin Controls is the only place these recovery/reset tools are added.
+    const renderAdminPageBeforeV234Recovery = renderAdminPage;
+    renderAdminPage = function() {
+      renderAdminPageBeforeV234Recovery();
+      window.setTimeout(appendAdminDevRecoveryCenterV234,0);
+    };
+
+
+    /* ========================================================================
+     * v23.4 SCROLL / REFRESH POSITION PRESERVATION
+     *
+     * A browser refresh, Vercel dev redeploy, heartbeat repaint, or async page
+     * rerender must not throw the user back to the top of the page.  We save
+     * the active portal page + scroll position in sessionStorage and restore it
+     * after DOM replacement settles.  Intentional sidebar navigation is still
+     * allowed to choose its own starting position.
+     * ======================================================================== */
+    const PORTAL_VIEW_STATE_V234 = "scioly.portal.view-state.v23.4";
+    let portalScrollRestoreV234 = null;
+    let portalScrollRestoreTimerV234 = 0;
+    let portalScrollSaveRafV234 = 0;
+
+    function portalReadViewStateV234() {
+      try {
+        const parsed = JSON.parse(sessionStorage.getItem(PORTAL_VIEW_STATE_V234) || "null");
+        if (!parsed || typeof parsed !== "object") return null;
+        return {
+          page:String(parsed.page || "orders"),
+          x:Number(parsed.x || 0),
+          y:Math.max(0,Number(parsed.y || 0)),
+          at:Number(parsed.at || 0)
+        };
+      } catch (ignored) { return null; }
+    }
+
+    function portalWriteViewStateV234() {
+      try {
+        sessionStorage.setItem(PORTAL_VIEW_STATE_V234, JSON.stringify({
+          page:String(currentPage || "orders"),
+          x:Number(window.scrollX || 0),
+          y:Math.max(0,Number(window.scrollY || document.documentElement.scrollTop || 0)),
+          at:Date.now()
+        }));
+      } catch (ignored) {}
+    }
+
+    function portalScheduleScrollSaveV234() {
+      if (portalScrollSaveRafV234) return;
+      portalScrollSaveRafV234 = requestAnimationFrame(function() {
+        portalScrollSaveRafV234 = 0;
+        portalWriteViewStateV234();
+      });
+    }
+
+    function portalApplySavedScrollV234() {
+      if (!portalScrollRestoreV234) return;
+      const state = portalScrollRestoreV234;
+      if (String(currentPage || "orders") !== state.page) return;
+      const maxY = Math.max(0,document.documentElement.scrollHeight - window.innerHeight);
+      const targetY = Math.min(state.y,maxY);
+      window.scrollTo({top:targetY,left:state.x,behavior:"auto"});
+      if (Math.abs((window.scrollY || 0) - targetY) <= 2 || maxY >= state.y) {
+        portalScrollRestoreV234 = null;
+        clearTimeout(portalScrollRestoreTimerV234);
+      }
+    }
+
+    function portalBeginScrollRestoreV234() {
+      const state = portalReadViewStateV234();
+      if (!state) return;
+      // sessionStorage is tab-scoped.  A short age guard prevents an ancient
+      // closed/reopened session from forcing an unexpected position.
+      if (state.at && Date.now() - state.at > 6 * 60 * 60 * 1000) return;
+      portalScrollRestoreV234 = state;
+      const tryRestore = function() {
+        portalApplySavedScrollV234();
+        if (portalScrollRestoreV234) {
+          portalScrollRestoreTimerV234 = window.setTimeout(tryRestore,80);
+        }
+      };
+      requestAnimationFrame(tryRestore);
+    }
+
+    // Capture position before a real refresh/redeploy navigation and while the
+    // user scrolls. pagehide is more reliable than beforeunload on modern UIs.
+    window.addEventListener("scroll",portalScheduleScrollSaveV234,{passive:true});
+    window.addEventListener("pagehide",portalWriteViewStateV234);
+    window.addEventListener("beforeunload",portalWriteViewStateV234);
+
+    // Async API responses frequently replace page-content.  While recovering
+    // from a refresh, keep re-applying the saved position until content reaches
+    // its final height instead of flashing/jumping to y=0.
+    const portalContentForScrollV234 = document.getElementById("page-content");
+    if (portalContentForScrollV234 && window.MutationObserver) {
+      new MutationObserver(function() {
+        if (portalScrollRestoreV234) requestAnimationFrame(portalApplySavedScrollV234);
+      }).observe(portalContentForScrollV234,{childList:true,subtree:true});
+    }
+
+    // Restore after the current script has installed all renderers.  Also keep
+    // browser native history restoration automatic as an extra fallback.
+    try { history.scrollRestoration = "auto"; } catch (ignored) {}
+    portalBeginScrollRestoreV234();
 
 </script>
 </body>
