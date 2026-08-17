@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#111111">
-  <meta name="scioly-portal-build" content="dev-recovery-last-click-wins-v23.4">
-  <meta name="scioly-portal-version" content="v23.4">
+  <meta name="scioly-portal-build" content="unified-release-manager-v23.5">
+  <meta name="scioly-portal-version" content="v23.5">
   <title>SciOly Orders</title>
   <script>
     (function() {
@@ -4133,6 +4133,222 @@
       .dev-reset-card,
       .meeting-recovery-row { grid-template-columns:1fr; }
       .meeting-recovery-actions { justify-content:flex-start; }
+    }
+
+  </style>
+
+  <style>
+
+    /* ==========================================================
+       v23.5 unified release manager
+       ========================================================== */
+    .release-manager-v235 {
+      position:relative;
+    }
+    .release-manager-steps {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+      margin-top:12px;
+    }
+    .release-manager-step {
+      display:flex;
+      align-items:center;
+      gap:9px;
+      padding:10px 11px;
+      border:1px solid var(--line);
+      border-radius:11px;
+      background:var(--surface-soft);
+      color:var(--ink-soft);
+      font-size:8.5px;
+      line-height:1.35;
+    }
+    .release-manager-step-number {
+      display:grid;
+      place-items:center;
+      width:22px;
+      height:22px;
+      flex:0 0 auto;
+      border:1px solid var(--line-strong);
+      border-radius:50%;
+      background:var(--surface);
+      color:var(--ink);
+      font-size:8px;
+      font-weight:950;
+    }
+    .release-manager-status-grid {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+    .release-manager-status-card {
+      padding:13px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--surface-soft);
+    }
+    .release-manager-status-label {
+      color:var(--muted);
+      font-size:7.5px;
+      font-weight:950;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .release-manager-status-value {
+      margin-top:4px;
+      color:var(--ink);
+      font-size:16px;
+      line-height:1.05;
+      font-weight:950;
+    }
+    .release-manager-status-copy {
+      margin-top:4px;
+      color:var(--muted);
+      font-size:8.5px;
+      line-height:1.45;
+    }
+    .release-manager-drop {
+      margin-top:14px;
+      padding:14px;
+      border:1px dashed var(--line-strong);
+      border-radius:13px;
+      background:var(--surface-soft);
+    }
+    .release-manager-file-input {
+      width:100%;
+      padding:9px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:var(--surface);
+      color:var(--ink-soft);
+      font:inherit;
+      font-size:8.5px;
+    }
+    .release-selected-files-v235 {
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      margin-top:9px;
+      min-height:24px;
+    }
+    .release-file-chip-v235 {
+      display:inline-flex;
+      align-items:center;
+      gap:5px;
+      padding:5px 7px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:var(--surface);
+      color:var(--ink-soft);
+      font-size:8px;
+      font-weight:850;
+    }
+    .release-file-chip-v235.manual {
+      color:#8b5c13;
+      border-color:#e0c58e;
+      background:var(--warning-bg);
+    }
+    .release-manager-actions {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top:11px;
+    }
+    .release-manager-actions-left,
+    .release-manager-actions-right {
+      display:flex;
+      gap:7px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .release-primary-v235 {
+      min-width:150px;
+    }
+    .release-manager-history-v235 {
+      display:grid;
+      gap:7px;
+      margin-top:9px;
+    }
+    .release-manager-history-row-v235 {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:10px;
+      align-items:center;
+      padding:10px 11px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--surface-soft);
+    }
+    .release-manager-history-row-v235.current {
+      border-color:rgba(47,134,91,.48);
+    }
+    .release-wizard-v235 {
+      display:grid;
+      gap:12px;
+    }
+    .release-wizard-progress-v235 {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:6px;
+    }
+    .release-wizard-progress-v235 > div {
+      padding:8px;
+      border:1px solid var(--line);
+      border-radius:9px;
+      background:var(--surface-soft);
+      color:var(--muted);
+      font-size:8px;
+      font-weight:850;
+      text-align:center;
+    }
+    .release-wizard-progress-v235 > div.active {
+      color:var(--ink);
+      border-color:var(--line-strong);
+      background:var(--surface);
+    }
+    .release-wizard-progress-v235 > div.done {
+      color:var(--success);
+      border-color:rgba(47,134,91,.28);
+      background:var(--success-bg);
+    }
+    .release-wizard-status-v235 {
+      padding:10px 11px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--surface-soft);
+      color:var(--ink-soft);
+      font-size:8.8px;
+      line-height:1.5;
+    }
+    .release-wizard-status-v235.success {
+      color:var(--success);
+      border-color:rgba(47,134,91,.28);
+      background:var(--success-bg);
+    }
+    .release-wizard-status-v235.warning {
+      color:#704500;
+      border-color:#e0c58e;
+      background:var(--warning-bg);
+    }
+    .release-manager-config-v235 {
+      margin-top:12px;
+    }
+    .release-manager-config-grid-v235 {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:8px;
+      margin-top:10px;
+    }
+    .release-manager-config-grid-v235 .wide { grid-column:1/-1; }
+    @media (max-width:760px) {
+      .release-manager-steps,
+      .release-manager-status-grid,
+      .release-wizard-progress-v235,
+      .release-manager-config-grid-v235 { grid-template-columns:1fr; }
+      .release-manager-config-grid-v235 .wide { grid-column:auto; }
     }
 
   </style>
@@ -12098,15 +12314,15 @@
       return `<section class="stats-section" id="admin-dev-recovery-center-v234">
         <div class="treasury-toolbar">
           <div>
-            <h2 class="stats-section-title" style="margin:0">DEV Recovery & Reset Center</h2>
-            <p class="section-caption" style="margin-top:4px">Super-admin recovery tools for the configured Vercel DEV website. Normal code uploads and dev → main promotions do not reset portal data.</p>
+            <h2 class="stats-section-title" style="margin:0">Recovery & Reset Center</h2>
+            <p class="section-caption" style="margin-top:4px">Super-admin recovery tools for the shared live portal backend. These controls work from both production and DEV; use them carefully because they affect the same real Sheets, messages, print jobs, and Treasury state.</p>
           </div>
-          <span class="admin-pill locked">DEV only</span>
+          <span class="admin-pill locked">Super-admin only</span>
         </div>
 
         <div class="dev-recovery-banner" style="margin-top:12px">
           <div>
-            <strong>Updates preserve saved state.</strong><br>
+            <strong>Shared live data.</strong><br>Actions in this Recovery & Reset Center affect the real portal backend whether you open them from production or DEV. Normal releases themselves still preserve saved state.<br><br><strong>Updates preserve saved state.</strong><br>
             Uploading a new index/Java/YAML/pom file, refreshing the page, or promoting DEV → main does not clear profiles, orientation, orders, Inbox, printing, budgets, or Treasury state. Orientation version remains ${escapeHTML(String(data.onboardingVersion || 6))}.
           </div>
           <span class="developer-branch-pill dev">No automatic resets</span>
@@ -12158,19 +12374,7 @@
       const host = document.createElement("div");
       host.id = "admin-dev-recovery-host-v234";
 
-      if (!isConfiguredRealDevSiteV234()) {
-        host.innerHTML = `<section class="stats-section">
-          <h2 class="stats-section-title" style="margin:0">DEV Recovery & Reset Center</h2>
-          <div class="dev-tool-locked" style="margin-top:10px">
-            Recovery/reset buttons are intentionally hidden on the normal student/production website.
-            Save the Vercel DEV preview URL in Developer Deployment Center, then open that DEV site as a super-admin to use them.
-          </div>
-        </section>`;
-        content.appendChild(host);
-        return;
-      }
-
-      host.innerHTML = `<section class="stats-section"><h2 class="stats-section-title">DEV Recovery & Reset Center</h2>${skeletonLoading("Loading meeting worker queue…")}</section>`;
+      host.innerHTML = `<section class="stats-section"><h2 class="stats-section-title">Recovery & Reset Center</h2>${skeletonLoading("Loading meeting worker queue…")}</section>`;
       content.appendChild(host);
 
       apiRequest(devRequestBaseV234("adminDevRecoveryState"))
@@ -12182,12 +12386,12 @@
         })
         .catch(function(error) {
           const target = document.getElementById("admin-dev-recovery-host-v234");
-          if (target) target.innerHTML = `<section class="stats-section"><h2 class="stats-section-title">DEV Recovery & Reset Center</h2><div class="approval-note warning">${escapeHTML(error.message || "Recovery state could not be loaded.")}</div></section>`;
+          if (target) target.innerHTML = `<section class="stats-section"><h2 class="stats-section-title">Recovery & Reset Center</h2><div class="approval-note warning">${escapeHTML(error.message || "Recovery state could not be loaded.")}</div></section>`;
         });
     }
 
     function refreshAdminDevRecoveryV234(button) {
-      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      if (!currentIsSuperAdmin) return;
       if (button) { button.disabled = true; button.textContent = "Refreshing…"; }
       return apiRequest(devRequestBaseV234("adminDevRecoveryState"))
         .then(function(result) {
@@ -12204,7 +12408,7 @@
     }
 
     function releaseMeetingQueueItemV234(encodedQueueId,button) {
-      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      if (!currentIsSuperAdmin) return;
       const queueId = decodeURIComponent(encodedQueueId || "");
       if (!queueId) return;
       if (button) { button.disabled = true; button.textContent = "Releasing…"; }
@@ -12227,7 +12431,7 @@
     }
 
     function confirmResetMeetingWorkerV234() {
-      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      if (!currentIsSuperAdmin) return;
       openPortalModal(`
         <div class="portal-modal-head">
           <div>
@@ -12244,7 +12448,7 @@
     }
 
     function resetMeetingWorkerV234(button) {
-      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      if (!currentIsSuperAdmin) return;
       if (button) { button.disabled = true; button.textContent = "Resetting…"; }
       apiRequest(devRequestBaseV234("adminDevResetMeetingWorker"))
         .then(function(result) {
@@ -12267,7 +12471,7 @@
     }
 
     function confirmPortalModuleResetV234(module,label) {
-      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      if (!currentIsSuperAdmin) return;
       const phrase = "RESET " + String(module || "").toUpperCase();
       const profileWarning = module === "PROFILES"
         ? `<div class="approval-note warning"><strong>This one intentionally resets orientation.</strong> Normal deployments never do this.</div>`
@@ -12293,7 +12497,7 @@
     }
 
     function runPortalModuleResetV234(module,label,button) {
-      if (!currentIsSuperAdmin || !isConfiguredRealDevSiteV234()) return;
+      if (!currentIsSuperAdmin) return;
       const input = document.getElementById("module-reset-confirmation-v234");
       const confirmation = String(input && input.value || "").trim();
       if (button) { button.disabled = true; button.textContent = "Resetting…"; }
@@ -12439,6 +12643,561 @@
     // browser native history restoration automatic as an extra fallback.
     try { history.scrollRestoration = "auto"; } catch (ignored) {}
     portalBeginScrollRestoreV234();
+
+
+    /* ========================================================================
+     * v23.5 UNIFIED RELEASE MANAGER
+     * ======================================================================== */
+
+    let savedReleaseManagerStateV235 = null;
+    let releaseFilesV235 = new Map();
+    let releaseManualFilesV235 = new Map();
+    let releaseFilesUploadedV235 = false;
+    let releaseWizardUploadPromiseV235 = null;
+    let releaseWizardUploadCompleteV235 = false;
+    let releaseWizardUploadErrorV235 = "";
+
+    const RELEASE_FILE_SLOTS_V235 = {
+      "index.html":"index",
+      "app.java":"app",
+      "statuschecker.java":"status",
+      "treasury-app.yml":"treasuryWorkflow",
+      "treasury-app.yaml":"treasuryWorkflow",
+      "status-checker.yml":"statusWorkflow",
+      "status-checker.yaml":"statusWorkflow",
+      "pom.xml":"pom"
+    };
+
+    function releaseManagerDeploymentV235() {
+      return savedReleaseManagerStateV235 && savedReleaseManagerStateV235.deployment || {};
+    }
+
+    function releaseManagerReleaseV235() {
+      return savedReleaseManagerStateV235 && savedReleaseManagerStateV235.release || {};
+    }
+
+    function releaseFileLabelV235(slot) {
+      return ({
+        index:"index.html",
+        app:"App.java",
+        status:"StatusChecker.java",
+        treasuryWorkflow:"treasury-app.yml",
+        statusWorkflow:"status-checker.yml",
+        pom:"pom.xml"
+      })[slot] || slot;
+    }
+
+    function handleReleaseFilesV235(fileList) {
+      releaseFilesV235 = new Map();
+      releaseManualFilesV235 = new Map();
+      releaseFilesUploadedV235 = false;
+      const unsupported = [];
+
+      Array.from(fileList || []).forEach(function(file) {
+        const lower = String(file.name || "").trim().toLowerCase();
+        const slot = RELEASE_FILE_SLOTS_V235[lower];
+        if (slot) {
+          releaseFilesV235.set(slot,file);
+        } else if (lower === "code.gs" || lower === "appsscript.json") {
+          releaseManualFilesV235.set(lower,file);
+        } else {
+          unsupported.push(file.name);
+        }
+      });
+
+      const target = document.getElementById("release-selected-files-v235");
+      if (target) target.innerHTML = renderReleaseSelectedFilesV235();
+      const note = document.getElementById("release-file-note-v235");
+      if (note) {
+        note.textContent = unsupported.length
+          ? `Ignored unsupported file${unsupported.length === 1 ? "" : "s"}: ${unsupported.join(", ")}`
+          : releaseFilesV235.size || releaseManualFilesV235.size
+            ? "Ready. You can upload all selected Git files with one button, or start Publish Update and the upload will happen automatically."
+            : "Choose the files from the update package.";
+      }
+    }
+
+    function renderReleaseSelectedFilesV235() {
+      const chips = [];
+      releaseFilesV235.forEach(function(file,slot) {
+        chips.push(`<span class="release-file-chip-v235">${escapeHTML(releaseFileLabelV235(slot))}</span>`);
+      });
+      releaseManualFilesV235.forEach(function(file,name) {
+        chips.push(`<span class="release-file-chip-v235 manual">${escapeHTML(file.name)} · manual Apps Script</span>`);
+      });
+      return chips.length ? chips.join("") : `<span class="meta">No files selected yet.</span>`;
+    }
+
+    async function readReleaseFilesV235() {
+      const entries = [];
+      for (const [slot,file] of releaseFilesV235.entries()) {
+        const encoded = await readDeveloperFile(file);
+        entries.push({slot:slot,file:encoded});
+      }
+      return entries;
+    }
+
+    function setReleaseManagerUploadStatusV235(message,kind) {
+      const target = document.getElementById("release-file-note-v235");
+      if (!target) return;
+      target.textContent = message;
+      target.style.color = kind === "error" ? "var(--danger)" : kind === "success" ? "var(--success)" : "";
+    }
+
+    async function uploadAllReleaseFilesV235(button,quiet) {
+      if (!currentIsSuperAdmin) throw new Error("Super-admin access is required.");
+      if (!releaseFilesV235.size) {
+        if (quiet) return {count:0,uploads:[]};
+        throw new Error("Choose at least one GitHub file first.");
+      }
+
+      if (button) { button.disabled = true; button.textContent = "Uploading all…"; }
+      setReleaseManagerUploadStatusV235(`Encoding ${releaseFilesV235.size} file${releaseFilesV235.size === 1 ? "" : "s"}…`);
+
+      try {
+        const files = await readReleaseFilesV235();
+        setReleaseManagerUploadStatusV235(`Uploading ${files.length} file${files.length === 1 ? "" : "s"} to DEV…`);
+
+        if (localPreviewMode) {
+          await new Promise(function(resolve){ setTimeout(resolve,350); });
+          releaseFilesUploadedV235 = true;
+          const result = {count:files.length,uploads:files.map(function(entry){ return {slot:entry.slot,branch:"dev"}; })};
+          setReleaseManagerUploadStatusV235(`${files.length} file${files.length === 1 ? "" : "s"} uploaded to DEV.`,"success");
+          return result;
+        }
+
+        const result = await apiRequest({
+          action:"releaseManagerUploadAllV235",
+          files:files
+        });
+        if (result.type !== "releaseManagerUploadAllV235") throw new Error(result.message || "The DEV upload failed.");
+        releaseFilesUploadedV235 = true;
+        setReleaseManagerUploadStatusV235(`${Number(result.data && result.data.count || files.length)} file${files.length === 1 ? "" : "s"} uploaded to DEV.`,"success");
+        return result.data || {};
+      } catch (error) {
+        releaseFilesUploadedV235 = false;
+        setReleaseManagerUploadStatusV235(error.message || "The DEV upload failed.","error");
+        throw error;
+      } finally {
+        if (button) { button.disabled = false; button.textContent = "Upload all selected to DEV"; }
+      }
+    }
+
+    async function inferSelectedIndexVersionV235() {
+      const file = releaseFilesV235.get("index");
+      if (!file) return "";
+      try {
+        const text = typeof file.text === "function" ? await file.text() : "";
+        const match = text.match(/<meta\s+name=["']scioly-portal-version["']\s+content=["']([^"']+)["']/i) ||
+          text.match(/<meta\s+content=["']([^"']+)["']\s+name=["']scioly-portal-version["']/i);
+        return match ? normalizePortalVersionText(match[1]) : "";
+      } catch (ignored) { return ""; }
+    }
+
+    function releaseManagerConfigReadyV235(deployment) {
+      deployment = deployment || {};
+      const website = deployment.website || {};
+      const worker = deployment.worker || {};
+      return Boolean(
+        deployment.hasToken &&
+        !deployment.error &&
+        website.prodExists && website.devExists &&
+        worker.prodExists && worker.devExists &&
+        safeHttpUrl(website.prodUrl || "") &&
+        safeHttpUrl(website.devUrl || "")
+      );
+    }
+
+    function renderReleaseManagerV235(state) {
+      state = state || {};
+      const release = state.release || {};
+      const deployment = state.deployment || {};
+      const production = release.production || {};
+      const development = release.development || null;
+      const history = Array.isArray(release.history) ? release.history : [];
+      const website = deployment.website || {};
+      const worker = deployment.worker || {};
+      const configReady = releaseManagerConfigReadyV235(deployment);
+      const devUrl = safeHttpUrl(website.devUrl || "");
+      const prodUrl = safeHttpUrl(website.prodUrl || "");
+
+      return `<section class="stats-section release-manager-v235" id="release-manager-v235">
+        <div class="treasury-toolbar">
+          <div>
+            <h2 class="stats-section-title" style="margin:0">Release Manager</h2>
+            <p class="section-caption" style="margin-top:4px">One release flow: upload everything to DEV, stage the notes, test DEV, then one Publish button promotes code and announces it to students.</p>
+          </div>
+          <span class="admin-pill ${configReady ? "" : "locked"}">${configReady ? "Ready" : "Setup needed"}</span>
+        </div>
+
+        <div class="release-manager-steps">
+          <div class="release-manager-step"><span class="release-manager-step-number">1</span><span><strong>Upload DEV</strong><br>All selected Git files in one action.</span></div>
+          <div class="release-manager-step"><span class="release-manager-step-number">2</span><span><strong>Stage + test</strong><br>Release notes + stable DEV website.</span></div>
+          <div class="release-manager-step"><span class="release-manager-step-number">3</span><span><strong>Publish</strong><br>DEV → main + student update popup.</span></div>
+        </div>
+
+        <div class="release-manager-status-grid">
+          <div class="release-manager-status-card">
+            <div class="release-manager-status-label">Student production</div>
+            <div class="release-manager-status-value">${escapeHTML(production.version || "Not initialized")}</div>
+            <div class="release-manager-status-copy">${escapeHTML(production.title || "Current live release")}</div>
+            ${prodUrl ? `<div class="approval-actions" style="margin-top:8px"><a class="button button-quiet" href="${escapeAttribute(prodUrl)}" target="_blank" rel="noopener">Open production ↗</a></div>` : ""}
+          </div>
+          <div class="release-manager-status-card">
+            <div class="release-manager-status-label">DEV candidate</div>
+            <div class="release-manager-status-value">${escapeHTML(development && development.version || "None")}</div>
+            <div class="release-manager-status-copy">${escapeHTML(development && development.title || "Upload a candidate and stage it when ready.")}</div>
+            ${devUrl ? `<div class="approval-actions" style="margin-top:8px"><a class="button button-quiet" href="${escapeAttribute(devUrl)}" target="_blank" rel="noopener">Open DEV ↗</a>${development ? `<button class="button button-primary" type="button" onclick="continueStagedReleaseV235()">Continue ${escapeHTML(development.version)}</button>` : ""}</div>` : ""}
+          </div>
+        </div>
+
+        <div class="release-manager-drop">
+          <div class="developer-upload-name">Update files</div>
+          <div class="developer-upload-path">Choose any/all files from the package. GitHub files are mapped automatically by filename. Code.gs and appsscript.json are shown as manual Apps Script files and are never committed to GitHub.</div>
+          <input class="release-manager-file-input" id="release-files-input-v235" type="file" multiple accept=".html,.java,.yml,.yaml,.xml,.gs,.json" onchange="handleReleaseFilesV235(this.files)">
+          <div class="release-selected-files-v235" id="release-selected-files-v235">${renderReleaseSelectedFilesV235()}</div>
+          <div class="developer-upload-state" id="release-file-note-v235">Choose the files from the update package.</div>
+          <div class="release-manager-actions">
+            <div class="release-manager-actions-left">
+              <button class="button" type="button" onclick="uploadAllReleaseFilesV235(this,false).catch(function(error){showToast(error.message||'Upload failed.');})">Upload all selected to DEV</button>
+              ${devUrl ? `<a class="button button-quiet" href="${escapeAttribute(devUrl)}" target="_blank" rel="noopener">Open DEV website ↗</a>` : ""}
+            </div>
+            <div class="release-manager-actions-right">
+              <button class="button button-primary release-primary-v235" type="button" onclick="openReleaseWizardV235()">Publish update</button>
+            </div>
+          </div>
+        </div>
+
+        <details class="github-connect-card release-manager-config-v235" ${configReady ? "" : "open"}>
+          <summary>
+            <div>
+              <div class="github-connect-title">Deployment settings</div>
+              <div class="github-connect-copy">Usually set once. PAT stays server-side. The stable DEV branch URL should be the git-dev Vercel URL.</div>
+            </div>
+            <span class="github-connect-state ${configReady ? "connected" : ""}">${configReady ? "Configured" : "Setup"}</span>
+          </summary>
+          <div class="github-connect-body">
+            ${deployment.error ? `<div class="approval-note warning"><strong>GitHub:</strong> ${escapeHTML(deployment.error)}</div>` : ""}
+            <div class="release-manager-config-grid-v235">
+              <label class="field-group"><span class="field-label">Website owner</span><input class="field-input" id="rm-owner-v235" value="${escapeAttribute(website.owner || "jnchaw7")}"></label>
+              <label class="field-group"><span class="field-label">Website repo</span><input class="field-input" id="rm-repo-v235" value="${escapeAttribute(website.repo || "scioly-tracker")}"></label>
+              <label class="field-group"><span class="field-label">Production branch</span><input class="field-input" id="rm-prod-branch-v235" value="${escapeAttribute(website.prodBranch || "main")}"></label>
+              <label class="field-group"><span class="field-label">DEV branch</span><input class="field-input" id="rm-dev-branch-v235" value="${escapeAttribute(website.devBranch || "dev")}"></label>
+              <label class="field-group"><span class="field-label">Worker DEV branch</span><input class="field-input" id="rm-worker-dev-v235" value="${escapeAttribute(worker.devBranch || "dev")}"></label>
+              <label class="field-group"><span class="field-label">Worker production branch</span><input class="field-input" value="${escapeAttribute(worker.prodBranch || "main")}" disabled></label>
+              <label class="field-group wide"><span class="field-label">Production Vercel URL</span><input class="field-input" id="rm-prod-url-v235" value="${escapeAttribute(website.prodUrl || "https://scioly-tracker-inky.vercel.app")}" placeholder="https://scioly-tracker-inky.vercel.app"></label>
+              <label class="field-group wide"><span class="field-label">Stable DEV Vercel branch URL</span><input class="field-input" id="rm-dev-url-v235" value="${escapeAttribute(website.devUrl || "")}" placeholder="https://scioly-tracker-git-dev-jchaw7.vercel.app"></label>
+            </div>
+            <div class="approval-actions">
+              <button class="button button-primary" type="button" onclick="saveReleaseManagerConfigV235(this)">Save & verify setup</button>
+              <button class="button" type="button" onclick="refreshReleaseManagerV235(this)">Refresh</button>
+            </div>
+          </div>
+        </details>
+
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">
+          <h3 class="stats-section-title" style="margin:0">Release history</h3>
+          <div class="release-manager-history-v235">
+            ${history.length ? history.slice(0,8).map(function(item) {
+              const current = production.version && item.version === production.version;
+              return `<div class="release-manager-history-row-v235 ${current ? "current" : ""}">
+                <div>
+                  <div class="list-title">${escapeHTML(item.version || "")} · ${escapeHTML(item.title || "Portal update")}</div>
+                  <div class="meta">${current ? "Live" : escapeHTML(item.status || "Archived")}${item.publishedAt ? ` · ${escapeHTML(formatAccessTime(item.publishedAt))}` : ""}</div>
+                </div>
+                ${current ? `<span class="admin-pill">Live</span>` : `<button class="button button-quiet" type="button" onclick="confirmRollbackPortalRelease('${escapeAttribute(encodeURIComponent(item.version || ""))}')">Restore</button>`}
+              </div>`;
+            }).join("") : `<div class="no-results">No release history yet.</div>`}
+          </div>
+        </div>
+      </section>`;
+    }
+
+    function appendReleaseManagerV235() {
+      if (!currentIsSuperAdmin) return;
+      const content = document.getElementById("page-content");
+      if (!content || document.getElementById("release-manager-v235") || document.getElementById("release-manager-host-v235")) return;
+
+      const host = document.createElement("div");
+      host.id = "release-manager-host-v235";
+      host.innerHTML = `<section class="stats-section"><h2 class="stats-section-title">Release Manager</h2>${skeletonLoading("Loading release and Git status…")}</section>`;
+      const recovery = document.getElementById("admin-dev-recovery-host-v234");
+      if (recovery) content.insertBefore(host,recovery); else content.appendChild(host);
+
+      if (localPreviewMode) {
+        savedReleaseManagerStateV235 = {
+          release:{production:{version:"v23.4",title:"Current production",status:"PUBLISHED"},development:null,history:[]},
+          deployment:{hasToken:true,error:"",website:{owner:"jnchaw7",repo:"scioly-tracker",prodBranch:"main",devBranch:"dev",prodUrl:"https://scioly-tracker-inky.vercel.app",devUrl:"https://scioly-tracker-git-dev-jchaw7.vercel.app",prodExists:true,devExists:true},worker:{owner:"jnchaw7",repo:"treasury-automation",prodBranch:"main",devBranch:"dev",prodExists:true,devExists:true}}
+        };
+        savedPortalReleaseState = savedReleaseManagerStateV235.release;
+        savedDeveloperDeploymentState = savedReleaseManagerStateV235.deployment;
+        host.innerHTML = renderReleaseManagerV235(savedReleaseManagerStateV235);
+        return;
+      }
+
+      apiRequest({action:"releaseManagerStateV235"})
+        .then(function(result) {
+          if (result.type !== "releaseManagerStateV235") throw new Error(result.message || "Release Manager could not load.");
+          savedReleaseManagerStateV235 = result.data || {};
+          savedPortalReleaseState = savedReleaseManagerStateV235.release || null;
+          portalReleaseState = savedPortalReleaseState ? {production:savedPortalReleaseState.production || null,development:savedPortalReleaseState.development || null} : portalReleaseState;
+          savedDeveloperDeploymentState = savedReleaseManagerStateV235.deployment || null;
+          const target = document.getElementById("release-manager-host-v235");
+          if (target) target.innerHTML = renderReleaseManagerV235(savedReleaseManagerStateV235);
+        })
+        .catch(function(error) {
+          const target = document.getElementById("release-manager-host-v235");
+          if (target) target.innerHTML = `<section class="stats-section"><h2 class="stats-section-title">Release Manager</h2><div class="approval-note warning">${escapeHTML(error.message || "Release Manager could not load.")}</div></section>`;
+        });
+    }
+
+    function saveReleaseManagerConfigV235(button) {
+      if (!currentIsSuperAdmin) return;
+      const config = {
+        websiteOwner:String(document.getElementById("rm-owner-v235")?.value || "").trim(),
+        websiteRepo:String(document.getElementById("rm-repo-v235")?.value || "").trim(),
+        websiteProdBranch:String(document.getElementById("rm-prod-branch-v235")?.value || "main").trim(),
+        websiteDevBranch:String(document.getElementById("rm-dev-branch-v235")?.value || "dev").trim(),
+        workerDevBranch:String(document.getElementById("rm-worker-dev-v235")?.value || "dev").trim(),
+        prodUrl:String(document.getElementById("rm-prod-url-v235")?.value || "").trim(),
+        devUrl:String(document.getElementById("rm-dev-url-v235")?.value || "").trim()
+      };
+      if (button) { button.disabled = true; button.textContent = "Checking…"; }
+      apiRequest({action:"releaseManagerSaveConfigV235",config:config})
+        .then(function(result) {
+          if (result.type !== "releaseManagerStateV235") throw new Error(result.message || "Deployment setup could not be saved.");
+          savedReleaseManagerStateV235 = result.data || {};
+          savedPortalReleaseState = savedReleaseManagerStateV235.release || null;
+          savedDeveloperDeploymentState = savedReleaseManagerStateV235.deployment || null;
+          renderAdminPage();
+          showToast("Release setup is ready.");
+        })
+        .catch(function(error) {
+          if (button) { button.disabled = false; button.textContent = "Save & verify setup"; }
+          showToast(error.message || "Deployment setup could not be saved.");
+        });
+    }
+
+    function refreshReleaseManagerV235(button) {
+      if (!currentIsSuperAdmin) return Promise.resolve();
+      if (button) { button.disabled = true; button.textContent = "Refreshing…"; }
+      return apiRequest({action:"releaseManagerStateV235",forceRefresh:true})
+        .then(function(result) {
+          if (result.type !== "releaseManagerStateV235") throw new Error(result.message || "Release Manager could not refresh.");
+          savedReleaseManagerStateV235 = result.data || {};
+          savedPortalReleaseState = savedReleaseManagerStateV235.release || null;
+          savedDeveloperDeploymentState = savedReleaseManagerStateV235.deployment || null;
+          const host = document.getElementById("release-manager-host-v235");
+          if (host) host.innerHTML = renderReleaseManagerV235(savedReleaseManagerStateV235);
+        })
+        .catch(function(error) {
+          showToast(error.message || "Release Manager could not refresh.");
+        })
+        .finally(function() {
+          if (button) { button.disabled = false; button.textContent = "Refresh"; }
+        });
+    }
+
+    function releaseWizardManualConfirmationNeededV235() {
+      return releaseManualFilesV235.size > 0;
+    }
+
+    function updateReleaseWizardStageButtonV235() {
+      const button = document.getElementById("release-wizard-stage-v235");
+      if (!button) return;
+      const manual = document.getElementById("release-wizard-manual-v235");
+      button.disabled = !releaseWizardUploadCompleteV235 || Boolean(releaseWizardUploadErrorV235) || (releaseWizardManualConfirmationNeededV235() && !(manual && manual.checked));
+    }
+
+    async function openReleaseWizardV235() {
+      if (!currentIsSuperAdmin) return;
+      const deployment = releaseManagerDeploymentV235();
+      if (!releaseManagerConfigReadyV235(deployment)) {
+        showToast("Finish Deployment settings first so both repos and the stable DEV/production URLs are ready.");
+        return;
+      }
+
+      const existing = releaseManagerReleaseV235().development || null;
+      const inferred = await inferSelectedIndexVersionV235();
+      const version = inferred || existing && existing.version || PORTAL_CLIENT_BUILD_VERSION;
+      const title = existing && existing.title || `Portal Update ${version}`;
+      const notes = existing && Array.isArray(existing.notes) ? existing.notes.join("\n") : "";
+      releaseWizardUploadCompleteV235 = releaseFilesUploadedV235 || !releaseFilesV235.size;
+      releaseWizardUploadErrorV235 = "";
+
+      openPortalModal(`<div class="release-wizard-v235">
+        <div class="portal-modal-head">
+          <div>
+            <h2 class="portal-modal-title" id="portal-modal-title">Publish an update</h2>
+            <p class="portal-modal-copy">Selected Git files upload to DEV automatically in the background. Add the release notes, stage it, test the DEV site, then Publish to students.</p>
+          </div>
+          <button class="modal-close" type="button" onclick="closePortalModal()" aria-label="Close">×</button>
+        </div>
+        <div class="release-wizard-progress-v235"><div class="active" id="rw-step1-v235">1 · Upload DEV</div><div id="rw-step2-v235">2 · Stage + test</div><div id="rw-step3-v235">3 · Publish</div></div>
+        <div class="release-wizard-status-v235" id="release-wizard-upload-status-v235">${releaseFilesUploadedV235 ? "Selected Git files are already uploaded to DEV." : releaseFilesV235.size ? `Uploading ${releaseFilesV235.size} selected Git file${releaseFilesV235.size === 1 ? "" : "s"} to DEV…` : "No new Git files selected. The current DEV branch will be used as-is."}</div>
+        <div class="release-form-grid">
+          <label class="field-group"><span class="field-label">Version</span><input class="field-input" id="release-wizard-version-v235" value="${escapeAttribute(version)}" placeholder="v23.5"></label>
+          <label class="field-group"><span class="field-label">Update title</span><input class="field-input" id="release-wizard-title-v235" value="${escapeAttribute(title)}" placeholder="Portal Update ${escapeAttribute(version)}"></label>
+        </div>
+        <label class="field-group"><span class="field-label">Release notes · one change per line</span><textarea class="field-input" id="release-wizard-notes-v235" rows="6" maxlength="4000" placeholder="Cleaner release workflow&#10;One-click DEV upload&#10;Fixed navigation refresh behavior">${escapeHTML(notes)}</textarea></label>
+        ${releaseWizardManualConfirmationNeededV235() ? `<label class="check-row"><input type="checkbox" id="release-wizard-manual-v235" onchange="updateReleaseWizardStageButtonV235()"><span>I manually updated/deployed ${escapeHTML(Array.from(releaseManualFilesV235.values()).map(function(file){return file.name;}).join(" + "))} in Apps Script.</span></label>` : ""}
+        <div class="approval-actions">
+          <button class="button button-primary" id="release-wizard-stage-v235" type="button" onclick="stageReleaseWizardV235()" ${releaseWizardUploadCompleteV235 && !releaseWizardManualConfirmationNeededV235() ? "" : "disabled"}>Stage on DEV</button>
+          <button class="button button-quiet" type="button" onclick="closePortalModal()">Cancel</button>
+        </div>
+      </div>`);
+
+      if (!releaseFilesUploadedV235 && releaseFilesV235.size) {
+        releaseWizardUploadPromiseV235 = uploadAllReleaseFilesV235(null,true)
+          .then(function(result) {
+            releaseWizardUploadCompleteV235 = true;
+            releaseWizardUploadErrorV235 = "";
+            const status = document.getElementById("release-wizard-upload-status-v235");
+            if (status) { status.className = "release-wizard-status-v235 success"; status.textContent = `${Number(result.count || releaseFilesV235.size)} Git file${releaseFilesV235.size === 1 ? "" : "s"} uploaded to DEV.`; }
+            const step = document.getElementById("rw-step1-v235"); if (step) step.className = "done";
+            updateReleaseWizardStageButtonV235();
+            return result;
+          })
+          .catch(function(error) {
+            releaseWizardUploadErrorV235 = error.message || "DEV upload failed.";
+            const status = document.getElementById("release-wizard-upload-status-v235");
+            if (status) { status.className = "release-wizard-status-v235 warning"; status.textContent = releaseWizardUploadErrorV235; }
+            updateReleaseWizardStageButtonV235();
+          });
+      } else {
+        const step = document.getElementById("rw-step1-v235"); if (step) step.className = "done";
+        updateReleaseWizardStageButtonV235();
+      }
+    }
+
+    function releaseWizardReadReleaseV235() {
+      const version = normalizePortalVersionText(document.getElementById("release-wizard-version-v235")?.value || "");
+      const title = String(document.getElementById("release-wizard-title-v235")?.value || "").trim();
+      const notes = String(document.getElementById("release-wizard-notes-v235")?.value || "")
+        .split(/\n+/).map(function(note){ return note.trim(); }).filter(Boolean);
+      if (!version) throw new Error("Enter a release version.");
+      if (!title) throw new Error("Enter an update title.");
+      if (!notes.length) throw new Error("Add at least one release-note item.");
+      return {version:version,title:title,notes:notes};
+    }
+
+    function stageReleaseWizardV235() {
+      if (!currentIsSuperAdmin || !releaseWizardUploadCompleteV235 || releaseWizardUploadErrorV235) return;
+      let release;
+      try { release = releaseWizardReadReleaseV235(); }
+      catch (error) { showToast(error.message); return; }
+      const button = document.getElementById("release-wizard-stage-v235");
+      if (button) { button.disabled = true; button.textContent = "Staging…"; }
+
+      apiRequest({action:"releaseManagerStageV235",release:release})
+        .then(function(result) {
+          if (result.type !== "releaseManagerStageV235") throw new Error(result.message || "The release could not be staged.");
+          savedReleaseManagerStateV235 = result.data && result.data.state || savedReleaseManagerStateV235;
+          savedPortalReleaseState = savedReleaseManagerStateV235 && savedReleaseManagerStateV235.release || savedPortalReleaseState;
+          savedDeveloperDeploymentState = savedReleaseManagerStateV235 && savedReleaseManagerStateV235.deployment || savedDeveloperDeploymentState;
+          renderReleaseWizardReadyV235(release,result.data && result.data.devBuild || {});
+        })
+        .catch(function(error) {
+          if (button) { button.disabled = false; button.textContent = "Stage on DEV"; }
+          showToast(error.message || "The release could not be staged.");
+        });
+    }
+
+    function renderReleaseWizardReadyV235(release,devBuild) {
+      const body = document.getElementById("portal-modal-content");
+      if (!body) return;
+      const deployment = releaseManagerDeploymentV235();
+      const devUrl = safeHttpUrl(deployment.website && deployment.website.devUrl || "");
+      const ready = devBuild && devBuild.version === release.version;
+      body.innerHTML = `<div class="release-wizard-v235">
+        <div class="portal-modal-head">
+          <div><h2 class="portal-modal-title" id="portal-modal-title">${escapeHTML(release.version)} staged on DEV</h2><p class="portal-modal-copy">Test the real DEV website. When it looks right, one Publish button promotes both repos, waits for Vercel production, and announces the release to students.</p></div>
+          <button class="modal-close" type="button" onclick="closePortalModal()" aria-label="Close">×</button>
+        </div>
+        <div class="release-wizard-progress-v235"><div class="done">1 · Upload DEV</div><div class="done">2 · Stage + test</div><div class="active">3 · Publish</div></div>
+        <div class="release-wizard-status-v235 ${ready ? "success" : "warning"}">${ready ? `DEV is serving ${escapeHTML(release.version)}.` : `DEV may still be deploying. ${devBuild && devBuild.version ? `It is currently serving ${escapeHTML(devBuild.version)}.` : "Open DEV and wait for the new build."}`}</div>
+        <div class="release-notes-hero"><span class="release-notes-version">${escapeHTML(release.version)}</span><h3>${escapeHTML(release.title)}</h3><p>${release.notes.length} release-note item${release.notes.length === 1 ? "" : "s"}</p></div>
+        <ul class="release-notes-preview">${release.notes.map(function(note){return `<li>${escapeHTML(note)}</li>`;}).join("")}</ul>
+        <div class="approval-actions">
+          ${devUrl ? `<a class="button" href="${escapeAttribute(devUrl)}" target="_blank" rel="noopener">Open DEV website ↗</a>` : ""}
+          <button class="button button-primary" id="release-wizard-publish-v235" type="button" onclick="publishReleaseWizardV235('${escapeAttribute(encodeURIComponent(release.version))}')">Publish to students</button>
+          <button class="button button-quiet" type="button" onclick="closePortalModal()">Not yet</button>
+        </div>
+      </div>`;
+    }
+
+    function continueStagedReleaseV235() {
+      const release = releaseManagerReleaseV235().development;
+      if (!release) return;
+      const deployment = releaseManagerDeploymentV235();
+      const devUrl = safeHttpUrl(deployment.website && deployment.website.devUrl || "");
+      openPortalModal(`<div class="release-wizard-v235">
+        <div class="portal-modal-head"><div><h2 class="portal-modal-title" id="portal-modal-title">Continue ${escapeHTML(release.version)}</h2><p class="portal-modal-copy">This release is already staged. Test DEV, then publish it to students.</p></div><button class="modal-close" type="button" onclick="closePortalModal()" aria-label="Close">×</button></div>
+        <div class="release-wizard-progress-v235"><div class="done">1 · Upload DEV</div><div class="done">2 · Stage + test</div><div class="active">3 · Publish</div></div>
+        <div class="release-notes-hero"><span class="release-notes-version">${escapeHTML(release.version)}</span><h3>${escapeHTML(release.title || "Portal update")}</h3></div>
+        ${Array.isArray(release.notes) ? `<ul class="release-notes-preview">${release.notes.map(function(note){return `<li>${escapeHTML(note)}</li>`;}).join("")}</ul>` : ""}
+        <div class="approval-actions">${devUrl ? `<a class="button" href="${escapeAttribute(devUrl)}" target="_blank" rel="noopener">Open DEV website ↗</a>` : ""}<button class="button button-primary" id="release-wizard-publish-v235" type="button" onclick="publishReleaseWizardV235('${escapeAttribute(encodeURIComponent(release.version))}')">Publish to students</button><button class="button button-quiet" type="button" onclick="closePortalModal()">Not yet</button></div>
+      </div>`);
+    }
+
+    function publishReleaseWizardV235(encodedVersion) {
+      if (!currentIsSuperAdmin) return;
+      const version = decodeURIComponent(encodedVersion || "");
+      const button = document.getElementById("release-wizard-publish-v235");
+      if (button) { button.disabled = true; button.textContent = "Publishing…"; }
+      const status = document.createElement("div");
+      status.className = "release-wizard-status-v235";
+      status.textContent = "Promoting worker DEV → main, promoting website DEV → main, then waiting for Vercel production. This can take about a minute.";
+      if (button && button.parentElement) button.parentElement.parentElement.insertBefore(status,button.parentElement);
+
+      apiRequest({action:"releaseManagerPublishV235",version:version})
+        .then(function(result) {
+          if (result.type !== "releaseManagerPublishV235") throw new Error(result.message || "The release could not be published.");
+          savedReleaseManagerStateV235 = result.data && result.data.state || savedReleaseManagerStateV235;
+          savedPortalReleaseState = savedReleaseManagerStateV235 && savedReleaseManagerStateV235.release || savedPortalReleaseState;
+          savedDeveloperDeploymentState = savedReleaseManagerStateV235 && savedReleaseManagerStateV235.deployment || savedDeveloperDeploymentState;
+          const body = document.getElementById("portal-modal-content");
+          if (body) body.innerHTML = `<div class="release-wizard-v235"><div class="portal-modal-head"><div><h2 class="portal-modal-title" id="portal-modal-title">${escapeHTML(version)} is live</h2><p class="portal-modal-copy">DEV was promoted to main, Vercel production was verified, and the student release announcement is published.</p></div><button class="modal-close" type="button" onclick="closePortalModal()" aria-label="Close">×</button></div><div class="release-wizard-progress-v235"><div class="done">1 · Upload DEV</div><div class="done">2 · Stage + test</div><div class="done">3 · Published</div></div><div class="release-wizard-status-v235 success">Done. Active student sessions will update safely through heartbeat; forms are still protected from mid-submit reloads.</div><div class="approval-actions"><button class="button button-primary" type="button" onclick="closePortalModal();renderAdminPage();">Done</button></div></div>`;
+        })
+        .catch(function(error) {
+          if (status) { status.className = "release-wizard-status-v235 warning"; status.textContent = error.message || "Publish failed."; }
+          if (button) { button.disabled = false; button.textContent = "Publish to students"; }
+        });
+    }
+
+    // v23.5 replaces the two confusing release/deployment sections with the
+    // single Release Manager above. The old code remains available internally
+    // for backwards-compatible helper functions and rollback support.
+    appendPortalUpdateCenter = function() {};
+    appendDeveloperDeploymentCenter = function() {};
+
+    // Fix the v23.4 DEV recovery race: do not depend on Developer Deployment
+    // Center having finished its async load first. Ask the backend directly;
+    // the backend remains authoritative about the configured DEV origin.
+    appendAdminDevRecoveryCenterV234 = function() {
+      if (!currentIsSuperAdmin) return;
+      const content = document.getElementById("page-content");
+      if (!content || document.getElementById("admin-dev-recovery-center-v234") || document.getElementById("admin-dev-recovery-host-v234")) return;
+      const host = document.createElement("div");
+      host.id = "admin-dev-recovery-host-v234";
+      host.innerHTML = `<section class="stats-section"><h2 class="stats-section-title">Recovery & Reset Center</h2>${skeletonLoading("Checking DEV access…")}</section>`;
+      content.appendChild(host);
+      apiRequest(devRequestBaseV234("adminDevRecoveryState"))
+        .then(function(result) {
+          if (result.type !== "adminDevRecoveryState") throw new Error(result.message || "Recovery state could not be loaded.");
+          savedAdminDevRecoveryV234 = result.data || {};
+          host.innerHTML = renderAdminDevRecoveryCenterV234(savedAdminDevRecoveryV234);
+        })
+        .catch(function(error) {
+          host.innerHTML = `<section class="stats-section"><h2 class="stats-section-title">Recovery & Reset Center</h2><div class="dev-tool-locked" style="margin-top:10px">${escapeHTML(error.message || "Recovery tools could not be loaded.")}</div></section>`;
+        });
+    };
+
+    const renderAdminPageBeforeV235ReleaseManager = renderAdminPage;
+    renderAdminPage = function() {
+      renderAdminPageBeforeV235ReleaseManager();
+      window.setTimeout(appendReleaseManagerV235,0);
+    };
 
 </script>
 </body>
