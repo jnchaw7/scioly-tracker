@@ -9097,35 +9097,11 @@
       return `<div class="list-row"><div><div class="list-title">${escapeHTML(item.itemName || "Unnamed item")}</div><div class="list-meta">${escapeHTML(item.personName || "Unknown")} · ${escapeHTML(item.eventName || "Unassigned event")} · <span class="treasury-state ${state.toLowerCase()}">${escapeHTML(treasuryStateLabel(state))}</span>${item.batchId ? ` · ${escapeHTML(item.batchId)}` : ""}</div><div class="approval-actions" style="margin-top:6px">${minutesLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(minutesLink)}" target="_blank" rel="noopener noreferrer">Meeting minutes ↗</a>` : ""}${linksDocumentLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(linksDocumentLink)}" target="_blank" rel="noopener noreferrer">Pre-approval links ↗</a>` : ""}</div></div>${canRemove ? `<button class="button button-quiet" type="button" onclick="removeTreasuryQueued('${encodeURIComponent(item.queueId)}',this)">Remove</button>` : ""}</div>`;
     }
 
-    function treasuryVendorName(item) {
-      if (item && item.vendor && String(item.vendor).trim() && String(item.vendor).toUpperCase() !== "OTHER") {
-        return formatVendor(item.vendor);
-      }
-      const raw = String((item && (item.itemLink || item.link)) || "").trim();
-      if (!raw) return "Unknown vendor";
-      try {
-        let host = new URL(raw).hostname.toLowerCase().replace(/^www\./, "");
-        const known = [
-          [/amazon\./, "Amazon"], [/mcmaster\./, "McMaster-Carr"], [/homedepot\./, "Home Depot"],
-          [/lowes\./, "Lowe's"], [/walmart\./, "Walmart"], [/target\./, "Target"],
-          [/digikey\./, "DigiKey"], [/mouser\./, "Mouser"], [/adafruit\./, "Adafruit"],
-          [/sparkfun\./, "SparkFun"], [/pololu\./, "Pololu"], [/aliexpress\./, "AliExpress"],
-          [/ebay\./, "eBay"], [/etsy\./, "Etsy"]
-        ];
-        for (const pair of known) if (pair[0].test(host)) return pair[1];
-        const base = host.split(".")[0].replace(/[-_]+/g, " ");
-        return base ? base.replace(/\b\w/g, c => c.toUpperCase()) : host;
-      } catch (_) {
-        return "Unknown vendor";
-      }
-    }
-
     function renderTreasuryK12Row(item) {
       const checked = treasuryK12Selection.has(item.queueId);
       const minutesLink = safeHttpUrl(item.minutesLink);
       const linksDocumentLink = safeHttpUrl(item.linksDocumentLink);
-      const vendorName = treasuryVendorName(item);
-      return `<label class="treasury-stage-row ${checked ? "" : "excluded"}"><input type="checkbox" ${checked ? "checked" : ""} onchange="toggleTreasuryK12Item('${encodeURIComponent(item.queueId)}',this.checked)"><div class="treasury-stage-copy"><div class="treasury-order-name">${escapeHTML(item.itemName || "Unnamed item")}</div><div class="treasury-stage-meta"><strong>Vendor: ${escapeHTML(vendorName)}</strong> · ${escapeHTML(item.personName || "Unknown")} · ${escapeHTML(item.eventName || "Unassigned event")} · ${checked ? "Included in next K12" : "Excluded — stays queued for later"}</div><div class="approval-actions" style="margin-top:6px">${minutesLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(minutesLink)}" target="_blank" rel="noopener noreferrer">Meeting minutes ↗</a>` : ""}${linksDocumentLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(linksDocumentLink)}" target="_blank" rel="noopener noreferrer">Pre-approval links ↗</a>` : ""}</div></div><div class="treasury-order-price">$${money(Number(item.unitPrice||0)*Number(item.quantity||1))}</div></label>`;
+      return `<label class="treasury-stage-row ${checked ? "" : "excluded"}"><input type="checkbox" ${checked ? "checked" : ""} onchange="toggleTreasuryK12Item('${encodeURIComponent(item.queueId)}',this.checked)"><div class="treasury-stage-copy"><div class="treasury-order-name">${escapeHTML(item.itemName || "Unnamed item")}</div><div class="treasury-stage-meta">${escapeHTML(item.personName || "Unknown")} · ${escapeHTML(item.eventName || "Unassigned event")} · ${checked ? "Included in next K12" : "Excluded — stays queued for later"}</div><div class="approval-actions" style="margin-top:6px">${minutesLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(minutesLink)}" target="_blank" rel="noopener noreferrer">Meeting minutes ↗</a>` : ""}${linksDocumentLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(linksDocumentLink)}" target="_blank" rel="noopener noreferrer">Pre-approval links ↗</a>` : ""}</div></div><div class="treasury-order-price">$${money(Number(item.unitPrice||0)*Number(item.quantity||1))}</div></label>`;
     }
 
     function renderTreasuryBatch(batch) {
