@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#111111">
-  <meta name="scioly-portal-build" content="minutes-links-dev-worker-v25.1">
-  <meta name="scioly-portal-version" content="v25.1">
+  <meta name="scioly-portal-build" content="v27-combined">
+  <meta name="scioly-portal-version" content="v27">
   <title>SciOly Orders</title>
   <script>
     (function() {
@@ -805,7 +805,7 @@
 
     /* v22: pre-authentication is a clean centered sign-in screen */
     #app-shell[hidden] { display:none !important; }
-    #login-page[hidden], #sign-in-loading[hidden], #waitlist-page[hidden] { display:none !important; }
+    #login-page[hidden], #sign-in-loading[hidden], #waitlist-page[hidden], #identity-page[hidden] { display:none !important; }
     body:not(.portal-authenticated) #app-shell { display:none !important; }
     body:not(.portal-authenticated) #login-page:not([hidden]) {
       position:fixed !important;
@@ -1931,7 +1931,8 @@
     @keyframes fade-in { from { opacity: .78; } }
 
     .sign-in-loading,
-    .waitlist-page {
+    .waitlist-page,
+    .identity-page {
       position: fixed;
       inset: 0;
       z-index: 90;
@@ -1944,7 +1945,8 @@
     }
 
     .sign-in-loading-card,
-    .waitlist-card {
+    .waitlist-card,
+    .identity-card {
       width: min(100%,440px);
       padding: 34px;
       border: 1px solid var(--line);
@@ -1955,12 +1957,15 @@
     }
 
     .sign-in-loading-card .brand-mark,
-    .waitlist-card .brand-mark { margin: 0 auto 22px; }
+    .waitlist-card .brand-mark,
+    .identity-card .brand-mark { margin: 0 auto 22px; }
     .sign-in-loading-card .spinner { width: 34px; height: 34px; margin-bottom: 18px; }
     .sign-in-loading-card h2,
-    .waitlist-card h2 { margin: 0; font-size: 24px; letter-spacing: -.035em; }
+    .waitlist-card h2,
+    .identity-card h2 { margin: 0; font-size: 24px; letter-spacing: -.035em; }
     .sign-in-loading-card p,
-    .waitlist-card p { margin: 9px auto 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .waitlist-card p,
+    .identity-card p { margin: 9px auto 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
     .loading-steps { display: grid; gap: 7px; margin-top: 23px; text-align: left; }
     .loading-step { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 11px; }
     .loading-step-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--line-strong); }
@@ -1969,6 +1974,15 @@
     .waitlist-status { display: inline-flex; margin-top: 18px; padding: 6px 9px; border-radius: 999px; color: var(--warning); background: var(--warning-bg); font-size: 10px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
     .waitlist-email { margin-top: 10px; color: var(--ink); font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
     .waitlist-actions { display: grid; gap: 8px; margin-top: 23px; }
+    .identity-card { width:min(100%,500px); text-align:left; }
+    .identity-card .brand-mark, .identity-card h2, .identity-card > p { text-align:center; }
+    .identity-login-email { margin:14px 0 18px; padding:10px 12px; border:1px solid var(--line); border-radius:11px; background:var(--surface-soft); color:var(--muted); font-size:11px; overflow-wrap:anywhere; }
+    .identity-form-grid { display:grid; gap:13px; margin-top:18px; }
+    .identity-form-grid label { display:grid; gap:6px; color:var(--ink); font-size:11px; font-weight:750; }
+    .identity-form-grid input { width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid var(--line); border-radius:10px; background:var(--surface); color:var(--ink); font:inherit; outline:none; }
+    .identity-form-grid input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(79,140,255,.1); }
+    .identity-help { color:var(--muted); font-size:10px; line-height:1.45; font-weight:500; }
+    .identity-error { min-height:18px; margin-top:10px; color:var(--danger); font-size:11px; }
 
     .login-history-list { display: grid; gap: 8px; }
     .login-history-item {
@@ -4393,7 +4407,7 @@
         </div>
       </div>
       <h1>Your orders,<br>without the guesswork.</h1>
-      <p class="login-copy">Sign in to see approval progress, delivery estimates, costs, and completed orders linked to your account.</p>
+      <p class="login-copy">Sign in with your personal Gmail. The first time, you’ll enter your school email and Student ID so Treasury can link your existing orders.</p>
       <div class="google-wrap">
         <div id="g_id_onload"
           data-client_id="483790698157-mk3l3ugqgvh4uv10q3bng2g9j8j3vp8q.apps.googleusercontent.com"
@@ -4437,12 +4451,41 @@
       <h2 id="waitlist-title">Approval required</h2>
       <div class="waitlist-status" id="waitlist-status">Waiting for approval</div>
       <div class="waitlist-email" id="waitlist-email"></div>
-      <p id="waitlist-message">External Google accounts must be approved by a Science Olympiad executive.</p>
+      <div class="waitlist-email" id="waitlist-identity"></div>
+      <p id="waitlist-message">Your personal Gmail must be linked to a school identity and approved by Treasury.</p>
       <div class="waitlist-actions">
-        <button class="button" id="waitlist-retry-button" type="button" onclick="retryWaitlistApproval()">Check approval again</button>
-        <button class="button button-primary" type="button" onclick="returnToLogin()">Use a school account</button>
+        <button class="button button-primary" id="waitlist-retry-button" type="button" onclick="retryWaitlistApproval()">Check approval again</button>
+        <button class="button" type="button" onclick="editIdentityClaim()">Edit school identity</button>
+        <button class="button button-quiet" type="button" onclick="returnToLogin()">Use a different Google account</button>
       </div>
     </div>
+  </section>
+
+  <section class="identity-page" id="identity-page" hidden>
+    <form class="identity-card" id="identity-claim-form" onsubmit="submitIdentityClaim(event)">
+      <div class="brand-mark" aria-hidden="true">SO</div>
+      <h2>Link your school identity</h2>
+      <p>Sign in with your personal Gmail, then enter the same student information that the school account used to provide automatically.</p>
+      <div class="identity-login-email" id="identity-login-email">Signed-in Google account</div>
+      <div class="identity-form-grid">
+        <label>Your name
+          <input id="identity-name" name="name" type="text" maxlength="60" autocomplete="name" placeholder="Julian Chaw" required>
+        </label>
+        <label>School email
+          <input id="identity-school-email" name="schoolEmail" type="email" maxlength="140" autocomplete="email" placeholder="1000xxxxx@mvla.net" required>
+          <span class="identity-help">This is written into the same Master email columns as before. You do not need to sign in with it.</span>
+        </label>
+        <label>Student ID
+          <input id="identity-student-id" name="studentId" type="text" inputmode="numeric" maxlength="24" placeholder="1000xxxxx" required>
+          <span class="identity-help">Treasury will review the Gmail ↔ school email ↔ Student ID mapping before access opens.</span>
+        </label>
+      </div>
+      <div class="identity-error" id="identity-error" role="alert"></div>
+      <div class="waitlist-actions">
+        <button class="button button-primary" id="identity-submit" type="submit">Submit identity for approval</button>
+        <button class="button button-quiet" type="button" onclick="returnToLogin()">Use a different Google account</button>
+      </div>
+    </form>
   </section>
 
   <div class="app-shell" id="app-shell" hidden>
@@ -4489,7 +4532,7 @@
         </button>
         <button class="nav-button" id="nav-approvals" type="button" onclick="navigateTo('approvals')" hidden>
           <span class="nav-icon" aria-hidden="true">✓</span>
-          <span>External approvals</span>
+          <span>Account approvals</span>
           <span class="nav-count pending-count" id="external-nav-count" hidden>0</span>
         </button>
         <button class="nav-button" id="nav-budgets" type="button" onclick="navigateTo('budgets')" hidden>
@@ -4769,9 +4812,13 @@
       currentDashboardData = buildPreviewDashboard(currentIsExecutive);
       if (currentIsSuperAdmin) currentDashboardData.email = "jn.chaw7@gmail.com";
       currentUserProfile = previewFirstTime
-        ? { name: "", needsName: true, onboardingComplete: false, needsOnboarding: true }
+        ? { name: "", schoolEmail:"", studentId:"", identityComplete:false, needsIdentity:true, needsName: true, onboardingComplete: false, needsOnboarding: true }
         : {
             name: currentIsExecutive ? "Preview Executive" : "Preview Student",
+            schoolEmail: currentIsExecutive ? "100034572@mvla.net" : "100039999@mvla.net",
+            studentId: currentIsExecutive ? "100034572" : "100039999",
+            identityComplete: true,
+            needsIdentity: false,
             needsName: false,
             onboardingComplete: true,
             needsOnboarding: false
@@ -5481,7 +5528,7 @@
         savedExternalApprovals = result.data || { pendingCount: 0, approvedCount: 0, rejectedCount: 0, entries: [] };
         externalPendingCount = Number(savedExternalApprovals.pendingCount || 0);
         updateExternalApprovalBadge();
-        // Do not redraw the currently visible External approvals page.
+        // Do not redraw the currently visible Account approvals page.
       });
     }
 
@@ -5618,6 +5665,10 @@
     function loadDashboard() {
       apiRequest({ action: "login" })
         .then(function(result) {
+          if (result.type === "identityRequired") {
+            showIdentityClaimScreen(result);
+            return;
+          }
           if (result.type === "waitlisted") {
             showWaitlistScreen(result);
             return;
@@ -5663,6 +5714,8 @@
           setSignInLoading(false);
           document.body.classList.remove("portal-authenticated");
           document.getElementById("app-shell").hidden = true;
+          document.getElementById("identity-page").hidden = true;
+          document.getElementById("waitlist-page").hidden = true;
           document.getElementById("login-page").hidden = false;
           showLoginError(error);
         });
@@ -5674,6 +5727,7 @@
       const displayName = getDisplayName();
       document.getElementById("login-page").hidden = true;
       document.getElementById("waitlist-page").hidden = true;
+      document.getElementById("identity-page").hidden = true;
       setSignInLoading(false);
       document.getElementById("app-shell").hidden = false;
       document.getElementById("app-shell").classList.add("app-reveal");
@@ -8035,7 +8089,7 @@
 
     function renderExecActionCenter(stats) {
       const actions = buildExecActionItems(stats);
-      return `<section class="exec-action-center" id="exec-action-center"><div class="exec-action-head"><div><h2>Action Center</h2><p>Items that currently deserve executive attention, gathered into one place.</p></div><span class="exec-action-count">${actions.length} ${actions.length === 1 ? "item" : "items"}</span></div>${actions.length ? `<div class="exec-action-list">${actions.map(function(action){ const item=action.item||{}; const person=action.person||{}; const email=encodeURIComponent(String(person.email || item.email || "")).replace(/'/g,"%27"); const name=encodeURIComponent(String(person.name || item.name || "Student")).replace(/'/g,"%27"); const eventName=encodeURIComponent(String(item.eventName || "")).replace(/'/g,"%27"); const link=safeHttpUrl(item.link); return `<article class="exec-action-item"><div><strong>${escapeHTML(item.itemName || "Unnamed item")}</strong><div class="exec-action-meta">${escapeHTML(person.name || item.name || "Unknown")} · ${escapeHTML(item.eventName || "Unassigned event")} · $${money(item.price || 0)}</div><span class="exec-action-reason ${escapeAttribute(action.tone)}">${escapeHTML(action.reason)}</span><div class="exec-action-meta">${escapeHTML(action.detail)}</div></div><div class="exec-action-buttons"><button class="button button-quiet" type="button" onclick="openStudentMessage('${email}','${name}','${eventName}',${Number(item.rowNum || 0)})">Message</button>${item.budgetApproved === false ? `<button class="button button-quiet" type="button" onclick="navigateTo('budgets')">Budget Center</button>` : ""}${item.emailApproved === false && currentIsSuperAdmin ? `<button class="button button-quiet" type="button" onclick="navigateTo('approvals')">External approvals</button>` : ""}${link ? `<a class="button button-quiet" href="${escapeAttribute(link)}" target="_blank" rel="noopener noreferrer">Open item ↗</a>` : ""}</div></article>`; }).join("")}</div>` : `<div class="no-results">No requests need executive attention right now.</div>`}</section>`;
+      return `<section class="exec-action-center" id="exec-action-center"><div class="exec-action-head"><div><h2>Action Center</h2><p>Items that currently deserve executive attention, gathered into one place.</p></div><span class="exec-action-count">${actions.length} ${actions.length === 1 ? "item" : "items"}</span></div>${actions.length ? `<div class="exec-action-list">${actions.map(function(action){ const item=action.item||{}; const person=action.person||{}; const email=encodeURIComponent(String(person.email || item.email || "")).replace(/'/g,"%27"); const name=encodeURIComponent(String(person.name || item.name || "Student")).replace(/'/g,"%27"); const eventName=encodeURIComponent(String(item.eventName || "")).replace(/'/g,"%27"); const link=safeHttpUrl(item.link); return `<article class="exec-action-item"><div><strong>${escapeHTML(item.itemName || "Unnamed item")}</strong><div class="exec-action-meta">${escapeHTML(person.name || item.name || "Unknown")} · ${escapeHTML(item.eventName || "Unassigned event")} · $${money(item.price || 0)}</div><span class="exec-action-reason ${escapeAttribute(action.tone)}">${escapeHTML(action.reason)}</span><div class="exec-action-meta">${escapeHTML(action.detail)}</div></div><div class="exec-action-buttons"><button class="button button-quiet" type="button" onclick="openStudentMessage('${email}','${name}','${eventName}',${Number(item.rowNum || 0)})">Message</button>${item.budgetApproved === false ? `<button class="button button-quiet" type="button" onclick="navigateTo('budgets')">Budget Center</button>` : ""}${item.emailApproved === false && currentIsSuperAdmin ? `<button class="button button-quiet" type="button" onclick="navigateTo('approvals')">Account approvals</button>` : ""}${link ? `<a class="button button-quiet" href="${escapeAttribute(link)}" target="_blank" rel="noopener noreferrer">Open item ↗</a>` : ""}</div></article>`; }).join("")}</div>` : `<div class="no-results">No requests need executive attention right now.</div>`}</section>`;
     }
 
     function renderTeamStatistics(stats) {
@@ -8337,7 +8391,7 @@
       quick.push(`<button class="button button-quiet" type="button" onclick="openStudentMessage('${email}','${name}','${encodedEvent}',${row})">Message student</button>`);
       if (link) quick.push(`<a class="button button-quiet" href="${escapeAttribute(link)}" target="_blank" rel="noopener noreferrer">Open item ↗</a>`);
       if (item.budgetApproved === false) quick.push(`<button class="button button-quiet" type="button" onclick="navigateTo('budgets')">Budget Center</button>`);
-      if (item.emailApproved === false && currentIsSuperAdmin) quick.push(`<button class="button button-quiet" type="button" onclick="navigateTo('approvals')">External approvals</button>`);
+      if (item.emailApproved === false && currentIsSuperAdmin) quick.push(`<button class="button button-quiet" type="button" onclick="navigateTo('approvals')">Account approvals</button>`);
       return `<details class="team-linked-order"><summary><div><div class="linked-order-name">${escapeHTML(item.itemName || "Unnamed item")}</div><div class="linked-order-meta">${escapeHTML(eventName)} · Qty ${escapeHTML(item.quantity || 1)} · ${escapeHTML(item.status || (signaturesCompleteForTimeline(item) ? "Approved · awaiting order" : "Pending"))}</div></div><div class="linked-order-price">$${money(item.price)}</div><span class="list-arrow">⌄</span></summary><div class="team-linked-order-detail"><div class="team-linked-quick-actions">${quick.join("")}</div>${renderOrderActivityTimeline(item)}<div class="order-thread"><div class="order-thread-title">Item-linked conversation</div><div data-order-thread-row="${row}" data-order-thread-event="${escapeAttribute(eventName)}">${renderOrderThreadBody(row,eventName)}</div></div></div></details>`;
     }
 
@@ -8376,7 +8430,7 @@
           if (currentPage === "approvals") renderExternalApprovals(savedExternalApprovals);
         })
         .catch(function(error) {
-          if (currentPage === "approvals") document.getElementById("page-content").innerHTML = pageHeader("External approvals", "Review non-school accounts connected to order activity.", false) + emptyState("!", "Unable to load approvals", error.message || "Please try again.", false);
+          if (currentPage === "approvals") document.getElementById("page-content").innerHTML = pageHeader("Account approvals", "Review personal Gmail ↔ school identity mappings.", false) + emptyState("!", "Unable to load approvals", error.message || "Please try again.", false);
         });
     }
 
@@ -8389,7 +8443,7 @@
         if (String(entry.status || "PENDING").toUpperCase() !== status) return false;
         if (!query) return true;
         const itemNames = Array.isArray(entry.items) ? entry.items.map(function(item) { return item.itemName; }) : [];
-        const haystack = [entry.email]
+        const haystack = [entry.email, entry.claimedName, entry.schoolEmail, entry.studentId]
           .concat(entry.names || [], entry.events || [], itemNames)
           .join(" ")
           .toLowerCase();
@@ -8397,7 +8451,7 @@
       });
 
       document.getElementById("page-content").innerHTML = `
-        ${pageHeader("External approvals", "Review and manage non-school accounts.", false)}
+        ${pageHeader("Account approvals", "Approve the personal Gmail linked to each claimed school identity.", false)}
 
         <section class="approval-summary" aria-label="External account summary">
           ${summaryCard("Waiting", Number(data.pendingCount || 0), "Requires a decision")}
@@ -8409,7 +8463,7 @@
           <div class="approval-toolbar">
             <label class="search-wrap">
               <span class="search-icon" aria-hidden="true">⌕</span>
-              <span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Search external accounts</span>
+              <span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Search account approvals</span>
               <input class="search-input" type="search" placeholder="Search email, name, event, or item" value="${escapeAttribute(externalApprovalSearch)}" oninput="updateExternalApprovalSearch(this.value)">
             </label>
             <div class="filter-group" aria-label="Approval status filter">
@@ -8430,7 +8484,7 @@
     function renderExternalApprovalEntry(entry) {
       const status = String(entry.status || "PENDING").toUpperCase();
       const statusClass = status.toLowerCase();
-      const names = Array.isArray(entry.names) && entry.names.length ? entry.names.join(", ") : "Name unavailable";
+      const names = entry.claimedName || (Array.isArray(entry.names) && entry.names.length ? entry.names.join(", ") : "Name unavailable");
       const events = Array.isArray(entry.events) && entry.events.length ? entry.events.join(", ") : "No event listed";
       const items = Array.isArray(entry.items) ? entry.items : [];
       const encodedEmail = encodeURIComponent(String(entry.email || "")).replace(/'/g, "%27");
@@ -8445,6 +8499,9 @@
             <span class="login-history-chevron" aria-hidden="true">⌄</span>
           </summary>
           <div class="approval-detail">
+            <div class="approval-meta"><strong style="color:var(--ink)">School email:</strong> ${escapeHTML(entry.schoolEmail || "Not submitted")}</div>
+            <div class="approval-meta"><strong style="color:var(--ink)">Student ID:</strong> ${escapeHTML(entry.studentId || "Not submitted")}</div>
+            <div class="approval-meta"><strong style="color:var(--ink)">Access after approval:</strong> ${escapeHTML(entry.claimedRole === "SUPER_ADMIN" ? "Super admin" : entry.claimedRole === "EXECUTIVE" ? "Executive" : "Student")}</div>
             <div class="approval-meta"><strong style="color:var(--ink)">Events:</strong> ${escapeHTML(events)}</div>
             <div class="approval-meta"><strong style="color:var(--ink)">First detected:</strong> ${escapeHTML(formatFullAccessTime(entry.firstSeen))}</div>
             ${entry.updatedBy ? `<div class="approval-meta"><strong style="color:var(--ink)">Last decision:</strong> ${escapeHTML(formatFullAccessTime(entry.updatedAt))} by ${escapeHTML(entry.updatedBy)}</div>` : ""}
@@ -9014,6 +9071,13 @@
 
       const minutesQueue = queue.filter(function(item) { return ["QUEUED","MINUTES_RUNNING","FAILED","BLOCKED"].indexOf(String(item.state||"").toUpperCase()) !== -1; });
       const k12Queue = queue.filter(function(item) { return ["K12_READY","K12_SELECTED"].indexOf(String(item.state||"").toUpperCase()) !== -1; });
+      const k12Recovery = queue.filter(function(item) {
+        const state = String(item.state||"").toUpperCase();
+        return ["K12_RUNNING","WAITING_FOR_MANUAL_SUBMISSION","FAILED","BLOCKED"].indexOf(state) !== -1
+          && Boolean(item.minutesReadyAt)
+          && !String(item.trackingLink||"").trim()
+          && !String(item.k12SubmittedAt||"").trim();
+      });
       const revision = String(data.revision || "");
       if (treasuryK12SeedRevision !== revision) {
         treasuryK12Selection = new Set(k12Queue.filter(function(item){ return String(item.state||"").toUpperCase() === "K12_SELECTED"; }).map(function(item){ return item.queueId; }));
@@ -9031,7 +9095,7 @@
         <section class="stats-grid" aria-label="Treasury automation summary">
           ${summaryCard("Ready to queue", Number(data.readyCount || 0), "Purchase gates clear")}
           ${summaryCard("Waiting for minutes", Number(data.minutesQueuedCount || 0), "Will be included in minutes")}
-          ${summaryCard("Ready for K12", Number(data.k12ReadyCount || 0), "Minutes + links generated")}
+          ${summaryCard("Ready for K12", Number(data.k12ReadyCount || 0), "Meeting minutes complete")}
           ${summaryCard("Active approval batches", Number(data.activeBatchCount || 0), "Submitted to InformedK12")}
         </section>
 
@@ -9064,6 +9128,7 @@
             <div class="treasury-selection-actions">
               <button class="button" type="button" onclick="selectTreasuryK12FirstTen()" ${k12Queue.length ? "" : "disabled"}>Select first 10</button>
               <button class="button button-quiet" type="button" onclick="clearTreasuryK12Selection()" ${treasuryK12Selection.size ? "" : "disabled"}>Exclude all</button>
+              ${k12Recovery.length ? `<button class="button danger-button" type="button" onclick="confirmResetK12AttemptV27()">Reset K12 attempt (${k12Recovery.length})</button>` : ""}
               ${appConfigured ? (appActive ? `<button class="button danger-button" type="button" onclick="cancelTreasuryAppWorker(this)">Cancel App worker</button>` : `<button class="button button-primary" id="treasury-run-k12" type="button" onclick="openTreasuryK12Confirmation()" ${treasuryK12Selection.size ? "" : "disabled"}>Run K12 for selected (${treasuryK12Selection.size})</button>`) : `<button class="button button-primary worker-connect-button" type="button" onclick="focusTreasuryGithubSetup()">Connect GitHub to run K12</button>`}
             </div>
           </div>
@@ -9097,11 +9162,52 @@
       return `<div class="list-row"><div><div class="list-title">${escapeHTML(item.itemName || "Unnamed item")}</div><div class="list-meta">${escapeHTML(item.personName || "Unknown")} · ${escapeHTML(item.eventName || "Unassigned event")} · <span class="treasury-state ${state.toLowerCase()}">${escapeHTML(treasuryStateLabel(state))}</span>${item.batchId ? ` · ${escapeHTML(item.batchId)}` : ""}</div><div class="approval-actions" style="margin-top:6px">${minutesLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(minutesLink)}" target="_blank" rel="noopener noreferrer">Meeting minutes ↗</a>` : ""}${linksDocumentLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(linksDocumentLink)}" target="_blank" rel="noopener noreferrer">Pre-approval links ↗</a>` : ""}</div></div>${canRemove ? `<button class="button button-quiet" type="button" onclick="removeTreasuryQueued('${encodeURIComponent(item.queueId)}',this)">Remove</button>` : ""}</div>`;
     }
 
+
+    function treasuryVendorFromLink(link) {
+      const raw = String(link || "").trim();
+      if (!raw) return "Unknown vendor";
+      try {
+        const normalized = /^https?:\/\//i.test(raw) ? raw : "https://" + raw;
+        const parsed = new URL(normalized);
+        const host = String(parsed.hostname || "").toLowerCase().replace(/^www\./, "");
+        if (!host) return "Unknown vendor";
+        if (host === "amazon.com" || host.endsWith(".amazon.com") || host === "amzn.to") return "Amazon";
+
+        const known = [
+          ["adafruit.com", "Adafruit"],
+          ["digikey.com", "DigiKey"],
+          ["mouser.com", "Mouser"],
+          ["pololu.com", "Pololu"],
+          ["sparkfun.com", "SparkFun"],
+          ["aliexpress.com", "AliExpress"],
+          ["ebay.com", "eBay"],
+          ["homedepot.com", "Home Depot"],
+          ["lowes.com", "Lowe's"],
+          ["walmart.com", "Walmart"],
+          ["target.com", "Target"],
+          ["mcmaster.com", "McMaster-Carr"],
+          ["mcmastercarr.com", "McMaster-Carr"]
+        ];
+        for (const pair of known) {
+          if (host === pair[0] || host.endsWith("." + pair[0])) return pair[1];
+        }
+
+        const parts = host.split(".").filter(Boolean);
+        if (parts.length >= 2) {
+          const base = parts[parts.length - 2];
+          return base ? base.charAt(0).toUpperCase() + base.slice(1) : host;
+        }
+        return host;
+      } catch (ignored) {
+        return "Unknown vendor";
+      }
+    }
+
     function renderTreasuryK12Row(item) {
       const checked = treasuryK12Selection.has(item.queueId);
       const minutesLink = safeHttpUrl(item.minutesLink);
       const linksDocumentLink = safeHttpUrl(item.linksDocumentLink);
-      return `<label class="treasury-stage-row ${checked ? "" : "excluded"}"><input type="checkbox" ${checked ? "checked" : ""} onchange="toggleTreasuryK12Item('${encodeURIComponent(item.queueId)}',this.checked)"><div class="treasury-stage-copy"><div class="treasury-order-name">${escapeHTML(item.itemName || "Unnamed item")}</div><div class="treasury-stage-meta">${escapeHTML(item.personName || "Unknown")} · ${escapeHTML(item.eventName || "Unassigned event")} · ${checked ? "Included in next K12" : "Excluded — stays queued for later"}</div><div class="approval-actions" style="margin-top:6px">${minutesLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(minutesLink)}" target="_blank" rel="noopener noreferrer">Meeting minutes ↗</a>` : ""}${linksDocumentLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(linksDocumentLink)}" target="_blank" rel="noopener noreferrer">Pre-approval links ↗</a>` : ""}</div></div><div class="treasury-order-price">$${money(Number(item.unitPrice||0)*Number(item.quantity||1))}</div></label>`;
+      return `<label class="treasury-stage-row ${checked ? "" : "excluded"}"><input type="checkbox" ${checked ? "checked" : ""} onchange="toggleTreasuryK12Item('${encodeURIComponent(item.queueId)}',this.checked)"><div class="treasury-stage-copy"><div class="treasury-order-name">${escapeHTML(item.itemName || "Unnamed item")}</div><div class="treasury-stage-meta"><strong>Vendor: ${escapeHTML(treasuryVendorFromLink(item.link))}</strong> · ${escapeHTML(item.personName || "Unknown")} · ${escapeHTML(item.eventName || "Unassigned event")} · ${checked ? "Included in next K12" : "Excluded — stays queued for later"}</div><div class="approval-actions" style="margin-top:6px">${minutesLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(minutesLink)}" target="_blank" rel="noopener noreferrer">Meeting minutes ↗</a>` : ""}${linksDocumentLink ? `<a class="treasury-doc-link item-link" href="${escapeAttribute(linksDocumentLink)}" target="_blank" rel="noopener noreferrer">Pre-approval links ↗</a>` : ""}</div></div><div class="treasury-order-price">$${money(Number(item.unitPrice||0)*Number(item.quantity||1))}</div></label>`;
     }
 
     function renderTreasuryBatch(batch) {
@@ -9184,7 +9290,7 @@
       const q=(savedTreasuryAutomation&&savedTreasuryAutomation.queue||[]).filter(function(item){ return ["K12_READY","K12_SELECTED"].indexOf(String(item.state||"").toUpperCase())!==-1; });
       const selected=q.filter(function(item){ return treasuryK12Selection.has(item.queueId); });
       const excluded=q.filter(function(item){ return !treasuryK12Selection.has(item.queueId); });
-      openPortalModal(`<div class="portal-modal-head"><div><h2 class="portal-modal-title" id="portal-modal-title">Run K12 for ${selected.length} selected item${selected.length===1?"":"s"}?</h2><p class="portal-modal-copy">App.java will reuse the meeting-minutes + pre-approval links documents that were already generated, open and fill InformedK12, then wait for your manual attachment/review/submission. The ${excluded.length} excluded item${excluded.length===1?"":"s"} will stay in the K12 queue for later.</p></div><button class="modal-close" type="button" onclick="closePortalModal()" aria-label="Close">×</button></div><div class="compact-list" style="max-height:44vh;overflow:auto">${selected.map(function(item){return `<div class="list-row"><div><div class="list-title">${escapeHTML(item.itemName||"Unnamed item")}</div><div class="list-meta">Included now · ${escapeHTML(item.eventName||"")}</div></div></div>`;}).join("")}</div>${excluded.length?`<div class="approval-note" style="margin-top:12px"><strong>${excluded.length} excluded</strong> · they remain Ready for K12.</div>`:""}<div class="approval-actions"><button class="button button-primary" id="confirm-run-k12" type="button" onclick="confirmTreasuryK12Run()">Run selected K12</button><button class="button button-quiet" type="button" onclick="closePortalModal()">Change selection</button></div>`);
+      openPortalModal(`<div class="portal-modal-head"><div><h2 class="portal-modal-title" id="portal-modal-title">Run K12 for ${selected.length} selected item${selected.length===1?"":"s"}?</h2><p class="portal-modal-copy">App.java will reuse the meeting-minutes document, create one fresh pre-approval links document from exactly these selected rows, open and fill InformedK12, then wait for your manual attachment/review/submission. The ${excluded.length} excluded item${excluded.length===1?"":"s"} will stay in the K12 queue for later.</p></div><button class="modal-close" type="button" onclick="closePortalModal()" aria-label="Close">×</button></div><div class="compact-list" style="max-height:44vh;overflow:auto">${selected.map(function(item){return `<div class="list-row"><div><div class="list-title">${escapeHTML(item.itemName||"Unnamed item")}</div><div class="list-meta"><strong>Vendor: ${escapeHTML(treasuryVendorFromLink(item.link))}</strong> · Included now · ${escapeHTML(item.eventName||"Unassigned event")}</div></div></div>`;}).join("")}</div>${excluded.length?`<div class="approval-note" style="margin-top:12px"><strong>${excluded.length} excluded</strong> · they remain Ready for K12.</div>`:""}<div class="approval-actions"><button class="button button-primary" id="confirm-run-k12" type="button" onclick="confirmTreasuryK12Run()">Run selected K12</button><button class="button button-quiet" type="button" onclick="closePortalModal()">Change selection</button></div>`);
     }
 
     function confirmTreasuryK12Run() {
@@ -9194,6 +9300,43 @@
         if(result.type!=="treasuryAutomation") throw new Error(result.message||"Unable to prepare K12 batch.");
         savedTreasuryAutomation=result.data||{}; treasuryRevision=String(savedTreasuryAutomation.revision||""); closePortalModal(); return dispatchTreasuryWorkflow("k12",null);
       }).catch(function(error){ showToast(error.message||"Unable to prepare K12 batch."); if(button){button.disabled=false;button.textContent="Run selected K12";} });
+    }
+
+    function confirmResetK12AttemptV27() {
+      if (!currentIsSuperAdmin) return;
+      const queue = savedTreasuryAutomation && savedTreasuryAutomation.queue || [];
+      const stuck = queue.filter(function(item) {
+        const state = String(item.state || "").toUpperCase();
+        return ["K12_RUNNING","WAITING_FOR_MANUAL_SUBMISSION","FAILED","BLOCKED"].includes(state)
+          && Boolean(item.minutesReadyAt)
+          && !String(item.trackingLink || "").trim()
+          && !String(item.k12SubmittedAt || "").trim();
+      });
+      if (!stuck.length) return showToast("No safe pre-submit K12 attempt is available to reset.");
+      openPortalModal(`
+        <div class="portal-modal-head"><div><h2 class="portal-modal-title" id="portal-modal-title">Reset ${stuck.length} K12 attempt${stuck.length===1?"":"s"}?</h2><p class="portal-modal-copy"><strong>Only use this if you did NOT press Submit in InformedK12.</strong> This resets a failed/pre-submit K12 attempt, preserves the meeting-minutes document, clears the failed K12 batch/tracking/status markers, and returns the row to Ready for K12. Rows that already have a captured tracking URL or submitted timestamp are protected.</p></div><button class="modal-close" type="button" onclick="closePortalModal()" aria-label="Close">×</button></div>
+        <div class="compact-list" style="max-height:42vh;overflow:auto">${stuck.map(function(item){return `<div class="list-row"><div><div class="list-title">${escapeHTML(item.itemName||"Unnamed item")}</div><div class="list-meta">${escapeHTML(item.state||"")} · ${escapeHTML(item.batchId||"No batch ID")}</div></div></div>`;}).join("")}</div>
+        <div class="approval-actions"><button class="button danger-button" id="confirm-reset-k12-v27" type="button" onclick="resetK12AttemptV27(this)">Reset K12 attempt</button><button class="button button-quiet" type="button" onclick="closePortalModal()">Cancel</button></div>
+      `);
+    }
+
+    function resetK12AttemptV27(button) {
+      if (!currentIsSuperAdmin) return;
+      if (button) { button.disabled=true; button.textContent="Resetting…"; }
+      apiRequest({action:"treasuryResetK12Attempt"})
+        .then(function(result) {
+          if (result.type !== "treasuryAutomation") throw new Error(result.message || "K12 reset failed.");
+          savedTreasuryAutomation = result.data || {};
+          treasuryK12Selection.clear();
+          treasuryK12SeedRevision = "";
+          closePortalModal();
+          renderTreasuryAutomation(savedTreasuryAutomation);
+          showToast("K12 attempt reset. Meeting minutes were preserved; select the row and run K12 again.");
+        })
+        .catch(function(error) {
+          showToast(error.message || "K12 reset failed.");
+          if (button) { button.disabled=false; button.textContent="Reset K12 attempt"; }
+        });
     }
 
     function refreshTreasuryPurchaseGates(button) {
@@ -9818,8 +9961,8 @@
       }
 
       if (currentIsSuperAdmin) {
-        clickStep("#nav-approvals",currentIsExecutive ? "budgets" : "materials","Now click External approvals","External Google-account access is separate from purchasing approval.","External approvals button");
-        explain("#page-content","approvals","External account decisions live on their own page","Admins can review non-school accounts without mixing that decision with any particular purchase.");
+        clickStep("#nav-approvals",currentIsExecutive ? "budgets" : "materials","Now click Account approvals","Personal Gmail identity approval is separate from purchasing approval.","Account approvals button");
+        explain("#page-content","approvals","Gmail identity decisions live on their own page","Admins can verify each Gmail, school email, and Student ID mapping without mixing identity approval with purchase approval.");
 
         clickStep("#nav-treasury","approvals","Now click Treasury automation","This is where exact purchase rows become a worker batch.","Treasury automation button");
         explain(".treasury-queue-list","treasury","Treasury batching uses the real queue layout","Only cleared rows are selectable. First generate meeting minutes for the queued rows. Those rows then move to the K12 queue, where you can exclude items that must wait for a later form. Master M is marked only after a real K12 tracking submission is captured.");
@@ -10108,17 +10251,85 @@
       });
     }
 
+    function showIdentityClaimScreen(result) {
+      signInRequestInFlight = false;
+      setSignInLoading(false);
+      document.body.classList.remove("portal-authenticated");
+      document.getElementById("login-page").hidden = true;
+      document.getElementById("app-shell").hidden = true;
+      document.getElementById("waitlist-page").hidden = true;
+      document.getElementById("identity-page").hidden = false;
+
+      const profile = result && result.profile || {};
+      document.getElementById("identity-login-email").textContent = "Signed in as " + String(result && result.email || "Google account");
+      document.getElementById("identity-name").value = String(profile.name || "");
+      document.getElementById("identity-school-email").value = String(profile.schoolEmail || "");
+      document.getElementById("identity-student-id").value = String(profile.studentId || "");
+      document.getElementById("identity-error").textContent = "";
+      const button = document.getElementById("identity-submit");
+      if (button) { button.disabled = false; button.textContent = "Submit identity for approval"; }
+    }
+
+    function editIdentityClaim() {
+      const profile = currentUserProfile || {};
+      showIdentityClaimScreen({
+        email: currentDashboardData && currentDashboardData.email || "",
+        profile: profile
+      });
+    }
+
+    function submitIdentityClaim(event) {
+      if (event) event.preventDefault();
+      const form = document.getElementById("identity-claim-form");
+      const error = document.getElementById("identity-error");
+      const button = document.getElementById("identity-submit");
+      if (!form) return;
+      const payload = {
+        action: "claimIdentity",
+        name: String(form.elements.name.value || "").trim(),
+        schoolEmail: String(form.elements.schoolEmail.value || "").trim().toLowerCase(),
+        studentId: String(form.elements.studentId.value || "").trim()
+      };
+      if (error) error.textContent = "";
+      if (button) { button.disabled = true; button.textContent = "Submitting…"; }
+
+      apiRequest(payload)
+        .then(function(result) {
+          if (result.type !== "waitlisted") throw new Error(result.message || "Unable to save identity.");
+          currentUserProfile = result.profile || currentUserProfile;
+          if (!currentDashboardData) currentDashboardData = { items:[], totalCost:0 };
+          if (result.email) currentDashboardData.email = result.email;
+          document.getElementById("identity-page").hidden = true;
+          showWaitlistScreen(result);
+        })
+        .catch(function(err) {
+          if (error) error.textContent = err.message || "Unable to save identity.";
+          if (button) { button.disabled = false; button.textContent = "Submit identity for approval"; }
+        });
+    }
+
     function showWaitlistScreen(result) {
       signInRequestInFlight = false;
       setSignInLoading(false);
       document.getElementById("login-page").hidden = true;
+      document.getElementById("identity-page").hidden = true;
       document.getElementById("app-shell").hidden = true;
       document.getElementById("waitlist-page").hidden = false;
-      document.getElementById("waitlist-email").textContent = result.email || "External Google account";
+      document.getElementById("waitlist-email").textContent = result.email || "Personal Google account";
+      currentUserProfile = result.profile || currentUserProfile || {};
+      if (!currentDashboardData) currentDashboardData = { items:[], totalCost:0 };
+      if (result.email) currentDashboardData.email = result.email;
+
+      const profile = result.profile || {};
+      const identityBits = [];
+      if (profile.schoolEmail) identityBits.push(profile.schoolEmail);
+      if (profile.studentId) identityBits.push("Student ID " + profile.studentId);
+      document.getElementById("waitlist-identity").textContent = identityBits.join(" · ");
+
       const rejected = String(result.status || "").toUpperCase() === "REJECTED";
       document.getElementById("waitlist-title").textContent = rejected ? "Account not approved" : "Waiting for approval";
-      document.getElementById("waitlist-status").textContent = rejected ? "Not approved" : "Waiting for owner review";
-      document.getElementById("waitlist-message").textContent = result.message || "Students should use their @mvla.net account. Mentor Gmail accounts must be approved by one of the two portal owners.";
+      document.getElementById("waitlist-status").textContent = rejected ? "Needs review again" : "Waiting for Treasury review";
+      document.getElementById("waitlist-message").textContent = result.message || "Treasury must approve this Gmail ↔ school identity mapping before you can enter the portal.";
       const retry = document.getElementById("waitlist-retry-button");
       if (retry) { retry.disabled = false; retry.textContent = "Check approval again"; }
     }
@@ -10183,7 +10394,10 @@
     }
 
     function openStudentOrderForm(item) {
-      const email = String(currentDashboardData && currentDashboardData.email || "").trim().toLowerCase();
+      const loginEmail = String(currentDashboardData && currentDashboardData.email || "").trim().toLowerCase();
+      const profileIdentity = currentUserProfile || {};
+      const schoolEmail = String(profileIdentity.schoolEmail || (loginEmail.endsWith("@mvla.net") ? loginEmail : "")).trim().toLowerCase();
+      const studentId = String(profileIdentity.studentId || studentIdFromEmail(schoolEmail) || "Not available");
       const editing = Boolean(item && item.portalSubmissionId);
       const name = getDisplayName();
       const quantity = Number(orderFormValue(item, "numericQuantity", 1)) || 1;
@@ -10200,8 +10414,9 @@
         <form class="student-order-form" id="student-order-form" data-submission-id="${escapeAttribute(orderFormValue(item, "portalSubmissionId", ""))}" onsubmit="submitStudentOrder(event)" oninput="scheduleStudentOrderPreview()">
           <div class="student-order-identity">
             <div><span class="field-label">Name</span><strong>${escapeHTML(name)}</strong></div>
-            <div><span class="field-label">Student ID</span><strong>${escapeHTML(studentIdFromEmail(email))}</strong></div>
-            <div><span class="field-label">Verified email</span><strong>${escapeHTML(email)}</strong></div>
+            <div><span class="field-label">Student ID</span><strong>${escapeHTML(studentId)}</strong></div>
+            <div><span class="field-label">School email</span><strong>${escapeHTML(schoolEmail || "Not set")}</strong></div>
+            <div><span class="field-label">Google login</span><strong>${escapeHTML(loginEmail)}</strong></div>
           </div>
           <input type="hidden" name="name" value="${escapeAttribute(name)}">
           <div class="student-order-grid">
@@ -10858,6 +11073,13 @@
       const k12Queue = queue.filter(function(item) {
         return ["K12_READY","K12_SELECTED"].includes(String(item.state || "").toUpperCase());
       });
+      const k12Recovery = queue.filter(function(item) {
+        const state = String(item.state || "").toUpperCase();
+        return ["K12_RUNNING","WAITING_FOR_MANUAL_SUBMISSION","FAILED","BLOCKED"].includes(state)
+          && Boolean(item.minutesReadyAt)
+          && !String(item.trackingLink || "").trim()
+          && !String(item.k12SubmittedAt || "").trim();
+      });
 
       const revision = String(data.revision || "");
       if (treasuryK12SeedRevision !== revision) {
@@ -10892,7 +11114,7 @@
         <section class="stats-grid" aria-label="Treasury automation summary">
           ${summaryCard("Ready for minutes", Number(data.readyCount || 0), "Purchase gates clear")}
           ${summaryCard("Minutes worker", minutesWaiting.length, appActive ? "Worker currently running" : "Internal worker state")}
-          ${summaryCard("Ready for K12", Number(data.k12ReadyCount || 0), "Minutes + links complete")}
+          ${summaryCard("Ready for K12", Number(data.k12ReadyCount || 0), "Meeting minutes complete")}
           ${summaryCard("Active approval batches", Number(data.activeBatchCount || 0), "Submitted to InformedK12")}
         </section>
 
@@ -10927,11 +11149,12 @@
           <div class="treasury-toolbar">
             <div>
               <h2 class="stats-section-title" style="margin:0">2. Choose the next K12 form</h2>
-              <p class="section-caption" style="margin-top:4px">As soon as the meeting-minutes and pre-approval links documents finish, those items move here automatically. The first 10 are selected by default. Exclude anything that cannot go in this K12 form; excluded items stay Ready for K12 for later.</p>
+              <p class="section-caption" style="margin-top:4px">As soon as the meeting-minutes document finishes, those items move here automatically. The links document is created only after you choose the exact K12 rows and press Run K12. The first 10 are selected by default. Exclude anything that cannot go in this K12 form; excluded items stay Ready for K12 for later.</p>
             </div>
             <div class="treasury-selection-actions">
               <button class="button" type="button" onclick="selectTreasuryK12FirstTen()" ${k12Queue.length ? "" : "disabled"}>Select first 10</button>
               <button class="button button-quiet" type="button" onclick="clearTreasuryK12Selection()" ${treasuryK12Selection.size ? "" : "disabled"}>Exclude all</button>
+              ${k12Recovery.length ? `<button class="button danger-button" type="button" onclick="confirmResetK12AttemptV27()">Reset K12 attempt (${k12Recovery.length})</button>` : ""}
               ${appConfigured
                 ? (appActive
                     ? `<button class="button danger-button" type="button" onclick="cancelTreasuryAppWorker(this)">Cancel App worker</button>`
@@ -10940,6 +11163,7 @@
             </div>
           </div>
           <div class="treasury-k12-summary"><strong>${k12Queue.length}</strong> waiting for K12 · <strong>${treasuryK12Selection.size}</strong> included in the next form · excluded items remain Ready for K12.</div>
+          ${k12Recovery.length ? `<div class="approval-note warning" style="margin:10px 0"><strong>${k12Recovery.length} pre-submit K12 attempt${k12Recovery.length===1?" is":"s are"} stuck.</strong> Reset K12 attempt returns only safe, unsubmitted rows to Ready for K12 and preserves meeting minutes.</div>` : ""}
           <div class="treasury-stage-grid">${k12Queue.length ? k12Queue.map(renderTreasuryK12Row).join("") : `<div class="no-results">Generate meeting minutes first; successful items appear here automatically.</div>`}</div>
         </section>
 
@@ -10977,7 +11201,7 @@
       const total = selected.reduce(function(sum,item) { return sum + Number(item.totalCost || 0); },0);
       openPortalModal(`
         <div class="portal-modal-head">
-          <div><h2 class="portal-modal-title" id="portal-modal-title">Generate meeting minutes for ${selected.length} item${selected.length === 1 ? "" : "s"}?</h2><p class="portal-modal-copy">This starts App.java immediately. It creates BOTH the meeting-minutes document and the pre-approval links document for every selected item, then moves each successful item to Ready for K12. It stops there: it does not open InformedK12 and does not mark Master M.</p></div>
+          <div><h2 class="portal-modal-title" id="portal-modal-title">Generate meeting minutes for ${selected.length} item${selected.length === 1 ? "" : "s"}?</h2><p class="portal-modal-copy">This starts App.java immediately. It creates the meeting-minutes document only, then moves each successful item to Ready for K12. The pre-approval links document is created later from the exact rows you select for K12. It stops there: it does not open InformedK12 and does not mark Master M.</p></div>
           <button class="modal-close" type="button" onclick="closePortalModal()" aria-label="Close">×</button>
         </div>
         <div class="compact-list" style="max-height:46vh;overflow:auto">
@@ -11001,7 +11225,7 @@
           savedTreasuryAutomation = result.data || savedTreasuryAutomation;
           closePortalModal();
           renderTreasuryAutomation(savedTreasuryAutomation || {});
-          showToast("Documents worker started. Meeting minutes + pre-approval links will be generated first; successful items then move to Ready for K12.");
+          showToast("Meeting-minutes worker started. Successful items will move to Ready for K12; the links document will be generated only after the exact K12 selection is confirmed.");
           window.setTimeout(function() { savedTreasuryAutomation = null; showTreasuryAutomation(); }, 1400);
         })
         .catch(function(error) {
@@ -12335,7 +12559,7 @@
         ["PRINTING","3D printing jobs","Clears print requests and trashes the portal-managed STL storage folder. Printer roster is preserved."],
         ["INBOX","Inbox / messages","Clears portal message threads and automated Inbox messages."],
         ["BUDGET_APPROVALS","Budget approvals","Clears item-level budget/high-value approval request state, then recalculates gates."],
-        ["EXTERNAL_APPROVALS","External approvals","Clears external-account approval decisions and recalculates email gates."],
+        ["EXTERNAL_APPROVALS","Account approvals","Clears external-account approval decisions and recalculates email gates."],
         ["EVENT_BUDGETS","Custom event budgets","Clears custom budget rows and restores the normal seeded/default budget sheet behavior."],
         ["PRINTER_ROSTER","Printer roster","Clears added printer volunteers and restores the built-in printer roster."],
         ["ACCESS_LOG","Login history","Clears portal access/login history only."],
