@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#111111">
-  <meta name="scioly-portal-build" content="v28.3.1-dev-team-tracker-exec-only">
+  <meta name="scioly-portal-build" content="v28.3-dev-team-tracker">
   <meta name="scioly-portal-version" content="v28.3-dev">
   <title>SciOly Orders</title>
   <script>
@@ -805,7 +805,7 @@
 
     /* v22: pre-authentication is a clean centered sign-in screen */
     #app-shell[hidden] { display:none !important; }
-    #login-page[hidden], #sign-in-loading[hidden], #waitlist-page[hidden], #identity-page[hidden] { display:none !important; }
+    #login-page[hidden], #sign-in-loading[hidden], #waitlist-page[hidden], #account-type-page[hidden], #identity-page[hidden] { display:none !important; }
     body:not(.portal-authenticated) #app-shell { display:none !important; }
     body:not(.portal-authenticated) #login-page:not([hidden]) {
       position:fixed !important;
@@ -4397,7 +4397,7 @@
 
 
     /* ======================================================================
-       v28.3.1 DEV · Competition tracker
+       v28.3 DEV · Competition tracker
        ====================================================================== */
     .tracker-dev-note { border:1px solid var(--line-strong); background:var(--surface-soft); border-radius:14px; padding:12px 14px; display:flex; gap:10px; align-items:flex-start; margin:14px 0 18px; }
     .tracker-dev-note strong { display:block; margin-bottom:2px; }
@@ -4436,49 +4436,17 @@
     .tracker-result-row { border:1px solid var(--line); border-radius:12px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
     .tracker-result-row strong { display:block; }
     .tracker-result-place { font-size:18px; font-weight:800; white-space:nowrap; }
+    .account-type-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:22px 0 8px; }
+    .account-type-choice { appearance:none; text-align:left; border:1px solid var(--line); border-radius:16px; background:var(--surface); padding:18px; cursor:pointer; color:var(--ink); transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease; }
+    .account-type-choice:hover { transform:translateY(-1px); border-color:var(--ink-muted); box-shadow:0 8px 24px rgba(0,0,0,.08); }
+    .account-type-choice:disabled { cursor:wait; opacity:.65; transform:none; }
+    .account-type-choice strong { display:block; font-size:18px; margin-bottom:6px; }
+    .account-type-choice span { display:block; color:var(--ink-muted); line-height:1.45; }
+    .mentor-review-note { margin-top:12px; border:1px solid var(--line); border-radius:12px; padding:11px 12px; background:var(--surface-soft); font-size:13px; line-height:1.45; }
+    .mentor-review-note.flagged { border-color:#b57600; }
+    @media (max-width:620px) { .account-type-grid { grid-template-columns:1fr; } }
     @media (max-width:780px) { .tracker-admin-grid { grid-template-columns:1fr; } .tracker-search-row { align-items:stretch; flex-direction:column; } }
 
-  </style>
-
-  <style id="order-modal-scroll-fix-v2832">
-    /* v28.3.2 DEV: restore scrolling for long portal modals/order forms.
-       A later rounded-card rule used overflow:hidden !important on
-       .portal-modal-card, which clipped the bottom of the order form. */
-    .portal-modal {
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .portal-modal-card {
-      max-height: min(760px, calc(100dvh - 44px));
-      overflow-x: hidden !important;
-      overflow-y: auto !important;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-    }
-
-    #portal-modal-content {
-      min-height: 0;
-    }
-
-    .student-order-form {
-      padding-bottom: max(8px, env(safe-area-inset-bottom));
-    }
-
-    @media (max-width: 680px) {
-      .portal-modal {
-        place-items: start center;
-        padding: 10px;
-      }
-
-      .portal-modal-card {
-        width: 100%;
-        max-height: calc(100dvh - 20px);
-        padding: 20px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -4492,7 +4460,7 @@
         </div>
       </div>
       <h1>Your orders,<br>without the guesswork.</h1>
-      <p class="login-copy">Sign in with your personal Gmail. The first time, you’ll enter your school email and Student ID so Treasury can link your existing orders.</p>
+      <p class="login-copy">School @mvla.net accounts are students automatically. If you sign in with Gmail, choose Student or Mentor; student Gmails link a school email + Student ID, while mentor Gmails skip that step. All Gmail accounts still require Treasury approval.</p>
       <div class="google-wrap">
         <div id="g_id_onload"
           data-client_id="483790698157-mk3l3ugqgvh4uv10q3bng2g9j8j3vp8q.apps.googleusercontent.com"
@@ -4540,7 +4508,30 @@
       <p id="waitlist-message">Your personal Gmail must be linked to a school identity and approved by Treasury.</p>
       <div class="waitlist-actions">
         <button class="button button-primary" id="waitlist-retry-button" type="button" onclick="retryWaitlistApproval()">Check approval again</button>
-        <button class="button" type="button" onclick="editIdentityClaim()">Edit school identity</button>
+        <button class="button" id="waitlist-edit-identity" type="button" onclick="editIdentityClaim()">Edit student identity</button>
+        <button class="button button-quiet" type="button" onclick="returnToLogin()">Use a different Google account</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="identity-page" id="account-type-page" hidden>
+    <div class="identity-card">
+      <div class="brand-mark" aria-hidden="true">SO</div>
+      <h2>Are you a student or mentor?</h2>
+      <p>This choice is recorded with your Gmail and shown to Treasury during approval.</p>
+      <div class="identity-login-email" id="account-type-login-email">Signed-in Google account</div>
+      <div class="account-type-grid">
+        <button class="account-type-choice" id="choose-student-type" type="button" onclick="choosePortalAccountType('STUDENT', this)">
+          <strong>Student</strong>
+          <span>I have an @mvla.net school email and Student ID. I’ll enter those next.</span>
+        </button>
+        <button class="account-type-choice" id="choose-mentor-type" type="button" onclick="choosePortalAccountType('MENTOR', this)">
+          <strong>Mentor</strong>
+          <span>I’m a mentor. Skip school email and Student ID, then send this Gmail to Treasury for approval.</span>
+        </button>
+      </div>
+      <div class="identity-error" id="account-type-error" role="alert"></div>
+      <div class="waitlist-actions">
         <button class="button button-quiet" type="button" onclick="returnToLogin()">Use a different Google account</button>
       </div>
     </div>
@@ -4568,6 +4559,7 @@
       <div class="identity-error" id="identity-error" role="alert"></div>
       <div class="waitlist-actions">
         <button class="button button-primary" id="identity-submit" type="submit">Submit identity for approval</button>
+        <button class="button" id="identity-mentor-switch" type="button" onclick="changeAccountTypeFromIdentity()">I’m a mentor instead</button>
         <button class="button button-quiet" type="button" onclick="returnToLogin()">Use a different Google account</button>
       </div>
     </form>
@@ -4907,12 +4899,14 @@
       currentDashboardData = buildPreviewDashboard(currentIsExecutive);
       if (currentIsSuperAdmin) currentDashboardData.email = "jn.chaw7@gmail.com";
       currentUserProfile = previewFirstTime
-        ? { name: "", schoolEmail:"", studentId:"", identityComplete:false, needsIdentity:true, needsName: true, onboardingComplete: false, needsOnboarding: true }
+        ? { name: "", schoolEmail:"", studentId:"", accountType:"", identityComplete:false, needsAccountType:true, needsIdentity:true, needsName: true, onboardingComplete: false, needsOnboarding: true }
         : {
             name: currentIsExecutive ? "Preview Executive" : "Preview Student",
             schoolEmail: currentIsExecutive ? "100034572@mvla.net" : "100039999@mvla.net",
             studentId: currentIsExecutive ? "100034572" : "100039999",
+            accountType: "STUDENT",
             identityComplete: true,
+            needsAccountType: false,
             needsIdentity: false,
             needsName: false,
             onboardingComplete: true,
@@ -5111,6 +5105,7 @@
         entries: [
           {
             email: "mentor.robotics@gmail.com",
+            accountType: "MENTOR", mentorSelfDeclared: true, mentorReviewFlag: true, claimedRole: "MENTOR",
             status: "PENDING",
             firstSeen: new Date(Date.now() - 2 * 3600000).toISOString(),
             updatedAt: "",
@@ -5126,6 +5121,7 @@
           },
           {
             email: "astronomy.coach@gmail.com",
+            accountType: "MENTOR", mentorSelfDeclared: true, mentorReviewFlag: false, claimedRole: "MENTOR",
             status: "PENDING",
             firstSeen: new Date(Date.now() - 25 * 60000).toISOString(),
             updatedAt: "",
@@ -5138,6 +5134,7 @@
           },
           {
             email: "approved.mentor@gmail.com",
+            accountType: "MENTOR", mentorSelfDeclared: true, mentorReviewFlag: false, claimedRole: "MENTOR",
             status: "APPROVED",
             firstSeen: new Date(Date.now() - 7 * 86400000).toISOString(),
             updatedAt: new Date(Date.now() - 6 * 86400000).toISOString(),
@@ -5150,6 +5147,7 @@
           },
           {
             email: "unknown.sender@gmail.com",
+            accountType: "STUDENT", mentorSelfDeclared: false, mentorReviewFlag: false, claimedRole: "STUDENT",
             status: "REJECTED",
             firstSeen: new Date(Date.now() - 3 * 86400000).toISOString(),
             updatedAt: new Date(Date.now() - 3 * 86400000).toISOString(),
@@ -5761,6 +5759,10 @@
     function loadDashboard() {
       apiRequest({ action: "login" })
         .then(function(result) {
+          if (result.type === "accountTypeRequired") {
+            showAccountTypeScreen(result);
+            return;
+          }
           if (result.type === "identityRequired") {
             showIdentityClaimScreen(result);
             return;
@@ -5810,6 +5812,7 @@
           setSignInLoading(false);
           document.body.classList.remove("portal-authenticated");
           document.getElementById("app-shell").hidden = true;
+          document.getElementById("account-type-page").hidden = true;
           document.getElementById("identity-page").hidden = true;
           document.getElementById("waitlist-page").hidden = true;
           document.getElementById("login-page").hidden = false;
@@ -5823,6 +5826,7 @@
       const displayName = getDisplayName();
       document.getElementById("login-page").hidden = true;
       document.getElementById("waitlist-page").hidden = true;
+      document.getElementById("account-type-page").hidden = true;
       document.getElementById("identity-page").hidden = true;
       setSignInLoading(false);
       document.getElementById("app-shell").hidden = false;
@@ -8534,7 +8538,7 @@
           if (currentPage === "approvals") renderExternalApprovals(savedExternalApprovals);
         })
         .catch(function(error) {
-          if (currentPage === "approvals") document.getElementById("page-content").innerHTML = pageHeader("Account approvals", "Review personal Gmail ↔ school identity mappings.", false) + emptyState("!", "Unable to load approvals", error.message || "Please try again.", false);
+          if (currentPage === "approvals") document.getElementById("page-content").innerHTML = pageHeader("Account approvals", "Review Gmail Student / Mentor selections and student identity mappings.", false) + emptyState("!", "Unable to load approvals", error.message || "Please try again.", false);
         });
     }
 
@@ -8547,7 +8551,7 @@
         if (String(entry.status || "PENDING").toUpperCase() !== status) return false;
         if (!query) return true;
         const itemNames = Array.isArray(entry.items) ? entry.items.map(function(item) { return item.itemName; }) : [];
-        const haystack = [entry.email, entry.claimedName, entry.schoolEmail, entry.studentId]
+        const haystack = [entry.email, entry.claimedName, entry.schoolEmail, entry.studentId, entry.accountType, entry.claimedRole]
           .concat(entry.names || [], entry.events || [], itemNames)
           .join(" ")
           .toLowerCase();
@@ -8555,7 +8559,7 @@
       });
 
       document.getElementById("page-content").innerHTML = `
-        ${pageHeader("Account approvals", "Approve the personal Gmail linked to each claimed school identity.", false)}
+        ${pageHeader("Account approvals", "Review each Gmail, including whether it self-selected Student or Mentor, before approving access.", false)}
 
         <section class="approval-summary" aria-label="External account summary">
           ${summaryCard("Waiting", Number(data.pendingCount || 0), "Requires a decision")}
@@ -8588,27 +8592,40 @@
     function renderExternalApprovalEntry(entry) {
       const status = String(entry.status || "PENDING").toUpperCase();
       const statusClass = status.toLowerCase();
+      const accountType = String(entry.accountType || "").toUpperCase();
+      const isMentor = accountType === "MENTOR";
+      const typeLabel = isMentor ? "Mentor" : accountType === "STUDENT" ? "Student" : "Not chosen";
       const names = entry.claimedName || (Array.isArray(entry.names) && entry.names.length ? entry.names.join(", ") : "Name unavailable");
       const events = Array.isArray(entry.events) && entry.events.length ? entry.events.join(", ") : "No event listed";
       const items = Array.isArray(entry.items) ? entry.items : [];
       const encodedEmail = encodeURIComponent(String(entry.email || "")).replace(/'/g, "%27");
+      const accessLabel = entry.claimedRole === "SUPER_ADMIN" ? "Super admin"
+        : entry.claimedRole === "EXECUTIVE" ? "Executive"
+        : entry.claimedRole === "MENTOR" ? "Mentor"
+        : "Student";
+      const mentorNote = isMentor
+        ? `<div class="mentor-review-note ${entry.mentorReviewFlag ? "flagged" : ""}"><strong>Mentor self-selection:</strong> This Gmail chose Mentor, so school email and Student ID were intentionally skipped. ${entry.mentorReviewFlag ? "Extra review recommended: this account also has order history or stored student-identity data." : "Verify that this person is actually a mentor before approving."}</div>`
+        : "";
+
       return `
         <details class="approval-entry">
           <summary>
             <div>
               <div class="approval-email">${escapeHTML(entry.email || "Unknown email")}</div>
-              <div class="approval-meta">${escapeHTML(names)} · ${Number(entry.orderCount || 0)} ${Number(entry.orderCount || 0) === 1 ? "order" : "orders"} · $${money(entry.totalCost)}</div>
+              <div class="approval-meta">${escapeHTML(typeLabel)} · ${escapeHTML(names)} · ${Number(entry.orderCount || 0)} ${Number(entry.orderCount || 0) === 1 ? "order" : "orders"} · $${money(entry.totalCost)}</div>
             </div>
             <span class="approval-status ${statusClass}">${status === "PENDING" ? "Waiting" : capitalize(status)}</span>
             <span class="login-history-chevron" aria-hidden="true">⌄</span>
           </summary>
           <div class="approval-detail">
-            <div class="approval-meta"><strong style="color:var(--ink)">School email:</strong> ${escapeHTML(entry.schoolEmail || "Not submitted")}</div>
-            <div class="approval-meta"><strong style="color:var(--ink)">Student ID:</strong> ${escapeHTML(entry.studentId || "Not submitted")}</div>
-            <div class="approval-meta"><strong style="color:var(--ink)">Access after approval:</strong> ${escapeHTML(entry.claimedRole === "SUPER_ADMIN" ? "Super admin" : entry.claimedRole === "EXECUTIVE" ? "Executive" : "Student")}</div>
+            <div class="approval-meta"><strong style="color:var(--ink)">Selected account type:</strong> ${escapeHTML(isMentor ? "Mentor (self-declared)" : accountType === "STUDENT" ? "Student" : "Not chosen")}</div>
+            ${!isMentor ? `<div class="approval-meta"><strong style="color:var(--ink)">School email:</strong> ${escapeHTML(entry.schoolEmail || "Not submitted")}</div>` : ""}
+            ${!isMentor ? `<div class="approval-meta"><strong style="color:var(--ink)">Student ID:</strong> ${escapeHTML(entry.studentId || "Not submitted")}</div>` : ""}
+            <div class="approval-meta"><strong style="color:var(--ink)">Access after approval:</strong> ${escapeHTML(accessLabel)}</div>
             <div class="approval-meta"><strong style="color:var(--ink)">Events:</strong> ${escapeHTML(events)}</div>
             <div class="approval-meta"><strong style="color:var(--ink)">First detected:</strong> ${escapeHTML(formatFullAccessTime(entry.firstSeen))}</div>
             ${entry.updatedBy ? `<div class="approval-meta"><strong style="color:var(--ink)">Last decision:</strong> ${escapeHTML(formatFullAccessTime(entry.updatedAt))} by ${escapeHTML(entry.updatedBy)}</div>` : ""}
+            ${mentorNote}
             <div class="approval-order-list">
               ${items.length ? items.map(function(item) {
                 const link = safeHttpUrl(item.link);
@@ -8620,7 +8637,7 @@
               ${status !== "REJECTED" ? `<button class="button" type="button" onclick="changeExternalApproval(event,'${encodedEmail}','REJECTED',this)">Reject sender</button>` : ""}
               ${status !== "PENDING" ? `<button class="button button-quiet" type="button" onclick="changeExternalApproval(event,'${encodedEmail}','PENDING',this)">Move to waiting</button>` : ""}
             </div>
-            <div class="approval-note">The decision applies only to this exact email address. It does not approve a different Gmail address belonging to the same person.</div>
+            <div class="approval-note">The decision applies only to this exact email address. For mentors, the Student / Mentor choice is self-declared and should be verified by Treasury.</div>
           </div>
         </details>
       `;
@@ -10067,7 +10084,7 @@
 
       if (currentIsSuperAdmin) {
         clickStep("#nav-approvals",currentIsExecutive ? "budgets" : "materials","Now click Account approvals","Personal Gmail identity approval is separate from purchasing approval.","Account approvals button");
-        explain("#page-content","approvals","Gmail identity decisions live on their own page","Admins can verify each Gmail, school email, and Student ID mapping without mixing identity approval with purchase approval.");
+        explain("#page-content","approvals","Gmail identity decisions live on their own page","Admins can verify each Gmail’s Student / Mentor selection and, for students, the school email + Student ID mapping without mixing identity approval with purchase approval.");
 
         clickStep("#nav-treasury","approvals","Now click Treasury automation","This is where exact purchase rows become a worker batch.","Treasury automation button");
         explain(".treasury-queue-list","treasury","Treasury batching uses the real queue layout","Only cleared rows are selectable. First generate meeting minutes for the queued rows. Those rows then move to the K12 queue, where you can exclude items that must wait for a later form. Master M is marked only after a real K12 tracking submission is captured.");
@@ -10356,6 +10373,65 @@
       });
     }
 
+    function showAccountTypeScreen(result) {
+      signInRequestInFlight = false;
+      setSignInLoading(false);
+      document.body.classList.remove("portal-authenticated");
+      document.getElementById("login-page").hidden = true;
+      document.getElementById("app-shell").hidden = true;
+      document.getElementById("waitlist-page").hidden = true;
+      document.getElementById("identity-page").hidden = true;
+      document.getElementById("account-type-page").hidden = false;
+
+      currentUserProfile = result && result.profile || currentUserProfile || {};
+      if (!currentDashboardData) currentDashboardData = { items:[], totalCost:0 };
+      if (result && result.email) currentDashboardData.email = result.email;
+      document.getElementById("account-type-login-email").textContent = "Signed in as " + String(result && result.email || "Google account");
+      document.getElementById("account-type-error").textContent = "";
+      ["choose-student-type", "choose-mentor-type"].forEach(function(id) {
+        const button = document.getElementById(id);
+        if (button) button.disabled = false;
+      });
+    }
+
+    function choosePortalAccountType(accountType, button) {
+      const normalizedType = String(accountType || "").toUpperCase();
+      const error = document.getElementById("account-type-error");
+      const buttons = [document.getElementById("choose-student-type"), document.getElementById("choose-mentor-type")];
+      if (error) error.textContent = "";
+      buttons.forEach(function(item) { if (item) item.disabled = true; });
+      if (button) button.disabled = true;
+
+      apiRequest({ action:"chooseAccountType", accountType:normalizedType })
+        .then(function(result) {
+          currentUserProfile = result.profile || currentUserProfile || {};
+          if (!currentDashboardData) currentDashboardData = { items:[], totalCost:0 };
+          if (result.email) currentDashboardData.email = result.email;
+          document.getElementById("account-type-page").hidden = true;
+
+          if (result.type === "identityRequired") {
+            showIdentityClaimScreen(result);
+            return;
+          }
+          if (result.type === "waitlisted") {
+            showWaitlistScreen(result);
+            return;
+          }
+          throw new Error(result.message || "Unable to save the account type.");
+        })
+        .catch(function(err) {
+          if (error) error.textContent = err.message || "Unable to save the account type.";
+          buttons.forEach(function(item) { if (item) item.disabled = false; });
+        });
+    }
+
+    function changeAccountTypeFromIdentity() {
+      showAccountTypeScreen({
+        email: currentDashboardData && currentDashboardData.email || "",
+        profile: currentUserProfile || {}
+      });
+    }
+
     function showIdentityClaimScreen(result) {
       signInRequestInFlight = false;
       setSignInLoading(false);
@@ -10363,6 +10439,7 @@
       document.getElementById("login-page").hidden = true;
       document.getElementById("app-shell").hidden = true;
       document.getElementById("waitlist-page").hidden = true;
+      document.getElementById("account-type-page").hidden = true;
       document.getElementById("identity-page").hidden = false;
 
       const profile = result && result.profile || {};
@@ -10377,6 +10454,13 @@
 
     function editIdentityClaim() {
       const profile = currentUserProfile || {};
+      if (String(profile.accountType || "").toUpperCase() === "MENTOR") {
+        showAccountTypeScreen({
+          email: currentDashboardData && currentDashboardData.email || "",
+          profile: profile
+        });
+        return;
+      }
       showIdentityClaimScreen({
         email: currentDashboardData && currentDashboardData.email || "",
         profile: profile
@@ -10417,6 +10501,7 @@
       signInRequestInFlight = false;
       setSignInLoading(false);
       document.getElementById("login-page").hidden = true;
+      document.getElementById("account-type-page").hidden = true;
       document.getElementById("identity-page").hidden = true;
       document.getElementById("app-shell").hidden = true;
       document.getElementById("waitlist-page").hidden = false;
@@ -10426,15 +10511,22 @@
       if (result.email) currentDashboardData.email = result.email;
 
       const profile = result.profile || {};
+      const accountType = String(profile.accountType || "").toUpperCase();
+      const isMentor = accountType === "MENTOR";
       const identityBits = [];
-      if (profile.schoolEmail) identityBits.push(profile.schoolEmail);
-      if (profile.studentId) identityBits.push("Student ID " + profile.studentId);
+      if (accountType) identityBits.push(isMentor ? "Mentor account" : "Student account");
+      if (!isMentor && profile.schoolEmail) identityBits.push(profile.schoolEmail);
+      if (!isMentor && profile.studentId) identityBits.push("Student ID " + profile.studentId);
       document.getElementById("waitlist-identity").textContent = identityBits.join(" · ");
 
       const rejected = String(result.status || "").toUpperCase() === "REJECTED";
       document.getElementById("waitlist-title").textContent = rejected ? "Account not approved" : "Waiting for approval";
       document.getElementById("waitlist-status").textContent = rejected ? "Needs review again" : "Waiting for Treasury review";
-      document.getElementById("waitlist-message").textContent = result.message || "Treasury must approve this Gmail ↔ school identity mapping before you can enter the portal.";
+      document.getElementById("waitlist-message").textContent = result.message || (isMentor
+        ? "Treasury must verify this mentor Gmail before you can enter the portal."
+        : "Treasury must approve this Gmail ↔ school identity mapping before you can enter the portal.");
+      const edit = document.getElementById("waitlist-edit-identity");
+      if (edit) edit.textContent = isMentor ? "Change student / mentor choice" : "Edit student identity";
       const retry = document.getElementById("waitlist-retry-button");
       if (retry) { retry.disabled = false; retry.textContent = "Check approval again"; }
     }
@@ -10447,6 +10539,7 @@
       const button = document.getElementById("waitlist-retry-button");
       if (button) { button.disabled = true; button.textContent = "Checking…"; }
       document.getElementById("waitlist-page").hidden = true;
+      document.getElementById("account-type-page").hidden = true;
       setSignInLoading(true);
       loadDashboard();
     }
@@ -10501,8 +10594,10 @@
     function openStudentOrderForm(item) {
       const loginEmail = String(currentDashboardData && currentDashboardData.email || "").trim().toLowerCase();
       const profileIdentity = currentUserProfile || {};
-      const schoolEmail = String(profileIdentity.schoolEmail || (loginEmail.endsWith("@mvla.net") ? loginEmail : "")).trim().toLowerCase();
-      const studentId = String(profileIdentity.studentId || studentIdFromEmail(schoolEmail) || "Not available");
+      const accountType = String(profileIdentity.accountType || (loginEmail.endsWith("@mvla.net") ? "STUDENT" : "")).toUpperCase();
+      const isMentor = accountType === "MENTOR";
+      const schoolEmail = isMentor ? "" : String(profileIdentity.schoolEmail || (loginEmail.endsWith("@mvla.net") ? loginEmail : "")).trim().toLowerCase();
+      const studentId = isMentor ? "" : String(profileIdentity.studentId || studentIdFromEmail(schoolEmail) || "Not available");
       const editing = Boolean(item && item.portalSubmissionId);
       const name = getDisplayName();
       const quantity = Number(orderFormValue(item, "numericQuantity", 1)) || 1;
@@ -10519,8 +10614,9 @@
         <form class="student-order-form" id="student-order-form" data-submission-id="${escapeAttribute(orderFormValue(item, "portalSubmissionId", ""))}" onsubmit="submitStudentOrder(event)" oninput="scheduleStudentOrderPreview()">
           <div class="student-order-identity">
             <div><span class="field-label">Name</span><strong>${escapeHTML(name)}</strong></div>
-            <div><span class="field-label">Student ID</span><strong>${escapeHTML(studentId)}</strong></div>
-            <div><span class="field-label">School email</span><strong>${escapeHTML(schoolEmail || "Not set")}</strong></div>
+            <div><span class="field-label">Account type</span><strong>${escapeHTML(isMentor ? "Mentor" : "Student")}</strong></div>
+            ${isMentor ? "" : `<div><span class="field-label">Student ID</span><strong>${escapeHTML(studentId)}</strong></div>`}
+            ${isMentor ? "" : `<div><span class="field-label">School email</span><strong>${escapeHTML(schoolEmail || "Not set")}</strong></div>`}
             <div><span class="field-label">Google login</span><strong>${escapeHTML(loginEmail)}</strong></div>
           </div>
           <input type="hidden" name="name" value="${escapeAttribute(name)}">
@@ -11414,12 +11510,6 @@
     }
 
     function renderTeamTracker(data) {
-      // Defense in depth: even if this renderer is invoked manually, a student
-      // session is redirected before any tracker UI can be rendered.
-      if (!currentIsExecutive) {
-        navigateTo("orders");
-        return;
-      }
       if (!currentIsExecutive) return navigateTo("orders");
       data = data || {};
       const summary = data.summary || {};
@@ -11429,7 +11519,7 @@
 
       document.getElementById("page-content").innerHTML = `
         ${pageHeader("Competition tracker","Track event placements across tournaments and build a weighted performance history for each student.",false)}
-        <div class="tracker-dev-note"><span aria-hidden="true">◇</span><div><strong>DEV build · isolated tracker data</strong><span class="list-meta">Executive-only. Students cannot view tracker stats, including their own. This version writes only to _TeamTrackerDEV_* sheets; existing orders, budgets, Treasury, profiles, and printing data are not changed.</span></div></div>
+        <div class="tracker-dev-note"><span aria-hidden="true">◇</span><div><strong>DEV build · isolated tracker data</strong><span class="list-meta">This version writes only to _TeamTrackerDEV_* sheets. Existing orders, budgets, Treasury, profiles, and printing data are not changed.</span></div></div>
         <section class="stats-grid" aria-label="Competition tracker summary">
           ${summaryCard("Students",Number(summary.activeStudents||0),"Active tracker roster")}
           ${summaryCard("Events",Number(summary.events||0),"Configured / imported")}
