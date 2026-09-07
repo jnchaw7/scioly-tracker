@@ -4448,6 +4448,110 @@
     @media (max-width:780px) { .tracker-admin-grid { grid-template-columns:1fr; } .tracker-search-row { align-items:stretch; flex-direction:column; } }
 
   </style>
+
+
+  <style id="order-modal-scroll-fix-v2832">
+    /* Preserved v28.3.2 fix: long portal/order modals must always scroll. */
+    .portal-modal {
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+    .portal-modal-card {
+      max-height: min(760px, calc(100dvh - 44px));
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+    #portal-modal-content { min-height: 0; }
+    .portal-modal-card .approval-actions { padding-bottom: max(2px, env(safe-area-inset-bottom)); }
+    @media (max-width:680px) {
+      .portal-modal { padding:10px; }
+      .portal-modal-card { width:100%; max-height:calc(100dvh - 20px); padding:20px; }
+    }
+  </style>
+
+  <style id="treasury-recovery-toolbox-v2833-styles">
+    .treasury-recovery-grid-v2833 {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+    .treasury-recovery-card-v2833 {
+      display:flex;
+      flex-direction:column;
+      gap:9px;
+      min-height:170px;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:var(--surface-soft);
+    }
+    .treasury-recovery-card-v2833.danger { border-color:#dfb4af; background:#fff8f7; }
+    .treasury-recovery-card-v2833 h3 { margin:0; font-size:12px; line-height:1.25; }
+    .treasury-recovery-card-v2833 p { margin:0; color:var(--muted); font-size:9.5px; line-height:1.5; flex:1; }
+    .treasury-recovery-count-v2833 { font-size:20px; line-height:1; font-weight:950; letter-spacing:-.04em; }
+    .treasury-recovery-list-v2833 { display:grid; gap:7px; max-height:44vh; overflow:auto; padding-right:2px; }
+    .treasury-recovery-row-v2833 {
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr);
+      gap:10px;
+      align-items:start;
+      padding:10px 11px;
+      border:1px solid var(--line);
+      border-radius:11px;
+      background:var(--surface-soft);
+    }
+    .treasury-recovery-row-v2833 input { width:16px; height:16px; margin-top:2px; }
+    .treasury-recovery-row-v2833 strong { display:block; font-size:10.5px; }
+    .treasury-recovery-row-v2833 span { display:block; margin-top:2px; color:var(--muted); font-size:9px; line-height:1.45; overflow-wrap:anywhere; }
+    .treasury-recovery-safety-v2833 { margin:10px 0; padding:10px 12px; border:1px solid #e6c36a; border-radius:11px; background:#fff9e8; font-size:9.5px; line-height:1.5; color:#6b5200; }
+    @media (max-width:680px) { .treasury-recovery-grid-v2833 { grid-template-columns:1fr; } }
+  </style>
+
+
+  <style id="portal-modal-scroll-fix-v2834">
+    /* v28.3.4: use the overlay as the single scroll container.
+       This avoids historical overflow:hidden rules on .portal-modal-card
+       trapping long forms such as Order one item. */
+    .portal-modal {
+      display: block !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      padding: 22px !important;
+    }
+    .portal-modal[hidden] {
+      display: none !important;
+    }
+    .portal-modal-card {
+      width: min(560px, 100%) !important;
+      max-height: none !important;
+      height: auto !important;
+      min-height: 0 !important;
+      margin: 0 auto !important;
+      overflow: visible !important;
+      contain: none !important;
+    }
+    #portal-modal-content {
+      min-height: 0 !important;
+      overflow: visible !important;
+    }
+    @media (max-width: 680px) {
+      .portal-modal {
+        padding: 10px !important;
+      }
+      .portal-modal-card {
+        width: 100% !important;
+        padding: 20px !important;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <section class="login-page" id="login-page">
@@ -14327,5 +14431,186 @@
 
 
 </script>
+
+
+  <script id="treasury-recovery-toolbox-v2833">
+    /* v28.3.3 — safe, selectable Treasury recovery controls. */
+    const TREASURY_RECOVERY_CONFIG_V2833 = {
+      BACK_TO_MINUTES: {
+        title:"Return to meeting minutes",
+        short:"Back to minutes",
+        tone:"danger",
+        copy:"Roll safe K12-ready/pre-submit rows back to the meeting-minutes stage. The previous minutes document stays in Drive for audit, but its queue binding is cleared. Your next minutes run creates a replacement document and can combine these rows with newly selected purchases.",
+        button:"Return selected to minutes",
+        done:"Selected rows are back in the meeting-minutes queue. Add any new purchases, then generate minutes again."
+      },
+      RESET_K12: {
+        title:"Reset failed K12 attempt",
+        short:"Reset K12",
+        tone:"",
+        copy:"For a failed or interrupted K12 attempt that was never submitted. Keeps the existing meeting-minutes document, clears only K12 batch/link/status markers, and returns the row to Ready for K12.",
+        button:"Reset selected K12 attempts",
+        done:"Selected K12 attempts were reset; meeting minutes were preserved."
+      },
+      RESET_MINUTES: {
+        title:"Unstick meeting-minutes attempt",
+        short:"Reset minutes",
+        tone:"",
+        copy:"For rows stuck in MINUTES_RUNNING, FAILED, or BLOCKED before any minutes document was successfully created. Returns them to QUEUED so the minutes worker can run them again.",
+        button:"Reset selected minutes attempts",
+        done:"Selected meeting-minutes attempts are ready to retry."
+      },
+      CLEAR_K12_SELECTION: {
+        title:"Clear K12 selection",
+        short:"Clear selection",
+        tone:"",
+        copy:"Changes selected K12 rows back from Included in next K12 to Ready for K12. Meeting minutes stay untouched and no purchase/order data is removed.",
+        button:"Clear selected K12 choices",
+        done:"Selected rows were removed from the next K12 form and remain Ready for K12."
+      },
+      RESTART_FROM_SCRATCH: {
+        title:"Restart Treasury workflow",
+        short:"Restart from scratch",
+        tone:"danger",
+        copy:"Completely releases safe pre-submit rows from Treasury automation. The original purchase remains intact and reappears as a normal candidate so you can start its Treasury workflow over from the beginning.",
+        button:"Restart selected rows",
+        done:"Selected rows were released from Treasury automation and can be selected again from the beginning."
+      }
+    };
+
+    function treasuryRecoveryHasQueueEvidenceV2833(item) {
+      const state = String(item && item.state || "").toUpperCase();
+      return Boolean(
+        String(item && item.trackingLink || "").trim() ||
+        String(item && item.k12SubmittedAt || "").trim() ||
+        String(item && item.firstSignatureAt || "").trim() ||
+        String(item && item.approvedAt || "").trim() ||
+        ["WAITING_SIGNATURE","TRACKING","COMPLETED","DONE"].includes(state)
+      );
+    }
+
+    function treasuryRecoveryRowsV2833(mode,data) {
+      const queue = Array.isArray(data && data.queue) ? data.queue : [];
+      return queue.filter(function(item) {
+        if (treasuryRecoveryHasQueueEvidenceV2833(item)) return false;
+        const state = String(item.state || "").toUpperCase();
+        const hasMinutes = Boolean(item.minutesReadyAt);
+        if (mode === "BACK_TO_MINUTES") return hasMinutes && ["K12_READY","K12_SELECTED","K12_RUNNING","WAITING_FOR_MANUAL_SUBMISSION","FAILED","BLOCKED"].includes(state);
+        if (mode === "RESET_K12") return hasMinutes && ["K12_RUNNING","WAITING_FOR_MANUAL_SUBMISSION","FAILED","BLOCKED"].includes(state);
+        if (mode === "RESET_MINUTES") return !hasMinutes && ["MINUTES_RUNNING","FAILED","BLOCKED"].includes(state);
+        if (mode === "CLEAR_K12_SELECTION") return state === "K12_SELECTED";
+        if (mode === "RESTART_FROM_SCRATCH") return ["QUEUED","MINUTES_RUNNING","FAILED","BLOCKED","K12_READY","K12_SELECTED","K12_RUNNING","WAITING_FOR_MANUAL_SUBMISSION"].includes(state);
+        return false;
+      });
+    }
+
+    function treasuryRecoveryCardV2833(mode,data) {
+      const cfg = TREASURY_RECOVERY_CONFIG_V2833[mode];
+      const count = treasuryRecoveryRowsV2833(mode,data).length;
+      return `<div class="treasury-recovery-card-v2833 ${cfg.tone || ""}">
+        <div class="treasury-recovery-count-v2833">${count}</div>
+        <h3>${escapeHTML(cfg.title)}</h3>
+        <p>${escapeHTML(cfg.copy)}</p>
+        <button class="button ${cfg.tone === "danger" ? "danger-button" : ""}" type="button" onclick="openTreasuryRecoveryV2833('${mode}')" ${count ? "" : "disabled"}>${escapeHTML(cfg.short)} (${count})</button>
+      </div>`;
+    }
+
+    function appendTreasuryRecoveryToolboxV2833(data) {
+      if (!currentIsSuperAdmin || currentPage !== "treasury") return;
+      const root = document.getElementById("page-content");
+      if (!root || document.getElementById("treasury-recovery-toolbox-v2833-section")) return;
+      root.insertAdjacentHTML("beforeend", `
+        <section class="stats-section" id="treasury-recovery-toolbox-v2833-section">
+          <div class="treasury-toolbar">
+            <div>
+              <h2 class="stats-section-title" style="margin:0">Recovery &amp; reset</h2>
+              <p class="section-caption" style="margin-top:4px">No spreadsheet editing required. Pick the exact rows and how far to roll them back. Rows with a real InformedK12 submission, tracking link, signature, approval, or Master processed marker are protected by the backend and cannot be reset here.</p>
+            </div>
+            <span class="admin-pill">Pre-submit only</span>
+          </div>
+          <div class="treasury-recovery-grid-v2833">
+            ${treasuryRecoveryCardV2833("BACK_TO_MINUTES",data)}
+            ${treasuryRecoveryCardV2833("RESET_K12",data)}
+            ${treasuryRecoveryCardV2833("RESET_MINUTES",data)}
+            ${treasuryRecoveryCardV2833("CLEAR_K12_SELECTION",data)}
+            ${treasuryRecoveryCardV2833("RESTART_FROM_SCRATCH",data)}
+          </div>
+        </section>
+      `);
+    }
+
+    function setTreasuryRecoveryChecksV2833(checked) {
+      document.querySelectorAll(".treasury-recovery-check-v2833").forEach(function(input) { input.checked = Boolean(checked); });
+    }
+
+    function openTreasuryRecoveryV2833(mode) {
+      if (!currentIsSuperAdmin) return;
+      const cfg = TREASURY_RECOVERY_CONFIG_V2833[mode];
+      if (!cfg) return;
+      const rows = treasuryRecoveryRowsV2833(mode,savedTreasuryAutomation || {});
+      if (!rows.length) return showToast("No safe rows are currently eligible for that recovery action.");
+
+      openPortalModal(`
+        <div class="portal-modal-head">
+          <div>
+            <h2 class="portal-modal-title" id="portal-modal-title">${escapeHTML(cfg.title)}</h2>
+            <p class="portal-modal-copy">${escapeHTML(cfg.copy)}</p>
+          </div>
+          <button class="modal-close" type="button" onclick="closePortalModal()" aria-label="Close">×</button>
+        </div>
+        <div class="treasury-recovery-safety-v2833"><strong>Safety rule:</strong> anything already submitted to InformedK12 is excluded here, and the server checks Master + the hidden queue again immediately before changing anything.</div>
+        <div class="approval-actions" style="margin:0 0 10px">
+          <button class="button" type="button" onclick="setTreasuryRecoveryChecksV2833(true)">Select all</button>
+          <button class="button button-quiet" type="button" onclick="setTreasuryRecoveryChecksV2833(false)">Select none</button>
+        </div>
+        <div class="treasury-recovery-list-v2833">
+          ${rows.map(function(item) {
+            const meta = [String(item.state || ""), item.minutesBatchId ? "Minutes " + item.minutesBatchId : "", item.batchId ? "K12 " + item.batchId : ""].filter(Boolean).join(" · ");
+            return `<label class="treasury-recovery-row-v2833"><input class="treasury-recovery-check-v2833" type="checkbox" value="${escapeAttribute(item.queueId || "")}" checked><span><strong>${escapeHTML(item.itemName || "Unnamed item")}</strong><span>${escapeHTML((item.personName || "Unknown") + " · " + (item.eventName || "Unassigned event"))}</span><span>${escapeHTML(meta)}</span></span></label>`;
+          }).join("")}
+        </div>
+        <div class="approval-actions">
+          <button class="button ${cfg.tone === "danger" ? "danger-button" : "button-primary"}" id="treasury-recovery-apply-v2833" type="button" onclick="applyTreasuryRecoveryV2833('${mode}',this)">${escapeHTML(cfg.button)}</button>
+          <button class="button button-quiet" type="button" onclick="closePortalModal()">Cancel</button>
+        </div>
+      `);
+    }
+
+    function applyTreasuryRecoveryV2833(mode,button) {
+      if (!currentIsSuperAdmin) return;
+      const cfg = TREASURY_RECOVERY_CONFIG_V2833[mode];
+      if (!cfg) return;
+      const ids = Array.from(document.querySelectorAll(".treasury-recovery-check-v2833:checked")).map(function(input) { return String(input.value || "").trim(); }).filter(Boolean);
+      if (!ids.length) return showToast("Select at least one row first.");
+      if (localPreviewMode) return showToast("Recovery actions require the connected DEV backend.");
+      if (button) { button.disabled = true; button.textContent = "Resetting…"; }
+
+      apiRequest({ action:"treasuryResetK12Attempt", mode:mode, queueIds:ids })
+        .then(function(result) {
+          if (result.type !== "treasuryAutomation") throw new Error(result.message || "Treasury recovery failed.");
+          savedTreasuryAutomation = result.data || {};
+          treasurySelection.clear();
+          treasuryK12Selection.clear();
+          treasuryK12SeedRevision = "";
+          treasuryRevision = String(savedTreasuryAutomation.revision || "");
+          closePortalModal();
+          renderTreasuryAutomation(savedTreasuryAutomation);
+          showToast(cfg.done);
+        })
+        .catch(function(error) {
+          showToast(error.message || "Treasury recovery failed.");
+          if (button) { button.disabled = false; button.textContent = cfg.button; }
+        });
+    }
+
+    // Wrap the final active Treasury renderer instead of editing older duplicate
+    // renderer definitions scattered through the historical single-file portal.
+    const renderTreasuryAutomationBeforeRecoveryV2833 = renderTreasuryAutomation;
+    renderTreasuryAutomation = function(data) {
+      renderTreasuryAutomationBeforeRecoveryV2833(data);
+      window.setTimeout(function() { appendTreasuryRecoveryToolboxV2833(data || {}); },0);
+    };
+  </script>
+
 </body>
 </html>
